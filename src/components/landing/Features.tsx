@@ -1,12 +1,45 @@
 import React from 'react';
 
 import config from '../../template/config/index.json';
+import { Code, Database, Grid, Palette } from 'lucide-react';
+import CardLanding from './CardLanding';
 
 const Features = () => {
   const { features } = config;
   const { title, subtitle, description, items: featuresList } = features;
+  const technologies = [
+    {
+      name: 'HTML',
+      icon: <Code className="w-12 h-12 text-blue-500" />,
+      description: 'Language de balisage pour structurer et presenter le contenu web',
+      features: ['Structure semantique', 'Accessibilite', 'SEO friendly'],
+      color: 'hover:border-blue-500'
+    },
+    {
+      name: 'CSS',
+      icon: <Palette className="w-12 h-12 text-blue-500" />,
+      description: 'Feuilles de style pour definir la presentation des documents HTML',
+      features: ['Responsive design', 'Animations', 'Flexbox/Grid'],
+      color: 'hover:border-blue-500'
+    },
+    {
+      name: 'PHP',
+      icon: <Database className="w-12 h-12 text-blue-500" />,
+      description: 'Language de programmation cote serveur pour sites web dynamiques',
+      features: ['Backend robuste', 'Gestion BDD', 'Securite'],
+      color: 'hover:border-blue-500'
+    },
+    {
+      name: 'BOOTSTRAP',
+      icon: <Grid className="w-12 h-12 text-blue-500" />,
+      description: 'Framework CSS pour developpement rapide interfaces responsive',
+      features: ['Composants prets', 'Systeme de grille', 'Personnalisable'],
+      color: 'hover:border-blue-500'
+    }
+  ];
+
   return (
-    <div className={`py-12 bg-background`} id="features">
+    <div className={`py-14 bg-background`} id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
           <h2
@@ -22,31 +55,11 @@ const Features = () => {
           </p>
         </div>
 
-        {/* <div className="mt-10">
-          <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-            {featuresList.map((feature) => (
-              <div key={feature.name} className="relative">
-                <dt>
-                  <div
-                    className={`absolute flex items-center justify-center h-12 w-12 rounded-md bg-background text-tertiary border-primary border-4`}
-                  >
-                    <img
-                      className={`inline-block h-6 w-6 rounded-full`}
-                      src={feature.icon}
-                      alt={feature.name}
-                    />
-                  </div>
-                  <p className="ml-16 text-lg leading-6 font-medium text-gray-900">
-                    {feature.name}
-                  </p>
-                </dt>
-                <dd className="mt-2 ml-16 text-base text-gray-500">
-                  {feature.description}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div> */}
+        <div className="grid pt-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {
+            technologies.map((tech,idx)=>{return <CardLanding key={idx} icon={tech.icon} name={tech.name} description={tech.description} features={tech.features} color={tech.color}/> })
+          }
+        </div>
       </div>
     </div>
   );

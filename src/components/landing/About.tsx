@@ -21,11 +21,16 @@ const About = () => {
             <a
               key={`${section.name}-${index}`}
               href={section.href}
-              className="hover:text-primary text-base cursor-pointer leading-4 text-gray-800 dark:text-gray-400 dark:hover:text-white"
+              className="hover:text-primary text-base cursor-pointer leading-4 text-gray-800"
             >
               {section.name}
             </a>
           ))}
+          <a
+            className="text-primary text-base cursor-pointer leading-4 text-gray-800"
+          >
+            Essayez maintenant
+          </a>
         </div>
         <div className="flex items-center gap-x-8 mt-6 h-8">
           <a
@@ -35,7 +40,7 @@ const About = () => {
             rel="noreferrer"
           >
             <svg
-              className="fill-current text-gray-800 dark:text-white hover:text-primary"
+              className="fill-current text-gray-800  hover:text-primary"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -51,7 +56,7 @@ const About = () => {
             rel="noreferrer"
           >
             <svg
-              className="fill-current text-gray-800 dark:text-white hover:text-primary"
+              className="fill-current text-gray-800  hover:text-primary"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -67,7 +72,7 @@ const About = () => {
             rel="noreferrer"
           >
             <svg
-              className="fill-current text-gray-800 dark:text-white hover:text-primary"
+              className="fill-current text-gray-800  hover:text-primary"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"

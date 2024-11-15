@@ -43,7 +43,7 @@ export default function Landing(){
       </LazyShow>
       <LazyShow>
         <>
-          <Canvas />
+          
           <About />
         </>
       </LazyShow>

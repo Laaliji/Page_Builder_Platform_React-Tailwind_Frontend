@@ -52,7 +52,7 @@ const Menu = () => {
                   duration={1000}
                   key={item.name}
                   to={item.href}
-                  className="font-medium text-gray-500 hover:text-gray-900"
+                  className="font-medium text-gray-500 hover:text-gray-900 cursor-pointer"
                 >
                   {item.name}
                 </Link>
@@ -61,7 +61,7 @@ const Menu = () => {
                 href="#"
                 className={`font-medium text-primary hover:text-secondary`}
               >
-                Call to action
+                Essayez maintenant
               </a>
             </div>
           </nav>
