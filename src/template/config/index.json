@@ -41,24 +41,24 @@
     }
   },
   "product": {
-    "title": "React landing page 2021",
+    "title": "Générateur de Sites Web 2024",
     "items": [
       {
-        "title": "A plug n play template",
-        "description": "Just edit the config.json file with details about your company and voila your beautiful state of the art landing page is ready to go live! Remember to also update your assets, add any images you want to show to /assets/images and link them in the config.json",
-        "img": "/assets/images/product1.jpg"
+        "title": "Créez un site web professionnel sans coder",
+        "description": "Notre modèle prêt-à-l'emploi vous permet de lancer rapidement un site web professionnel et sur-mesure. Concentrez-vous sur votre contenu, nous nous occupons de tout le reste - de la conception sans code à l'optimisation mobile, en passant par la personnalisation avancée. Notre interface intuitive vous donne le contrôle total pour refléter parfaitement votre marque, du choix des couleurs aux polices en un temps record. Que vous soyez une startup, un professionnel ou une petite entreprise, notre solution clé en main s'adapte à tous vos besoins web.",
+        "img": "/assets/images/product1.png"
       },
       {
-        "title": "Make it your own!",
-        "description": "Play around with the theme.ts file and configure the color palette to match the branding of your company! If you're feeling wild, maybe change some tailwind css as well!",
-        "img": "/assets/images/product2.jpg"
+        "title": "Personnalisez sans effort",
+        "description": "Personnalisez chaque détail pour refléter parfaitement votre marque grâce à notre interface intuitive. Modifiez facilement la palette de couleurs pour des tons sobres ou audacieux, adaptez les polices à votre style, et intégrez des images qui capturent l’esprit de votre entreprise. Chaque élément visuel peut être ajusté en quelques clics pour garantir une expérience cohérente et professionnelle. Cette flexibilité vous permet de créer une identité unique qui parle à votre audience, tout en renforçant l’impact de votre message. Avec nos outils simples et efficaces, la personnalisation devient rapide et accessible.",
+        "img": "/assets/images/product2.png"
       }
     ]
   },
   "features": {
-    "title": "Latest & greatest ",
-    "subtitle": "All the best technologies out there!",
-    "description": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
+    "title": "Technologies Innovantes",
+    "subtitle": "Toutes les meilleures \n technologies du moment !",
+    "description": "Découvrez les technologies modernes pour concevoir des sites web en quelques clics grâce au drag & drop.\n Un contenu bien structuré est essentiel pour attirer l’attention de vos visiteurs et améliorer leur expérience.",
     "items": [
       {
         "name": "React.js",

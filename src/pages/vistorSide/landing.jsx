@@ -39,7 +39,7 @@ export default function Landing(){
         </>
       </LazyShow>
       <LazyShow>
-        <Pricing />
+        {/* <Pricing /> */}
       </LazyShow>
       <LazyShow>
         <>
