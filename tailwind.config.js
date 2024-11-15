@@ -5,7 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   mode: 'jit',
-  darkMode: false,
+  darkMode: "media",
   theme: {
     fontSize: {
       xs: '0.75rem',
