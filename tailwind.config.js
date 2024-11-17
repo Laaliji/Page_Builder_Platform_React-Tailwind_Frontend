@@ -26,6 +26,11 @@ export default {
         tertiary: '#1e97f3',
         border: '#1a2e35',
         background: '#ffffff',
+        button: {
+          bg: '#1477d2',    
+          text: '#ffffff',   
+          hover: '#1a8ae5',  
+        }
       },
       animation: {
         vote: 'vote 1s ease-in-out',
@@ -48,4 +53,3 @@ export default {
   variants: {},
   plugins: [],
 }
-
