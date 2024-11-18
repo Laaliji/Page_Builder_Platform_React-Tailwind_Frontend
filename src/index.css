@@ -14,13 +14,12 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #ffffff; /* Set default background for light mode */
-  color: #213547; /* Set text color for light mode */
+  background-color: #ffffff;
+  color: #213547;
 }
+
 
 /* Tailwind's dark mode styles */
 body.dark {
