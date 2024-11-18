@@ -1,4 +1,3 @@
-// StepperControl.jsx
 import React from "react";
 
 const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
@@ -22,7 +21,7 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
         transition duration-200 ease-in-out
         ${currentStep === totalSteps 
           ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-          : 'bg-green-500 text-white hover:bg-slate-700 hover:text-white'}`}
+          : 'bg-blue-500 text-white hover:bg-slate-700 hover:text-white'}`}
       >
         {currentStep === totalSteps ? 'Finish' : 'Next'}
       </button>

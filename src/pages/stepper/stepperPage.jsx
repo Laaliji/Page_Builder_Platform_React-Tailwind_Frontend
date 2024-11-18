@@ -10,17 +10,17 @@ function StepperPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const steps = [
     "Project Information",
-    "Template and Responsiveness", 
+    "Template and Responsiveness",
     "Style and Color Palette",
     "Quick Review and Complete"
   ];
 
   const displayStep = (step) => {
-    switch(step){
-      case 1: return <Project/>;
-      case 2: return <Template/>;
-      case 3: return <Style/>;
-      case 4: return <Final/>;
+    switch (step) {
+      case 1: return <Project />;
+      case 2: return <Template />;
+      case 3: return <Style />;
+      case 4: return <Final />;
       default: return null;
     }
   };
@@ -34,8 +34,8 @@ function StepperPage() {
   };
 
   return (
-    <div className="w-screen min-h-screen bg-gray-100 flex justify-center items-center">
-      <div className="md:w-1/2 w-full mx-auto shadow-xl rounded-2xl pb-2 bg-white">
+    <div className="w-full min-h-screen bg-gray-100 flex justify-center items-center px-4">
+      <div className="w-full max-w-6xl mx-auto shadow-xl rounded-2xl pb-2 bg-white">
         <div className="container horizontal mt-5">
           <Stepper
             steps={steps}
@@ -43,7 +43,7 @@ function StepperPage() {
           />
         </div>
         {displayStep(currentStep)}
-        <StepperControl 
+        <StepperControl
           currentStep={currentStep}
           totalSteps={steps.length}
           onNext={handleNext}
@@ -53,5 +53,6 @@ function StepperPage() {
     </div>
   );
 }
+
 
 export default StepperPage;

@@ -5,7 +5,8 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   mode: 'jit',
-  darkMode: "media",
+  // Désactivation du dark mode
+  darkMode: false, 
   theme: {
     fontSize: {
       xs: '0.75rem',
@@ -21,19 +22,55 @@ export default {
     },
     extend: {
       colors: {
-        primary: '#1477d2',
-        secondary: '#1a8ae5',
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "#ffffff", // Couleur de fond claire
+        foreground: "#000000", // Couleur de texte foncée
+        primary: {
+          DEFAULT: '#1477d2',
+          foreground: "#ffffff",
+        },
+        secondary: {
+          DEFAULT: '#1a8ae5',
+          foreground: "#ffffff",
+        },
         tertiary: '#1e97f3',
-        border: '#1a2e35',
-        background: '#ffffff',
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "#f9f9f9", // Fond clair pour les cartes
+          foreground: "#000000",
+        },
         button: {
           bg: '#1477d2',    
-          text: '#ffffff',   
+          text: '#ffffff',  
           hover: '#1a8ae5',  
         }
       },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
       animation: {
         vote: 'vote 1s ease-in-out',
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       keyframes: {
         vote: {
@@ -47,9 +84,16 @@ export default {
             transform: 'rotate(30deg)',
           },
         },
+        "accordion-down": {
+          from: { height: 0 },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
+        },
       },
     },
   },
-  variants: {},
-  plugins: [],
-}
+  plugins: [require("tailwindcss-animate")],
+};
