@@ -1,17 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Typewriter from 'typewriter-effect';
-import Button from './Button' // Adjust the import path as needed
+import Button from './Button';
 import config from '../../template/config/index.json';
 
 const MainHero = () => {
+  const navigate = useNavigate();
   const { mainHero } = config;
-  
+
+  const handleCommencezClick = () => {
+    navigate('/stepper');
+  };
+
   return (
     <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
       <div className="sm:text-center lg:text-left">
         <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-          <span className="block xl:inline relative">
-            <div className="h-40 overflow-hidden">
+          <span className="block xl:inline">
+            <div className="h-40">
               <Typewriter
                 options={{
                   strings: ['Créez un site web sans coder', 'Simple, rapide et intuitif.'],
@@ -28,19 +34,20 @@ const MainHero = () => {
         </p>
         <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
           <div className="rounded-md shadow">
-            <Button 
-              href={mainHero.primaryAction.href} 
+            <Button
+              onClick={handleCommencezClick}
               variant="primary"
             >
               Commencez
             </Button>
           </div>
           <div className="mt-3 sm:mt-0 sm:ml-3">
-            <Button 
-              href={mainHero.secondaryAction.href} 
+            {/* Use href prop for the second button */}
+            <Button
+              href={mainHero.secondaryAction?.href}
               variant="primary"
             >
-              {mainHero.secondaryAction.text}
+              {mainHero.secondaryAction?.text}
             </Button>
           </div>
         </div>

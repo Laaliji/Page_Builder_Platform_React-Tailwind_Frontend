@@ -1,10 +1,19 @@
 import React from 'react';
 
-const Button = ({ 
+interface ButtonProps {
+  href?: string;
+  variant?: string;
+  className?: string;
+  children: React.ReactNode;
+  onClick?: () => void;  
+}
+
+const Button:  React.FC<ButtonProps> = ({ 
   href, 
   variant = 'primary', 
   className = '', 
-  children 
+  children,
+  onClick
 }) => {
   const baseStyles = "w-full flex items-center justify-center px-8 py-3 text-base font-medium rounded-md md:py-4 md:text-lg md:px-10";
   
@@ -13,13 +22,24 @@ const Button = ({
     secondary: "text-secondary bg-background hover:bg-border hover:text-primary border border-primary"
   };
 
+  const buttonClass = `${baseStyles} ${variants[variant as keyof typeof variants]} ${className}`;
+
+  if (href) {
+    return (
+      <a href={href} className={buttonClass}>
+        {children}
+      </a>
+    );
+  }
+
   return (
-    <a
-      href={href}
-      className={`${baseStyles} ${variants[variant]} ${className}`}
+    <button
+      onClick={onClick}
+      className={buttonClass}
+      type="button"
     >
       {children}
-    </a>
+    </button>
   );
 };
 
