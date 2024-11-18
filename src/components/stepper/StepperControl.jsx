@@ -10,7 +10,7 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
         transition duration-200 ease-in-out
         ${currentStep === 1 
           ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-          : 'bg-white text-slate-400 border-2 border-slate-300 hover:bg-slate-700 hover:text-white'}`}
+          : 'bg-white text-black border-2 border-slate-300 hover:bg-slate-700 hover:text-white'}`}
       >
         Back
       </button>

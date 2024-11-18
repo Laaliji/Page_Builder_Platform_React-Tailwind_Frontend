@@ -29,7 +29,7 @@ const Stepper = ({ steps, currentStep }) => {
   return (
     <div className="flex max-w justify-center items-center w-full py-16">
       {/* Stepper Container */}
-      <div className="w-full max-w flex  justify-between px-12">
+      <div className="w-full max-w flex justify-between px-12">
         {newStep.map((step, index) => (
           <div
             key={index}
@@ -42,7 +42,7 @@ const Stepper = ({ steps, currentStep }) => {
                 border-2 h-12 w-12 flex items-center justify-center
                 ${
                   step.completed
-                    ? "bg-green-600 text-white border-green-600"
+                    ? "bg-black text-white border-black"
                     : step.highlighted
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-white border-gray-300"
@@ -51,7 +51,7 @@ const Stepper = ({ steps, currentStep }) => {
                 {index + 1}
               </div>
               {/* Description below each step */}
-              <div className="absolute top-16 text-center text-xs font-medium uppercase w-32">
+              <div className="absolute top-16 text-center text-xs font-medium uppercase w-32 text-black">
                 {step.description}
               </div>
             </div>
@@ -59,7 +59,7 @@ const Stepper = ({ steps, currentStep }) => {
             {index !== newStep.length - 1 && (
               <div
                 className={`flex-auto border-t-2 mx-2 ${
-                  step.completed ? "border-green-600" : "border-gray-300"
+                  step.completed ? "border-black" : "border-gray-300"
                 }`}
               ></div>
             )}
