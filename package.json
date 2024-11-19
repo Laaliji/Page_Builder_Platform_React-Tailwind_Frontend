@@ -26,9 +26,13 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "react-scroll": "^1.9.0",
+<<<<<<< HEAD
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "typewriter-effect": "^2.21.0"
+=======
+    "react-simple-typewriter": "^5.0.1"
+>>>>>>> 7005623a57a6de2ce381711ad2788fdace2a42d1
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

@@ -25,25 +25,25 @@ export default function Landing(){
         </div>
         <MainHeroImage />
       </div>
-      <Canvas />
+      {/* <Canvas /> */}
       <LazyShow>
         <>
           <Product />
-          <Canvas />
+          {/* <Canvas /> */}
         </>
       </LazyShow>
       <LazyShow>
         <>
           <Features />
-          <Canvas />
+          {/* <Canvas /> */}
         </>
       </LazyShow>
       <LazyShow>
-        <Pricing />
+        {/* <Pricing /> */}
       </LazyShow>
       <LazyShow>
         <>
-          <Canvas />
+          
           <About />
         </>
       </LazyShow>

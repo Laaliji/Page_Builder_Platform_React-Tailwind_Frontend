@@ -75,6 +75,22 @@ a:hover {
   color: #535bf2;
 }
 
+<<<<<<< HEAD
+=======
+body {
+  /* margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh; */
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+>>>>>>> 7005623a57a6de2ce381711ad2788fdace2a42d1
 button {
   border-radius: 8px;
   border: 1px solid transparent;
