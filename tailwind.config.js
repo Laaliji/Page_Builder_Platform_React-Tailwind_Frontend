@@ -25,8 +25,8 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#ffffff", // Couleur de fond claire
-        foreground: "#000000", // Couleur de texte foncée
+        background: "#ffffff", 
+        foreground: "#000000", 
         primary: {
           DEFAULT: '#1477d2',
           foreground: "#ffffff",
@@ -53,7 +53,7 @@ export default {
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "#f9f9f9", // Fond clair pour les cartes
+          DEFAULT: "#f9f9f9", 
           foreground: "#000000",
         },
         button: {

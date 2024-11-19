@@ -42,7 +42,7 @@ const MainHero = () => {
             </Button>
           </div>
           <div className="mt-3 sm:mt-0 sm:ml-3">
-            {/* Use href prop for the second button */}
+            
             <Button
               href={mainHero.secondaryAction?.href}
               variant="primary"
