@@ -1,14 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Typewriter from 'typewriter-effect';
+import { Typewriter } from 'react-simple-typewriter';
 import Button from './Button';
 import config from '../../template/config/index.json';
-import { Typewriter } from 'react-simple-typewriter';
 
 const MainHero = () => {
   const navigate = useNavigate();
   const { mainHero } = config;
-
+  
   const handleCommencezClick = () => {
     navigate('/stepper');
   };
@@ -18,27 +17,18 @@ const MainHero = () => {
       <div className="sm:text-center lg:text-left">
         <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
           <span className="block xl:inline">
-            <div className="h-40">
+            <span className="block xl:inline">Créez un site web sans coder, </span>{' '}
+            <span className={`block text-primary xl:inline`}>
               <Typewriter
-                options={{
-                  strings: ['Créez un site web sans coder', 'Simple, rapide et intuitif.'],
-                  autoStart: true,
-                  loop: true,
-                  delay: 75,
-                }}
+                words={['Simple', 'Rapide', 'Intuitif']}
+                loop={100}
+                cursor
+                cursorStyle='.'
+                typeSpeed={70}
+                deleteSpeed={50}
+                delaySpeed={1000}
               />
-            </div>
-          <span className="block xl:inline">Créez un site web sans coder, </span>{' '}
-          <span className={`block text-primary xl:inline`}>
-            <Typewriter
-              words={['Simple', 'Rapide', 'Intuitif']}
-              loop={100}
-              cursor
-              cursorStyle='.'
-              typeSpeed={70}
-              deleteSpeed={50}
-              delaySpeed={1000}
-            />
+            </span>
           </span>
         </h1>
         <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
@@ -54,7 +44,6 @@ const MainHero = () => {
             </Button>
           </div>
           <div className="mt-3 sm:mt-0 sm:ml-3">
-            
             <Button
               href={mainHero.secondaryAction?.href}
               variant="primary"
