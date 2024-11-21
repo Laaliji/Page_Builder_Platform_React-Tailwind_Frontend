@@ -8,7 +8,7 @@ import Layout from './pages/vistorSide/layoute.jsx'
 
 const router = createBrowserRouter([
 
-  { path: '/home', element: <Landing /> },
+  { path: '/', element: <Landing /> },
   { path: '/stepper', element: <StepperPage /> },
 ]);
 

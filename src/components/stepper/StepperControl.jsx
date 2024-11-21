@@ -2,7 +2,7 @@ import React from "react";
 
 const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
   return (
-    <div className="container flex justify-around mt-4 mb-8">
+    <div className="container flex justify-around mt-4 mb">
       <button
         onClick={onPrev}
         disabled={currentStep === 1}
@@ -21,7 +21,7 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
         transition duration-200 ease-in-out
         ${currentStep === totalSteps 
           ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-          : 'bg-blue-500 text-white hover:bg-slate-700 hover:text-white'}`}
+          : 'bg-[#0D92F4] text-white hover:bg-slate-700 hover:text-white'}`}
       >
         {currentStep === totalSteps ? 'Finish' : 'Next'}
       </button>

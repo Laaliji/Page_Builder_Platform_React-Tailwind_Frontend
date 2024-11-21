@@ -1,32 +1,31 @@
 import React, { useState } from 'react';
-import { User, Building2, Briefcase } from 'lucide-react';
 import { GlareCard } from '../../ui/GlareCard';
+
+
 
 export default function Template() {
   const [selectedType, setSelectedType] = useState(null);
 
   const projectTypes = [
     {
-      id: 'personal',
-      icon: <User size={48} className="text-blue-500" />,
-      title: 'Personal Project',
-      description: 'Create a website for your personal portfolio, blog, or hobby project.',
-      color: 'border-blue-500',
+      id: "personal",
+      icon: "../../../../public/assets/icons/personal.png",
+      title: "Personal Project",
+      description: "Create a website for your personal portfolio, blog, or hobby project.",
     },
     {
-      id: 'company',
-      icon: <Building2 size={48} className="text-green-500" />,
-      title: 'Company Project',
-      description: 'Develop a professional website for your business or organization.',
-      color: 'border-green-500',
+      id: "business",
+      icon: "../../../../public/assets/icons/briefcase.png",
+      title: "Business Project",
+      description: "Develop a professional website for your business or organization.",
     },
     {
-      id: 'freelance',
-      icon: <Briefcase size={48} className="text-purple-500" />,
-      title: 'Freelance Project',
-      description: 'Build a website for a client or your freelance business.',
-      color: 'border-purple-500',
+      id: "freelance",
+      icon: "../../../../public/assets/icons/freelancer.png",
+      title: "Freelance Project",
+      description: "Build a website for a client or your freelance business.",
     },
+    
   ];
 
   const handleCardSelect = (type) => {
@@ -35,41 +34,48 @@ export default function Template() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-center mb-8">
+      <h2 className="text-2xl font-bold text-center mb-8 text-slate-900">
         Select Your Project Type
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
         {projectTypes.map((type) => (
           <GlareCard
             key={type.id}
-            className={`cursor-pointer p-6 rounded-lg shadow-lg transition-all duration-300 ${
-              selectedType === type.id
-                ? `border-4 ${type.color} scale-105`
-                : 'border border-gray-200 hover:border-gray-300'
+            className={`cursor-pointer p-6 rounded-lg shadow-lg transition-all duration-300 h-full flex flex-col items-center text-center ${
+              selectedType === type.id ? "bg-blue-100" : "bg-white"
             }`}
+            isSelected={selectedType === type.id}
             onClick={() => handleCardSelect(type.id)}
           >
-            <div className="flex flex-col items-center text-center">
-              <div className="mb-4">{type.icon}</div>
-              <h3 className="text-xl font-semibold mb-2">{type.title}</h3>
-              <p className="text-gray-600 mb-4">{type.description}</p>
-              {selectedType === type.id && (
-                <div className="absolute top-4 right-4 text-green-500">✓</div>
-              )}
+            <div className="mb-4">
+              <img
+                src={type.icon}
+                alt={`${type.title} icon`}
+                className="w-12 h-12"
+              />
             </div>
+            <h3
+              className={`text-xl font-semibold mb-2 ${
+                selectedType === type.id ? "text-black" : "text-blue-900"
+              }`}
+            >
+              {type.title}
+            </h3>
+            <p
+              className={`${
+                selectedType === type.id ? "text-black" : "text-blue-700"
+              } mb-4 flex-grow`}
+            >
+              {type.description}
+            </p>
+            {selectedType === type.id && (
+              <div className="absolute top-4 right-4 text-blue-600">✓</div>
+            )}
           </GlareCard>
         ))}
       </div>
-      {selectedType && (
-        <div className="mt-8 text-center">
-          <p className="text-lg">
-            You selected:{' '}
-            <span className="font-bold">
-              {projectTypes.find((type) => type.id === selectedType)?.title}
-            </span>
-          </p>
-        </div>
-      )}
+     
     </div>
   );
 }
+
