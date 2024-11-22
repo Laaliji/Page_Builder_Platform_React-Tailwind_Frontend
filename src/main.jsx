@@ -5,6 +5,7 @@ import './index.css'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 import Layout from './pages/vistorSide/layoute.jsx'
 import Landing from './pages/vistorSide/landing.jsx'
+import Editor from './pages/panelSide/editor.jsx'
 
 const router = createBrowserRouter([
   { 
@@ -16,10 +17,8 @@ const router = createBrowserRouter([
       {}
     ] 
   },
-  {
-
-  }
-])
+  { path : '/editor' , element : <Editor /> }
+]) 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

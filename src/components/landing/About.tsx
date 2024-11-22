@@ -10,7 +10,7 @@ const About = () => {
   return (
     <div
       id="about"
-      className="mx-auto container xl:px-20 lg:px-12 sm:px-6 px-4 py-12"
+      className="mx-auto bg-tertiary bg-opacity-10 xl:px-20 lg:px-12 sm:px-6 px-4 py-12"
     >
       <div className="flex flex-col items-center justify-center">
         <div>

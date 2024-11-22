@@ -13,7 +13,7 @@ import Product from '../../components/landing/Product';
 
 export default function Landing(){
   return (
-    <div className={`bg-background grid gap-y-16 overflow-hidden`}>
+    <div className={`bg-background grid overflow-hidden`}>
       <div className={`relative bg-background`}>
         <div className="max-w-7xl mx-auto">
           <div
