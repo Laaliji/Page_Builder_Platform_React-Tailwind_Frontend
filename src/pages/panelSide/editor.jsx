@@ -1,386 +1,225 @@
-// EnhancedGrapesEditor.jsx
-import React, { useEffect, useRef } from 'react';
+// Editor.jsx
+import React, { useEffect, useState } from 'react';
+import { Settings, Download, FileText, Plus } from 'lucide-react';
 import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
+import gjsBlockBasic from 'grapesjs-blocks-basic';
+import Toolbar from '../../components/editor/Toolbar';
+import PanelFiles from '@/components/editor/PanelFiles';
+import PanelStyles from '@/components/editor/PanelStyles';
 
-export default function Editor(){
-  const editorRef = useRef(null);
+const Editor = () => {
+  const [editor, setEditor] = useState(null);
+  const [showNewPageModal, setShowNewPageModal] = useState(false);
+  const [pages, setPages] = useState([
+    { id: 1, name: 'Home', path: '/home' },
+    { id: 2, name: 'About', path: '/about' },
+    { id: 3, name: 'Dashboard', path: '/dashboard' },
+  ]);
 
   useEffect(() => {
-    if (!editorRef.current) {
-      const editor = grapesjs.init({
-        container: '#gjs',
-        height: '100%',
-        width: 'auto',
-        storageManager: false,
-        canvas: {
-          styles: [
-            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'
-          ],
-        },
-        panels: {
-          defaults: [
-            {
-              id: 'main-toolbar',
-              buttons: [
-                { id: 'preview', className: 'btn-preview', label: '👁 Preview', command: 'preview' },
-                { id: 'publish', className: 'btn-publish', label: '🚀 Publish', command: e => console.log('Published:', e.getHtml()) },
-                { id: 'download', className: 'btn-download', label: '⬇️ Download', command: 'export-template' },
-                { id: 'extract', className: 'btn-extract', label: '📤 Extract', command: e => console.log('Extracted:', e.getHtml()) },
-                { id: 'settings', className: 'btn-settings', label: '⚙️', command: 'open-settings' }
-              ]
-            }
-          ]
-        },
-        blockManager: {
-          appendTo: '#blocks',
-          blocks: [
-            {
-              id: 'section',
-              label: '<div class="block-label"><i class="fas fa-square"></i>Section</div>',
-              category: 'Basic',
-              content: `
-                <section class="section-block">
-                  <h2>Section Title</h2>
-                  <p>Add your content here...</p>
-                </section>
-              `,
-              attributes: { class: 'section-block-item' }
-            },
-            {
-              id: 'text',
-              label: '<div class="block-label"><i class="fas fa-font"></i>Text</div>',
-              category: 'Basic',
-              content: '<div data-gjs-type="text">Add your text here</div>',
-              attributes: { class: 'text-block-item' }
-            },
-            {
-              id: 'image',
-              label: '<div class="block-label"><i class="fas fa-image"></i>Image</div>',
-              category: 'Basic',
-              content: { type: 'image' },
-              attributes: { class: 'image-block-item' }
-            },
-            {
-              id: 'button',
-              label: '<div class="block-label"><i class="fas fa-square"></i>Button</div>',
-              category: 'Basic',
-              content: `<button class="custom-button">Click me</button>`,
-              attributes: { class: 'button-block-item' }
-            },
-            {
-              id: 'form',
-              label: '<div class="block-label"><i class="fas fa-form"></i>Form</div>',
-              category: 'Basic',
-              content: `
-                <form class="custom-form">
-                  <div class="form-group">
-                    <label>Name:</label>
-                    <input type="text" class="form-control"/>
-                  </div>
-                  <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" class="form-control"/>
-                  </div>
-                  <button type="submit" class="submit-button">Submit</button>
-                </form>
-              `,
-              attributes: { class: 'form-block-item' }
-            }
-          ]
-        },
-        styleManager: {
-          appendTo: '#styles-container',
-          sectors: [
-            {
-              name: 'Dimension',
-              open: false,
-              buildProps: ['width', 'height', 'min-width', 'min-height', 'padding', 'margin'],
-              properties: [
-                {
-                  name: 'Width',
-                  property: 'width',
-                  type: 'slider',
-                  units: ['px', '%', 'rem'],
-                  defaults: 'auto',
-                  min: 0,
-                  max: 100
-                },
-                {
-                  name: 'Height',
-                  property: 'height',
-                  type: 'slider',
-                  units: ['px', '%', 'rem'],
-                  defaults: 'auto',
-                  min: 0,
-                  max: 100
-                }
-              ]
-            },
-            {
-              name: 'Typography',
-              open: false,
-              buildProps: [
-                'font-family',
-                'font-size',
-                'font-weight',
-                'letter-spacing',
-                'color',
-                'line-height',
-                'text-align',
-                'text-decoration',
-                'text-shadow'
-              ]
-            },
-            {
-              name: 'Decorations',
-              open: false,
-              buildProps: [
-                'background-color',
-                'border',
-                'border-radius',
-                'box-shadow'
-              ],
-              properties: [
-                {
-                  name: 'Background',
-                  property: 'background-color',
-                  type: 'color'
-                },
-                {
-                  name: 'Border Radius',
-                  property: 'border-radius',
-                  type: 'slider',
-                  units: ['px', '%'],
-                  defaults: '0',
-                  min: 0,
-                  max: 50
-                }
-              ]
-            },
-            {
-              name: 'Extra',
-              open: false,
-              buildProps: ['opacity', 'transition', 'transform']
-            }
-          ]
-        }
-      });
-
-      // Add custom commands
-      editor.Commands.add('export-template', {
-        run: editor => {
-          const html = editor.getHtml();
-          const css = editor.getCss();
-          const content = `
-            <html>
-              <head>
-                <style>${css}</style>
-              </head>
-              <body>${html}</body>
-            </html>
-          `;
-          const blob = new Blob([content], { type: 'text/html' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'template.html';
-          a.click();
-          URL.revokeObjectURL(url);
-        }
-      });
-
-      editorRef.current = editor;
-    }
-
-    return () => {
-      if (editorRef.current) {
-        editorRef.current.destroy();
-        editorRef.current = null;
+    const editor = grapesjs.init({
+      container: '#gjs',
+      height: '100%',
+      width: 'auto',
+      storageManager: false,
+      panels: {
+        defaults: [
+          {
+            id: 'basic-actions',
+            el: '.panel__basic-actions',
+            buttons: [
+              {
+                id: 'visibility',
+                active: true,
+                className: 'btn-toggle-borders',
+                label: '<u>B</u>',
+                command: 'sw-visibility',
+              },
+            ],
+          }
+        ]
+      },
+      deviceManager: {
+        devices: [
+          {
+            name: 'Desktop',
+            width: '', 
+          },
+          {
+            name: 'Mobile',
+            width: '320px',
+            widthMedia: '480px',
+          },
+        ]
+      },
+      blockManager: {
+        appendTo: '#blocks',
+        blocks: [
+          // Basic Components
+          { id: 'section', label: 'Section', category: 'Composants', content: '<section class="section"><h1>Section Title</h1><p>Section content goes here</p></section>', attributes: { class: 'gjs-block-section' } },
+          { id: 'text', label: 'Text', category: 'Composants', content: { type: 'text', content: 'Insert your text here', style: { padding: '10px' } }, attributes: { class: 'gjs-block-text' } },
+          { id: 'image', label: 'Image', category: 'Composants', content: { type: 'image' }, attributes: { class: 'gjs-block-image' } },
+          { id: 'button', label: 'Button', category: 'Composants', content: '<button class="button">Click me</button>', attributes: { class: 'gjs-block-button' } },
+      
+          // Layout Components
+          { id: 'grid', label: 'Grid', category: 'Mise en page', content: '<div class="grid-container"><div class="grid-item">1</div><div class="grid-item">2</div><div class="grid-item">3</div><div class="grid-item">4</div></div>', attributes: { class: 'gjs-block-grid' } },
+          { id: 'two-cols', label: 'Two Columns', category: 'Mise en page', content: '<div class="two-cols-container"><div class="col">Column 1</div><div class="col">Column 2</div></div>', attributes: { class: 'gjs-block-two-cols' } },
+          { id: 'float', label: 'Float Layout', category: 'Mise en page', content: '<div class="float-container"><div class="float-item" style="float:left; width:50%;">Left</div><div class="float-item" style="float:right; width:50%;">Right</div></div>', attributes: { class: 'gjs-block-float' } },
+      
+          // Advanced Components
+          { id: 'card', label: 'Card', category: 'Avancé', content: '<div class="card"><h2>Card Title</h2><p>Card content goes here</p><button>Click Me</button></div>', attributes: { class: 'gjs-block-card' } },
+          { id: 'list', label: 'List', category: 'Avancé', content: '<ul class="list"><li>List Item 1</li><li>List Item 2</li><li>List Item 3</li></ul>', attributes: { class: 'gjs-block-list' } },
+          { id: 'form', label: 'Form', category: 'Avancé', content: '<form class="form"><input type="text" placeholder="Enter text" /><button type="submit">Submit</button></form>', attributes: { class: 'gjs-block-form' } },
+          
+          // Additional Components
+          { id: 'video', label: 'Video', category: 'Médias', content: '<video controls><source src="movie.mp4" type="video/mp4">Your browser does not support the video tag.</video>', attributes: { class: 'gjs-block-video' } },
+          { id: 'audio', label: 'Audio', category: 'Médias', content: '<audio controls><source src="audio.mp3" type="audio/mp3">Your browser does not support the audio tag.</audio>', attributes: { class: 'gjs-block-audio' } },
+          { id: 'map', label: 'Map', category: 'Médias', content: '<iframe src="https://www.google.com/maps/embed" width="600" height="450" frameborder="0" style="border:0"></iframe>', attributes: { class: 'gjs-block-map' } },
+          { id: 'accordion', label: 'Accordion', category: 'Widgets', content: '<div class="accordion"><h3>Section 1</h3><div><p>Section 1 Content</p></div><h3>Section 2</h3><div><p>Section 2 Content</p></div></div>', attributes: { class: 'gjs-block-accordion' } },
+          { id: 'carousel', label: 'Carousel', category: 'Widgets', content: '<div class="carousel"><div class="carousel-item">Item 1</div><div class="carousel-item">Item 2</div><div class="carousel-item">Item 3</div></div>', attributes: { class: 'gjs-block-carousel' } },
+          { id: 'tabs', label: 'Tabs', category: 'Widgets', content: '<div class="tabs"><ul><li>Tab 1</li><li>Tab 2</li></ul><div class="tab-content">Content for Tab 1</div><div class="tab-content">Content for Tab 2</div></div>', attributes: { class: 'gjs-block-tabs' } },
+          { id: 'progress-bar', label: 'Progress Bar', category: 'Widgets', content: '<div class="progress-bar"><div class="progress" style="width: 70%;">70%</div></div>', attributes: { class: 'gjs-block-progress-bar' } },
+          { id: 'alert', label: 'Alert', category: 'Widgets', content: '<div class="alert">This is an alert message</div>', attributes: { class: 'gjs-block-alert' } },
+          { id: 'quote', label: 'Quote', category: 'Composants', content: '<blockquote class="quote">This is a quote</blockquote>', attributes: { class: 'gjs-block-quote' } },
+          { id: 'timeline', label: 'Timeline', category: 'Widgets', content: '<div class="timeline"><div class="timeline-item">Item 1</div><div class="timeline-item">Item 2</div></div>', attributes: { class: 'gjs-block-timeline' } },
+          { id: 'pricing-table', label: 'Pricing Table', category: 'Widgets', content: '<div class="pricing-table"><div class="pricing-item"><h3>Basic</h3><p>$10</p></div><div class="pricing-item"><h3>Pro</h3><p>$20</p></div></div>', attributes: { class: 'gjs-block-pricing-table' } },
+          { id: 'testimonial', label: 'Testimonial', category: 'Widgets', content: '<div class="testimonial"><p>"This is a testimonial"</p><cite>- Author</cite></div>', attributes: { class: 'gjs-block-testimonial' } },
+          { id: 'faq', label: 'FAQ', category: 'Widgets', content: '<div class="faq"><h3>Question 1</h3><p>Answer 1</p><h3>Question 2</h3><p>Answer 2</p></div>', attributes: { class: 'gjs-block-faq' } },
+          { id: 'countdown', label: 'Countdown', category: 'Widgets', content: '<div class="countdown"><span>10:00</span></div>', attributes: { class: 'gjs-block-countdown' } },
+          { id: 'contact-form', label: 'Contact Form', category: 'Forms', content: '<form class="contact-form"><input type="text" placeholder="Name" /><input type="email" placeholder="Email" /><textarea placeholder="Message"></textarea><button type="submit">Send</button></form>', attributes: { class: 'gjs-block-contact-form' } },
+          { id: 'login-form', label: 'Login Form', category: 'Forms', content: '<form class="login-form"><input type="text" placeholder="Username" /><input type="password" placeholder="Password" /><button type="submit">Login</button></form>', attributes: { class: 'gjs-block-login-form' } },
+          { id: 'register-form', label: 'Register Form', category: 'Forms', content: '<form class="register-form"><input type="text" placeholder="Username" /><input type="email" placeholder="Email" /><input type="password" placeholder="Password" /><button type="submit">Register</button></form>', attributes: { class: 'gjs-block-register-form' } },
+          { id: 'image-slider', label: 'Image Slider', category: 'Médias', content: '<div class="image-slider"><div class="slider-item">Image 1</div><div class="slider-item">Image 2</div></div>', attributes: { class: 'gjs-block-image-slider' } },
+          { id: 'newsletter', label: 'Newsletter', category: 'Forms', content: '<form class="newsletter"><input type="email" placeholder="Email" /><button type="submit">Subscribe</button></form>', attributes: { class: 'gjs-block-newsletter' } }
+        ]
       }
-    };
+      
+      ,
+      styleManager: {
+        appendTo: '#styles',
+        sectors: [
+          {
+            name: 'Dimension',
+            open: false,
+            properties: [
+              { type: 'number', name: 'Width', property: 'width', units: ['px', '%', 'rem'], defaults: 'auto' },
+              { type: 'number', name: 'Height', property: 'height', units: ['px', '%', 'rem'], defaults: 'auto' },
+              { type: 'number', name: 'Padding', property: 'padding', units: ['px', '%', 'rem'], defaults: '0' },
+              { type: 'number', name: 'Margin', property: 'margin', units: ['px', '%', 'rem'], defaults: '0' }
+            ]
+          },
+          {
+            name: 'Typography',
+            open: false,
+            properties: [
+              { name: 'Font Size', property: 'font-size', type: 'number', units: ['px', 'em', 'rem'], defaults: '16px' },
+              { name: 'Font Weight', property: 'font-weight', type: 'select', defaults: '400', options: [{ value: '100', name: 'Thin' }, { value: '400', name: 'Normal' }, { value: '700', name: 'Bold' }] },
+              { name: 'Color', property: 'color', type: 'color', defaults: '#000000' },
+              { name: 'Line Height', property: 'line-height', type: 'number', units: ['px', 'em', 'rem'], defaults: '1.5' },
+              { name: 'Letter Spacing', property: 'letter-spacing', type: 'number', units: ['px', 'em', 'rem'], defaults: '0' }
+            ]
+          },
+          {
+            name: 'Background',
+            open: false,
+            properties: [
+              { name: 'Background Color', property: 'background-color', type: 'color', defaults: 'transparent' },
+              { name: 'Background Image', property: 'background-image', type: 'file' },
+              { name: 'Background Repeat', property: 'background-repeat', type: 'select', options: [{ value: 'no-repeat', name: 'No Repeat' }, { value: 'repeat', name: 'Repeat' }, { value: 'repeat-x', name: 'Repeat X' }, { value: 'repeat-y', name: 'Repeat Y' }] },
+              { name: 'Background Size', property: 'background-size', type: 'select', options: [{ value: 'auto', name: 'Auto' }, { value: 'cover', name: 'Cover' }, { value: 'contain', name: 'Contain' }] }
+            ]
+          },
+          {
+            name: 'Border',
+            open: false,
+            properties: [
+              { name: 'Border Width', property: 'border-width', type: 'number', units: ['px'], defaults: '1px' },
+              { name: 'Border Style', property: 'border-style', type: 'select', options: [{ value: 'none', name: 'None' }, { value: 'solid', name: 'Solid' }, { value: 'dotted', name: 'Dotted' }, { value: 'dashed', name: 'Dashed' }] },
+              { name: 'Border Color', property: 'border-color', type: 'color', defaults: '#000000' },
+              { name: 'Border Radius', property: 'border-radius', type: 'number', units: ['px', '%'], defaults: '0' }
+            ]
+          }
+        ]
+      }
+      
+    });
+
+    setEditor(editor);
+    return () => editor.destroy();
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <div className="h-16 bg-white shadow-sm flex items-center px-6">
-        <div id="main-toolbar" className="flex items-center space-x-4"></div>
+    <div className="h-screen pt-4 gap-y-5 justify-center items-center flex flex-col bg-gradient-to-r from-[#373b44] to-[#4286f4]">
+
+      <Toolbar />
+
+      <div className="flex-1 flex w-[95%] gap-x-5 pb-3">
+
+        <PanelFiles />
+
+        <div className="flex-1 w-[500px] rounded-2xl bg-white p-2">
+            <div id="gjs" className="h-full w-[400px] rounded-2xl"></div>
+        </div>
+
+        <PanelStyles />
+
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex">
-        {/* Left sidebar - Components */}
-        <div className="w-72 bg-white border-r">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Components</h2>
-            <div id="blocks" className="component-list"></div>
-          </div>
-        </div>
 
-        {/* Editor area */}
-        <div className="flex-1 bg-gray-100">
-          <div id="gjs" className="h-full"></div>
-        </div>
+      <style jsx global>{`
+        .gjs-block {
+          width: 50%;
+          height: auto;
+          min-height: 45px;
+          margin: 5px 0;
+          padding: 1em;
+          background: #fff;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          cursor: move;
+          transition: all 0.2s ease;
+          text-align: center;
+        }
 
-        {/* Right sidebar - Styles */}
-        <div className="w-72 bg-white border-l">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Styles</h2>
-            <div id="styles-container"></div>
-          </div>
-        </div>
-      </div>
+        .gjs-block:hover {
+          box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+          border-color: #bbb;
+        }
+
+        .gjs-block-label {
+          font-size: 14px;
+        }
+
+        .gjs-one-bg {
+          background-color: #fff;
+        }
+
+        .gjs-two-color {
+          color: #383838;
+        }
+
+        .gjs-three-bg {
+          background-color: #f5f5f5;
+        }
+
+        .gjs-four-color,
+        .gjs-four-color-h:hover {
+          color: #3b82f6;
+        }
+
+        #gjs {
+          border: none;
+        }
+
+        .gjs-cv-canvas {
+          width: 100%;
+          height: 100%;
+          top: 0;
+        }
+      `}</style>
     </div>
   );
 };
 
-// Add custom styles
-const customStyles = `
-  /* General Editor Styles */
-  .gjs-one-bg { background-color: #ffffff; }
-  .gjs-two-color { color: #2c3e50; }
-  .gjs-three-bg { background-color: #f8f9fa; }
-  .gjs-four-color { color: #2c3e50; }
-
-  /* Component Blocks */
-  .block-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    font-size: 14px;
-    color: #2c3e50;
-  }
-
-  .block-label i {
-    font-size: 16px;
-    color: #4a90e2;
-  }
-
-  /* Draggable Components */
-  [class*="-block-item"] {
-    padding: 12px;
-    margin: 8px 0;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    transition: all 0.2s;
-    cursor: move;
-  }
-
-  [class*="-block-item"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Custom Button Styles */
-  .custom-button {
-    padding: 10px 20px;
-    background: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .custom-button:hover {
-    background: #357abd;
-  }
-
-  /* Form Styles */
-  .custom-form {
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #2c3e50;
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-  }
-
-  /* Submit Button */
-  .submit-button {
-    padding: 10px 20px;
-    background: #48bb78;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .submit-button:hover {
-    background: #38a169;
-  }
-
-  /* Style Manager Improvements */
-  #styles-container {
-    padding: 8px;
-  }
-
-  .gjs-sm-sector {
-    margin-bottom: 20px;
-  }
-
-  .gjs-sm-sector-title {
-    font-weight: 600;
-    color: #2c3e50;
-  }
-
-  .gjs-sm-properties {
-    padding: 10px;
-  }
-
-  /* Toolbar Buttons */
-  .btn-preview,
-  .btn-publish,
-  .btn-download,
-  .btn-extract,
-  .btn-settings {
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .btn-preview { background: #ffffff; border: 1px solid #e2e8f0; }
-  .btn-publish { background: #4a90e2; color: white; border: none; }
-  .btn-download { background: #48bb78; color: white; border: none; }
-  .btn-extract { background: #ffffff; border: 1px solid #e2e8f0; }
-  .btn-settings { background: #ffffff; border: 1px solid #e2e8f0; }
-
-  .btn-preview:hover,
-  .btn-extract:hover,
-  .btn-settings:hover {
-    background: #f8f9fa;
-  }
-
-  .btn-publish:hover { background: #357abd; }
-  .btn-download:hover { background: #38a169; }
-`;
-
-// Create style element
-const styleElement = document.createElement('style');
-styleElement.textContent = customStyles;
-document.head.appendChild(styleElement);
-
+export default Editor;
