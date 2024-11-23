@@ -1,160 +1,278 @@
 "use client";
 
 import React, { useState } from "react";
-import { Carousel } from "react-responsive-carousel";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalTrigger } from "../../ui/animated-modal";
-import { DirectionAwareHover } from "../../ui/direction-aware-hover"; 
-import "react-responsive-carousel/lib/styles/carousel.min.css"; 
+import { ChromePicker } from "react-color";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../ui/dialog";
 
-const colorPalettes = [
-  { 
-    id: "minimal-light", 
-    name: "Minimal Light", 
-    colors: ["#FFFFFF", "#F5F5F5", "#000000", "#4A4A4A"],
-    description: "Clean, crisp, and professional",
-  },
-  { 
-    id: "ocean-breeze", 
-    name: "Ocean Breeze", 
-    colors: ["#E0F2F1", "#4DB6AC", "#00796B", "#004D40"],
-    description: "Calm and refreshing blues and greens",
-  },
-  { 
-    id: "sunset-warm", 
-    name: "Sunset Warm", 
-    colors: ["#FFF3E0", "#FFB74D", "#FF9800", "#F57C00"],
-    description: "Vibrant and energetic oranges",
-  },
-  { 
-    id: "dark-mode", 
-    name: "Dark Mode", 
-    colors: ["#121212", "#1E1E1E", "#BB86FC", "#03DAC6"],
-    description: "Modern and sleek dark theme",
-  },
-  { 
-    id: "pastel-soft", 
-    name: "Pastel Soft", 
-    colors: ["#FFE5B4", "#FFCDD2", "#C5E1A5", "#80DEEA"],
-    description: "Soft and gentle color combinations",
-  },
-];
+const Style = () => {
+  const [color, setColor] = useState("#dfe1ec");
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); 
 
-export default function Style() {
-  const [selectedPalette, setSelectedPalette] = useState(null);
-  const [customColors, setCustomColors] = useState([]);
-
-  const handleCustomColorChange = (index, value) => {
-    const updatedColors = [...customColors];
-    updatedColors[index] = value;
-    setCustomColors(updatedColors);
+  const handleColorChange = (selectedColor) => {
+    setColor(selectedColor.hex);
   };
 
-  const addCustomColor = () => setCustomColors([...customColors, "#000000"]);
-  const removeCustomColor = (index) => {
-    setCustomColors(customColors.filter((_, i) => i !== index));
+  const hexToRgb = (hex) => {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
+  };
+
+  const hexToHsl = (hex) => {
+    let r = parseInt(hex.slice(1, 3), 16) / 255;
+    let g = parseInt(hex.slice(3, 5), 16) / 255;
+    let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l;
+    l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+        default:
+          break;
+      }
+      h /= 6;
+    }
+    return `${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(
+      l * 100
+    )}%`;
+  };
+
+  const colorPalettes = [
+    {
+      colors: ["#FFB6C1", "#FF69B4", "#FFC0CB"],
+      descriptions: ["Pastel Pink", "Hot Pink", "Light Pink"],
+    },
+    {
+      colors: ["#87CEFA", "#4682B4", "#00BFFF"],
+      descriptions: ["Sky Blue", "Steel Blue", "Deep Sky Blue"],
+    },
+    {
+      colors: ["#98FB98", "#32CD32", "#00FF00"],
+      descriptions: ["Pale Green", "Lime Green", "Lime"],
+    },
+    {
+      colors: ["#FFD700", "#FFA500", "#FF8C00"],
+      descriptions: ["Gold", "Orange", "Dark Orange"],
+    },
+  ];
+
+  const handleSave = () => {
+    if (selectedTemplate !== null) {
+      console.log(`Saved template: ${selectedTemplate}`);
+      setIsDialogOpen(false); 
+    } else {
+      alert("Please select a template before saving.");
+    }
   };
 
   return (
-    <div className="mx-auto px-4 py-8">
-      {/* Color Palette Section */}
-      <div>
-        <h3 className="text-xl font-semibold mb-4 text-center">Choose Color Palette</h3>
+    <div
+      style={{
+        display: "flex",
+        gap: "20px",
+        fontFamily: "Arial, sans-serif",
+        color: "black",
+        padding: "20px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: "20px",
+        }}
+      >
+        {/* Left Section */}
+        <div style={{ flex: "1", fontFamily: "Arial, sans-serif" }}>
+          <h1 style={{ marginBottom: "10px" }}>Color Palette</h1>
+          <p style={{ fontSize: "18px", marginBottom: "20px" }}>
+            Choose the color palette for your website.
+          </p>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <button
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "black",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Select Template
+              </button>
+            </DialogTrigger>
 
-        {/* Carousel for displaying color palettes */}
-        <Carousel 
-          showThumbs={false} 
-          infiniteLoop={true} 
-          centerMode={true} 
-          dynamicHeight={false} 
-          onChange={(index) => setSelectedPalette(colorPalettes[index].id)}
-          className="max-w-4xl mx-auto" // To center the carousel and control the width
-        >
-          {colorPalettes.map((palette) => (
-            <div 
-              key={palette.id}
-              className={`
-                p-6 rounded-xl cursor-pointer
-                bg-white hover:bg-gray-50 shadow-lg transform transition-all duration-300 ease-in-out
-                ${selectedPalette === palette.id 
-                  ? "scale-105 border-2 border-blue-500" 
-                  : "border border-gray-200"}
-              `}
-              onClick={() => setSelectedPalette(palette.id)}
-            >
-              <DirectionAwareHover className="h-60 w-full" childrenClassName="text-white">
-                {/* Render the color circles and palette details */}
-                <div className="p-4 text-center">
-                  <h4 className="font-semibold text-lg mb-2">{palette.name}</h4>
-                  <p className="text-sm text-gray-600 mb-4">{palette.description}</p>
-                  <div className="flex justify-center">
-                    {/* Ensure colors is defined and is an array */}
-                    {(palette.colors && Array.isArray(palette.colors)) ? (
-                      palette.colors.map((color, index) => (
-                        <div 
-                          key={index} 
-                          className="w-12 h-12 mr-2 rounded-full"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))
-                    ) : (
-                      <span>No colors available</span>
-                    )}
-                  </div>
-                </div>
-              </DirectionAwareHover>
-            </div>
-          ))}
-        </Carousel>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle style={{ color: "black" }}>
+                  Select a Website Template
+                </DialogTitle>
+              </DialogHeader>
 
-        {/* Trigger for Custom Modal */}
-        <Modal>
-          <ModalTrigger className="flex-shrink-0 w-[220px] p-6 rounded-lg cursor-pointer bg-white hover:bg-gray-50 border border-gray-200">
-            <div className="text-gray-600">+ Create Custom Palette</div>
-          </ModalTrigger>
-          <ModalBody>
-            <ModalContent>
-              <h3 className="text-xl font-semibold mb-4 text-center">Custom Color Palette</h3>
-              {customColors.map((color, index) => (
-                <div key={index} className="flex items-center mb-2">
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => handleCustomColorChange(index, e.target.value)}
-                    className="w-12 h-12 border rounded"
-                  />
-                  <input
-                    type="text"
-                    value={color}
-                    onChange={(e) => handleCustomColorChange(index, e.target.value)}
-                    className="ml-4 p-2 border rounded flex-grow"
-                    placeholder="Enter color hex code"
-                  />
-                  <button
-                    onClick={() => removeCustomColor(index)}
-                    className="ml-4 text-red-500"
+              <div
+                style={{
+                  marginTop: "40px",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: "20px",
+                }}
+              >
+                {colorPalettes.map((palette, index) => (
+                  <div
+                    key={index}
+                    onClick={() => setSelectedTemplate(index)}
+                    style={{
+                      border:
+                        selectedTemplate === index
+                          ? "2px solid #000"
+                          : "1px solid #ccc",
+                      borderRadius: "8px",
+                      padding: "10px",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      backgroundColor:
+                        selectedTemplate === index ? "#f0f0f0" : "white",
+                    }}
                   >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <button
-                onClick={addCustomColor}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
-              >
-                Add Color
-              </button>
-            </ModalContent>
-            <ModalFooter>
-              <button
-                onClick={() => setSelectedPalette("custom")}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Save
-              </button>
-            </ModalFooter>
-          </ModalBody>
-        </Modal>
+                    {palette.colors.map((color, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "20px",
+                            height: "20px",
+                            borderRadius: "50%",
+                            backgroundColor: color,
+                            marginRight: "10px",
+                          }}
+                        ></div>
+                        <p style={{ margin: 0, color: "black" }}>
+                          {palette.descriptions[idx]}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Save Button */}
+              <div style={{ marginTop: "20px", textAlign: "right" }}>
+                <button
+                  onClick={handleSave}
+                  disabled={selectedTemplate === null}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor:
+                      selectedTemplate !== null ? "black" : "#ccc",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor:
+                      selectedTemplate !== null ? "pointer" : "not-allowed",
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Right Section */}
+        <div
+          style={{
+            flex: "1",
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            padding: "20px",
+          }}
+        >
+          <div style={{ display: "flex", gap: "20px" }}>
+            <div style={{ flex: "1" }}>
+              <ChromePicker color={color} onChange={handleColorChange} />
+            </div>
+            <div style={{ flex: "1" }}>
+              <h3 style={{ color: "black" }}>HEX</h3>
+              <input
+                type="text"
+                value={color}
+                readOnly
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+              />
+              <h3 style={{ color: "black" }}>RGB</h3>
+              <input
+                type="text"
+                value={hexToRgb(color)}
+                readOnly
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+              />
+              <h3 style={{ color: "black" }}>HSL</h3>
+              <input
+                type="text"
+                value={hexToHsl(color)}
+                readOnly
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Style;
