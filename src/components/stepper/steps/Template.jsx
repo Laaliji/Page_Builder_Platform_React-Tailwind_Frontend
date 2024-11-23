@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { GlareCard } from '../../ui/GlareCard';
+import React, { useState } from "react";
+import { BriefcaseBusiness, User, Code } from "lucide-react";
+import { GlareCard } from "../../ui/GlareCard";
 
-
+const getColorClasses = (type) => {
+  const colorMap = {
+    personal: "bg-blue-500/10 text-blue-500",
+    business: "bg-green-500/10 text-green-500",
+    freelance: "bg-purple-500/10 text-purple-500",
+  };
+  return colorMap[type] || "bg-slate-500/10 text-slate-500";
+};
 
 export default function Template() {
   const [selectedType, setSelectedType] = useState(null);
@@ -9,73 +17,70 @@ export default function Template() {
   const projectTypes = [
     {
       id: "personal",
-      icon: "../../../../public/assets/icons/personal.png",
+      Icon: User,
       title: "Personal Project",
       description: "Create a website for your personal portfolio, blog, or hobby project.",
+      examples: ["Blog", "Portfolio", "Hobby Project"],
     },
     {
       id: "business",
-      icon: "../../../../public/assets/icons/briefcase.png",
+      Icon: BriefcaseBusiness,
       title: "Business Project",
       description: "Develop a professional website for your business or organization.",
+      examples: ["Company Website", "E-commerce", "Landing Page"],
     },
     {
       id: "freelance",
-      icon: "../../../../public/assets/icons/freelancer.png",
+      Icon: Code,
       title: "Freelance Project",
       description: "Build a website for a client or your freelance business.",
+      examples: ["Client Projects", "Landing Page", "Service Showcase"],
     },
-    
   ];
 
   const handleCardSelect = (type) => {
-    setSelectedType(type);
+    console.log(`Card clicked: ${type}`); // Log to check if selection is triggered
+    setSelectedType(type === selectedType ? null : type);
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-center mb-8 text-slate-900">
-        Select Your Project Type
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        {projectTypes.map((type) => (
-          <GlareCard
-            key={type.id}
-            className={`cursor-pointer p-6 rounded-lg shadow-lg transition-all duration-300 h-full flex flex-col items-center text-center ${
-              selectedType === type.id ? "bg-blue-100" : "bg-white"
-            }`}
-            isSelected={selectedType === type.id}
-            onClick={() => handleCardSelect(type.id)}
-          >
-            <div className="mb-4">
-              <img
-                src={type.icon}
-                alt={`${type.title} icon`}
-                className="w-12 h-12"
-              />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+      {projectTypes.map((type) => (
+        <GlareCard
+          key={type.id}
+          onClick={() => handleCardSelect(type.id)}
+          className={`relative p-6 bg-slate-800 cursor-pointer transition-all duration-300 hover:bg-slate-700 ${
+            selectedType === type.id ? 'border-2 border-[#1d4ed8]' : ''
+          }`}
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div className={`p-4 rounded-full ${getColorClasses(type.id)}`}>
+              <type.Icon className="w-6 h-6" />
             </div>
-            <h3
-              className={`text-xl font-semibold mb-2 ${
-                selectedType === type.id ? "text-black" : "text-blue-900"
-              }`}
-            >
+
+            <h3 className="text-lg font-semibold text-white text-center">
               {type.title}
             </h3>
-            <p
-              className={`${
-                selectedType === type.id ? "text-black" : "text-blue-700"
-              } mb-4 flex-grow`}
-            >
+
+            <p className="text-sm text-slate-300 text-center">
               {type.description}
             </p>
-            {selectedType === type.id && (
-              <div className="absolute top-4 right-4 text-blue-600">✓</div>
-            )}
-          </GlareCard>
-        ))}
-      </div>
-     
+
+            <div className="w-full border-t border-slate-700 pt-4 mt-2">
+              <div className="flex flex-wrap justify-center gap-2">
+                {type.examples.map((example, index) => (
+                  <span
+                    key={`${type.id}-${index}`}
+                    className="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded-full hover:bg-slate-600"
+                  >
+                    {example}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </GlareCard>
+      ))}
     </div>
   );
 }
-

@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import { Carousel } from "react-responsive-carousel";
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalTrigger } from "../../ui/animated-modal";
+import { DirectionAwareHover } from "../../ui/direction-aware-hover"; 
+import "react-responsive-carousel/lib/styles/carousel.min.css"; 
 
 const colorPalettes = [
   { 
@@ -52,114 +55,106 @@ export default function Style() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       {/* Color Palette Section */}
       <div>
         <h3 className="text-xl font-semibold mb-4 text-center">Choose Color Palette</h3>
-        <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
+
+        {/* Carousel for displaying color palettes */}
+        <Carousel 
+          showThumbs={false} 
+          infiniteLoop={true} 
+          centerMode={true} 
+          dynamicHeight={false} 
+          onChange={(index) => setSelectedPalette(colorPalettes[index].id)}
+          className="max-w-4xl mx-auto" // To center the carousel and control the width
+        >
           {colorPalettes.map((palette) => (
             <div 
               key={palette.id}
-              onClick={() => setSelectedPalette(palette.id)}
               className={`
-                flex-shrink-0 w-[220px] p-6 rounded-lg cursor-pointer 
-                transition-all duration-300 text-center
+                p-6 rounded-xl cursor-pointer
+                bg-white hover:bg-gray-50 shadow-lg transform transition-all duration-300 ease-in-out
                 ${selectedPalette === palette.id 
-                  ? "bg-blue-100 border-2 border-blue-500 scale-105" 
-                  : "bg-white hover:bg-gray-50 border border-gray-200"}
+                  ? "scale-105 border-2 border-blue-500" 
+                  : "border border-gray-200"}
               `}
+              onClick={() => setSelectedPalette(palette.id)}
             >
-              <div className="flex justify-center mb-4">
-                {palette.colors.map((color, index) => (
-                  <div 
-                    key={index} 
-                    className="w-8 h-8 mr-2 rounded-full"
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-              <h4 className="font-semibold mb-2">{palette.name}</h4>
-              <p className="text-sm text-gray-600">{palette.description}</p>
+              <DirectionAwareHover className="h-60 w-full" childrenClassName="text-white">
+                {/* Render the color circles and palette details */}
+                <div className="p-4 text-center">
+                  <h4 className="font-semibold text-lg mb-2">{palette.name}</h4>
+                  <p className="text-sm text-gray-600 mb-4">{palette.description}</p>
+                  <div className="flex justify-center">
+                    {/* Ensure colors is defined and is an array */}
+                    {(palette.colors && Array.isArray(palette.colors)) ? (
+                      palette.colors.map((color, index) => (
+                        <div 
+                          key={index} 
+                          className="w-12 h-12 mr-2 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))
+                    ) : (
+                      <span>No colors available</span>
+                    )}
+                  </div>
+                </div>
+              </DirectionAwareHover>
             </div>
           ))}
+        </Carousel>
 
-          {/* Trigger for Custom Modal */}
-          <Modal>
-            <ModalTrigger className="flex-shrink-0 w-[220px] p-6 rounded-lg cursor-pointer bg-white hover:bg-gray-50 border border-gray-200">
-              <div className="text-gray-600">+ Create Custom Palette</div>
-            </ModalTrigger>
-            <ModalBody>
-              <ModalContent>
-                <h3 className="text-xl font-semibold mb-4 text-center">Custom Color Palette</h3>
-                {customColors.map((color, index) => (
-                  <div key={index} className="flex items-center mb-2">
-                    <input
-                      type="color"
-                      value={color}
-                      onChange={(e) => handleCustomColorChange(index, e.target.value)}
-                      className="w-12 h-12 border rounded"
-                    />
-                    <input
-                      type="text"
-                      value={color}
-                      onChange={(e) => handleCustomColorChange(index, e.target.value)}
-                      className="ml-4 p-2 border rounded flex-grow"
-                      placeholder="Enter color hex code"
-                    />
-                    <button
-                      onClick={() => removeCustomColor(index)}
-                      className="ml-4 text-red-500"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={addCustomColor}
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
-                >
-                  Add Color
-                </button>
-              </ModalContent>
-              <ModalFooter>
-                <button
-                  onClick={() => setSelectedPalette("custom")}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  Save
-                </button>
-              </ModalFooter>
-            </ModalBody>
-          </Modal>
-        </div>
-      </div>
-
-      {/* Selected Options Summary */}
-      {selectedPalette && (
-        <div className="mt-8 p-6 bg-white rounded-lg shadow-md text-center">
-          <h3 className="text-xl font-semibold mb-4">Your Selections</h3>
-          {selectedPalette !== "custom" && (
-            <div>
-              <span className="font-bold">Color Palette:</span>
-              <p>{colorPalettes.find((p) => p.id === selectedPalette)?.name}</p>
-            </div>
-          )}
-          {selectedPalette === "custom" && (
-            <div>
-              <span className="font-bold">Custom Colors:</span>
-              <div className="flex justify-center space-x-2 mt-2">
-                {customColors.map((color, index) => (
-                  <div 
-                    key={index} 
-                    className="w-8 h-8 rounded-full border" 
-                    style={{ backgroundColor: color }}
+        {/* Trigger for Custom Modal */}
+        <Modal>
+          <ModalTrigger className="flex-shrink-0 w-[220px] p-6 rounded-lg cursor-pointer bg-white hover:bg-gray-50 border border-gray-200">
+            <div className="text-gray-600">+ Create Custom Palette</div>
+          </ModalTrigger>
+          <ModalBody>
+            <ModalContent>
+              <h3 className="text-xl font-semibold mb-4 text-center">Custom Color Palette</h3>
+              {customColors.map((color, index) => (
+                <div key={index} className="flex items-center mb-2">
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => handleCustomColorChange(index, e.target.value)}
+                    className="w-12 h-12 border rounded"
                   />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+                  <input
+                    type="text"
+                    value={color}
+                    onChange={(e) => handleCustomColorChange(index, e.target.value)}
+                    className="ml-4 p-2 border rounded flex-grow"
+                    placeholder="Enter color hex code"
+                  />
+                  <button
+                    onClick={() => removeCustomColor(index)}
+                    className="ml-4 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={addCustomColor}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+              >
+                Add Color
+              </button>
+            </ModalContent>
+            <ModalFooter>
+              <button
+                onClick={() => setSelectedPalette("custom")}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Save
+              </button>
+            </ModalFooter>
+          </ModalBody>
+        </Modal>
+      </div>
     </div>
   );
 }

@@ -34,21 +34,22 @@ function StepperPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-blue-50 flex justify-center items-center px-4 py-8">
+    <div className="w-full min-h-screen bg-white flex justify-center items-center px-4 py-8">
       <div className="w-full max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
-        <div className="bg-blue-100 p-4">
+        <div className="bg-white p-4">
           <Stepper
             steps={steps}
             currentStep={currentStep}
           />
         </div>
-        
-        <div className="p-8 min-h-[400px] flex justify-center items-center"> 
-  {displayStep(currentStep)}
-</div>
-
-        
-        <div className="bg-blue-50 p-4 border-t border-blue-200">
+       
+        <div className="p-8 min-h-[500px] flex justify-center items-center">
+          <div className="w-full max-w-4xl">
+            {displayStep(currentStep)}
+          </div>
+        </div>
+       
+        <div className="bg-white p-4 border-t border-gray-200">
           <StepperControl
             currentStep={currentStep}
             totalSteps={steps.length}

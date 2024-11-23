@@ -1,29 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typewriter } from 'react-simple-typewriter';
+import TopBarProgress from 'react-topbar-progress-indicator';
 import Button from './Button';
 import config from '../../template/config/index.json';
 
-const MainHero = () => {
+
+TopBarProgress.config({
+  barColors: {
+    "0": "#2563eb",   
+    "1.0": "#1d4ed8"
+  },
+  shadowBlur: 5
+});
+
+const MainHero: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const { mainHero } = config;
-  
-  const handleCommencezClick = () => {
-    navigate('/stepper');
+
+  const handleCommencezClick = (): void => {
+    setLoading(true);
+    setTimeout(() => {
+      navigate('/stepper');
+    }, 1000);
   };
 
   return (
     <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+      {loading && <TopBarProgress />}
       <div className="sm:text-center lg:text-left">
         <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
           <span className="block xl:inline">
             <span className="block xl:inline">Créez un site web sans coder, </span>{' '}
-            <span className={`block text-primary xl:inline`}>
+            <span className="block text-primary xl:inline">
               <Typewriter
                 words={['Simple', 'Rapide', 'Intuitif']}
                 loop={100}
                 cursor
-                cursorStyle='.'
+                cursorStyle="."
                 typeSpeed={70}
                 deleteSpeed={50}
                 delaySpeed={1000}
@@ -39,6 +54,7 @@ const MainHero = () => {
             <Button
               onClick={handleCommencezClick}
               variant="primary"
+              disabled={loading}
             >
               Commencez
             </Button>
