@@ -10,7 +10,7 @@ TopBarProgress.config({
   shadowBlur: 5,
 });
 
-const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
+const StepperControl = ({ currentStep, totalSteps, onNext, onPrev, onFinish }) => {
   const [loading, setLoading] = useState(false);
 
   const handleNext = () => {
@@ -19,7 +19,7 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
       onNext();
       setTimeout(() => {
         setLoading(false);
-      }, 1000); 
+      }, 1000);
     }
   };
 
@@ -29,8 +29,16 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
       onPrev();
       setTimeout(() => {
         setLoading(false);
-      }, 1000); 
+      }, 1000);
     }
+  };
+
+  const handleFinish = () => {
+    setLoading(true);
+    onFinish();
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   };
 
   return (
@@ -48,17 +56,21 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
       >
         Back
       </Button>
-      <Button
-        onClick={handleNext}
-        disabled={currentStep === totalSteps}
-        className={`uppercase font-semibold ${
-          currentStep === totalSteps
-            ? "opacity-50 cursor-not-allowed"
-            : "bg-black hover:bg-slate-700 hover:text-white"
-        }`}
-      >
-        {currentStep === totalSteps ? "Finish" : "Next"}
-      </Button>
+      {currentStep === totalSteps ? (
+        <Button
+          onClick={handleFinish}
+          className="uppercase font-semibold bg-[#1d4ed8] hover:bg-blue-700"
+        >
+          Finish
+        </Button>
+      ) : (
+        <Button
+          onClick={handleNext}
+          className="uppercase font-semibold bg-black hover:bg-slate-700 hover:text-white"
+        >
+          Next
+        </Button>
+      )}
     </div>
   );
 };

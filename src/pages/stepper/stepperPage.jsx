@@ -12,43 +12,48 @@ function StepperPage() {
     "Project Information",
     "Template and Responsiveness",
     "Style and Color Palette",
-    "Quick Review and Complete"
+    "Quick Review and Complete",
   ];
 
   const displayStep = (step) => {
     switch (step) {
-      case 1: return <Project />;
-      case 2: return <Template />;
-      case 3: return <Style />;
-      case 4: return <Final />;
-      default: return null;
+      case 1:
+        return <Project />;
+      case 2:
+        return <Template />;
+      case 3:
+        return <Style />;
+      case 4:
+        return (
+          <Final
+            onNavigateToStep={(step) => setCurrentStep(step)}
+            // Pass any other required props to Final
+          />
+        );
+      default:
+        return null;
     }
   };
 
   const handleNext = () => {
-    setCurrentStep(prev => Math.min(prev + 1, steps.length));
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
   };
 
   const handlePrev = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   return (
     <div className="w-full min-h-screen bg-white flex justify-center items-center px-4 py-8">
       <div className="w-full max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
         <div className="bg-white p-4">
-          <Stepper
-            steps={steps}
-            currentStep={currentStep}
-          />
+          <Stepper steps={steps} currentStep={currentStep} />
         </div>
-       
+
         <div className="p-8 min-h-[500px] flex justify-center items-center">
-          <div className="w-full max-w-4xl">
-            {displayStep(currentStep)}
-          </div>
+          <div className="w-full max-w-4xl">{displayStep(currentStep)}</div>
         </div>
-       
+
         <div className="bg-white p-4 border-t border-gray-200">
           <StepperControl
             currentStep={currentStep}
