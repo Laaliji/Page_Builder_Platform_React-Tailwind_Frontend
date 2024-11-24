@@ -29,6 +29,7 @@
     "react-color": "^2.19.3",
     "react-dom": "^18.3.1",
     "react-feather": "^2.0.10",
+    "react-lazy-load-image-component": "^1.6.2",
     "react-modal": "^3.16.1",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.28.0",

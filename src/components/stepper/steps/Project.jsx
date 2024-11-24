@@ -19,6 +19,7 @@ const Project = () => {
 
   return (
     <div className="mt-10 mb-16">
+      <h2 className="text-2xl font-semibold text-slate-900 mb-6">Project Information</h2>
       <Card className="mx-8">
         <CardContent className="pt-6">
           <form className="space-y-6">

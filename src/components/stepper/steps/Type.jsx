@@ -39,11 +39,12 @@ export default function Template() {
   ];
 
   const handleCardSelect = (type) => {
-    console.log(`Card clicked: ${type}`); // Log to check if selection is triggered
+    console.log(`Card clicked: ${type}`); 
     setSelectedType(type === selectedType ? null : type);
   };
 
   return (
+    
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {projectTypes.map((type) => (
         <GlareCard

@@ -42,36 +42,39 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev, onFinish }) =
   };
 
   return (
-    <div className="container flex justify-around mt-4 mb">
-      {loading && <TopBarProgress />}
+    <div className="container flex justify-between items-center mt-4 mb-4 w-full">
+    {loading && <TopBarProgress />}
+    <Button
+      onClick={handlePrev}
+      disabled={currentStep === 1}
+      variant="secondary"
+      className={`uppercase font-semibold ${
+        currentStep === 1
+          ? "opacity-50 cursor-not-allowed"
+          : "bg-black hover:bg-slate-700 hover:text-white mr-4"
+      }`}
+    >
+      Back
+    </Button>
+    {currentStep === totalSteps ? (
       <Button
-        onClick={handlePrev}
-        disabled={currentStep === 1}
-        variant="secondary"
-        className={`uppercase font-semibold ${
-          currentStep === 1
-            ? "opacity-50 cursor-not-allowed"
-            : "bg-black hover:bg-slate-700 hover:text-white"
-        }`}
+        onClick={handleFinish}
+        className="uppercase font-semibold bg-[#1d4ed8] hover:bg-blue-700"
       >
-        Back
+        Finish
       </Button>
-      {currentStep === totalSteps ? (
-        <Button
-          onClick={handleFinish}
-          className="uppercase font-semibold bg-[#1d4ed8] hover:bg-blue-700"
-        >
-          Finish
-        </Button>
-      ) : (
-        <Button
-          onClick={handleNext}
-          className="uppercase font-semibold bg-black hover:bg-slate-700 hover:text-white"
-        >
-          Next
-        </Button>
-      )}
-    </div>
+    ) : (
+      <Button
+        onClick={handleNext}
+        className="uppercase font-semibold bg-black hover:bg-slate-700 hover:text-white"
+      >
+        Next
+      </Button>
+    )}
+  </div>
+  
+  
+
   );
 };
 

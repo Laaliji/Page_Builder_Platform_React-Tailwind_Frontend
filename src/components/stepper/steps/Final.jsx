@@ -13,7 +13,6 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
   const demoTemplate = "personal";
   const demoColor = "#dfe1ec";
 
-  
   const data = projectData || demoProjectData;
   const template = selectedTemplate || demoTemplate;
   const color = colorPalette || demoColor;
@@ -74,18 +73,23 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
               label="Repository URL"
               value={data.repoUrl}
             />
+            <SectionHeader title="Project Type" stepNumber={2} />
+            <ReviewItem
+              label="Selected Template"
+              value={getTemplateTitle(template)}
+            />
           </CardContent>
         </Card>
 
         {/* Right Column - Combined Template and Color Card */}
         <Card className="h-full">
           <CardContent className="p-6">
-            <SectionHeader title="Template and Responsiveness" stepNumber={2} />
+            <SectionHeader title="Template starter" stepNumber={3} />
             <ReviewItem
-              label="Selected Template"
+              label="Selected Starter"
               value={getTemplateTitle(template)}
             />
-            <SectionHeader title="Style and Color Palette" stepNumber={3} />
+            <SectionHeader title="Style and Color Palette" stepNumber={4} />
             <ReviewItem
               label="Primary Color"
               value={
