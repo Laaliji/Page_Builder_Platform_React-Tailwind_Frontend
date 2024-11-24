@@ -1,17 +1,18 @@
-import React from 'react';
+import React from "react";
 
-import About from '../../components/landing/About';
-import Analytics from '../../components/landing/Analytics';
-import Canvas from '../../components/landing/Canvas';
-import Features from '../../components/landing/Features';
-import Header from '../../components/landing/Header';
-import LazyShow from '../../components/landing/LazyShow';
-import MainHero from '../../components/landing/MainHero';
-import MainHeroImage from '../../components/landing/MainHeroImage';
-import Pricing from '../../components/landing/Pricing';
-import Product from '../../components/landing/Product';
+import About from "../../components/landing/About";
+import Analytics from "../../components/landing/Analytics";
+import Canvas from "../../components/landing/Canvas";
+import Features from "../../components/landing/Features";
+import Header from "../../components/landing/Header";
+import LazyShow from "../../components/landing/LazyShow";
+import MainHero from "../../components/landing/MainHero";
+import MainHeroImage from "../../components/landing/MainHeroImage";
+import Pricing from "../../components/landing/Pricing";
+import Product from "../../components/landing/Product";
+import Contact from "../../components/landing/Contact";
 
-export default function Landing(){
+export default function Landing() {
   return (
     <div className={`bg-background grid gap-y-16 overflow-hidden`}>
       <div className={`relative bg-background`}>
@@ -39,15 +40,15 @@ export default function Landing(){
         </>
       </LazyShow>
       <LazyShow>
-        {/* <Pricing /> */}
+        {" "}
+        <Contact />
       </LazyShow>
       <LazyShow>
         <>
-          
           <About />
         </>
       </LazyShow>
       <Analytics />
     </div>
   );
-};
+}
