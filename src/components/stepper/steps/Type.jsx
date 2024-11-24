@@ -4,16 +4,16 @@ import { GlareCard } from "../../ui/GlareCard";
 
 const getColorClasses = (type) => {
   const colorMap = {
-    personal: "bg-blue-500/10 text-blue-500",
-    business: "bg-green-500/10 text-green-500",
-    freelance: "bg-purple-500/10 text-purple-500",
+    personal: "bg-blue-100 text-blue-900",
+    business: "bg-green-100 text-green-900",
+    freelance: "bg-purple-100 text-purple-900",
   };
-  return colorMap[type] || "bg-slate-500/10 text-slate-500";
+  return colorMap[type] || "bg-gray-100 text-gray-900";
 };
 
 export default function Template() {
   const [selectedType, setSelectedType] = useState(null);
-
+  
   const projectTypes = [
     {
       id: "personal",
@@ -39,40 +39,36 @@ export default function Template() {
   ];
 
   const handleCardSelect = (type) => {
-    console.log(`Card clicked: ${type}`); 
+    console.log(`Card clicked: ${type}`);
     setSelectedType(type === selectedType ? null : type);
   };
 
   return (
-    
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {projectTypes.map((type) => (
         <GlareCard
           key={type.id}
           onClick={() => handleCardSelect(type.id)}
-          className={`relative p-6 bg-slate-800 cursor-pointer transition-all duration-300 hover:bg-slate-700 ${
-            selectedType === type.id ? 'border-2 border-[#1d4ed8]' : ''
+          className={`relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50 ${
+            selectedType === type.id ? 'border-2 border-black' : ''
           }`}
         >
           <div className="flex flex-col items-center gap-4">
             <div className={`p-4 rounded-full ${getColorClasses(type.id)}`}>
               <type.Icon className="w-6 h-6" />
             </div>
-
-            <h3 className="text-lg font-semibold text-white text-center">
+            <h3 className="text-lg font-semibold text-gray-900 text-center">
               {type.title}
             </h3>
-
-            <p className="text-sm text-slate-300 text-center">
+            <p className="text-sm text-gray-600 text-center">
               {type.description}
             </p>
-
-            <div className="w-full border-t border-slate-700 pt-4 mt-2">
+            <div className="w-full border-t border-gray-200 pt-4 mt-2">
               <div className="flex flex-wrap justify-center gap-2">
                 {type.examples.map((example, index) => (
                   <span
                     key={`${type.id}-${index}`}
-                    className="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded-full hover:bg-slate-600"
+                    className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
                   >
                     {example}
                   </span>
