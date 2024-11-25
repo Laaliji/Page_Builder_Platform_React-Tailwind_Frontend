@@ -5,10 +5,11 @@ import grapesjs from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import gjsBlockBasic from 'grapesjs-blocks-basic';
 import Toolbar from '../../components/editor/Toolbar';
-import PanelFiles from '@/components/editor/PanelFiles';
 import PanelStyles from '@/components/editor/PanelStyles';
+import LeftPanel from '@/components/editor/LeftPanel';
 
 const Editor = () => {
+  const [tabState,setTabState] = useState(false);
   const [editor, setEditor] = useState(null);
   const [showNewPageModal, setShowNewPageModal] = useState(false);
   const [pages, setPages] = useState([
@@ -21,7 +22,7 @@ const Editor = () => {
     const editor = grapesjs.init({
       container: '#gjs',
       height: '100%',
-      width: 'auto',
+      width: '95%',
       storageManager: false,
       panels: {
         defaults: [
@@ -96,73 +97,426 @@ const Editor = () => {
       }
       
       ,
-      styleManager: {
-        appendTo: '#styles',
+      styleManager : {
+        appendTo: "#styles",
         sectors: [
           {
-            name: 'Dimension',
-            open: false,
+            name: "General",
+            buildProps: [
+              "float",
+              "display",
+              "position",
+              "top",
+              "right",
+              "left",
+              "bottom",
+            ],
             properties: [
-              { type: 'number', name: 'Width', property: 'width', units: ['px', '%', 'rem'], defaults: 'auto' },
-              { type: 'number', name: 'Height', property: 'height', units: ['px', '%', 'rem'], defaults: 'auto' },
-              { type: 'number', name: 'Padding', property: 'padding', units: ['px', '%', 'rem'], defaults: '0' },
-              { type: 'number', name: 'Margin', property: 'margin', units: ['px', '%', 'rem'], defaults: '0' }
-            ]
+              {
+                name: "Alignment",
+                property: "float",
+                type: "radio",
+                defaults: "none",
+                list: [
+                  { value: "none", className: "fa fa-times" },
+                  { value: "left", className: "fa fa-align-left" },
+                  { value: "right", className: "fa fa-align-right" },
+                ],
+              },
+              { property: "position", type: "select" },
+            ],
           },
           {
-            name: 'Typography',
+            name: "Dimension",
             open: false,
+            buildProps: [
+              "width",
+              "max-width",
+              "min-width",
+              "height",
+              "max-height",
+              "min-height",
+              "margin",
+              "padding",
+            ],
             properties: [
-              { name: 'Font Size', property: 'font-size', type: 'number', units: ['px', 'em', 'rem'], defaults: '16px' },
-              { name: 'Font Weight', property: 'font-weight', type: 'select', defaults: '400', options: [{ value: '100', name: 'Thin' }, { value: '400', name: 'Normal' }, { value: '700', name: 'Bold' }] },
-              { name: 'Color', property: 'color', type: 'color', defaults: '#000000' },
-              { name: 'Line Height', property: 'line-height', type: 'number', units: ['px', 'em', 'rem'], defaults: '1.5' },
-              { name: 'Letter Spacing', property: 'letter-spacing', type: 'number', units: ['px', 'em', 'rem'], defaults: '0' }
-            ]
+              {
+                id: "flex-width",
+                type: "integer",
+                name: "Width",
+                units: ["px", "%"],
+                property: "flex-basis",
+                toRequire: 1,
+              },
+              {
+                property: "margin",
+                properties: [
+                  { name: "Top", property: "margin-top" },
+                  { name: "Right", property: "margin-right" },
+                  { name: "Bottom", property: "margin-bottom" },
+                  { name: "Left", property: "margin-left" },
+                ],
+              },
+              {
+                property: "padding",
+                properties: [
+                  { name: "Top", property: "padding-top" },
+                  { name: "Right", property: "padding-right" },
+                  { name: "Bottom", property: "padding-bottom" },
+                  { name: "Left", property: "padding-left" },
+                ],
+              },
+            ],
           },
           {
-            name: 'Background',
+            name: "Typography",
             open: false,
+            buildProps: [
+              "font-family",
+              "font-size",
+              "font-weight",
+              "letter-spacing",
+              "color",
+              "line-height",
+              "text-align",
+              "text-decoration",
+              "text-shadow",
+            ],
             properties: [
-              { name: 'Background Color', property: 'background-color', type: 'color', defaults: 'transparent' },
-              { name: 'Background Image', property: 'background-image', type: 'file' },
-              { name: 'Background Repeat', property: 'background-repeat', type: 'select', options: [{ value: 'no-repeat', name: 'No Repeat' }, { value: 'repeat', name: 'Repeat' }, { value: 'repeat-x', name: 'Repeat X' }, { value: 'repeat-y', name: 'Repeat Y' }] },
-              { name: 'Background Size', property: 'background-size', type: 'select', options: [{ value: 'auto', name: 'Auto' }, { value: 'cover', name: 'Cover' }, { value: 'contain', name: 'Contain' }] }
-            ]
+              { name: "Font", property: "font-family" },
+              { name: "Weight", property: "font-weight" },
+              { name: "Font color", property: "color" },
+              {
+                property: "text-align",
+                type: "radio",
+                defaults: "left",
+                list: [
+                  { value: "left", name: "Left", className: "fa fa-align-left" },
+                  {
+                    value: "center",
+                    name: "Center",
+                    className: "fa fa-align-center",
+                  },
+                  { value: "right", name: "Right", className: "fa fa-align-right" },
+                  {
+                    value: "justify",
+                    name: "Justify",
+                    className: "fa fa-align-justify",
+                  },
+                ],
+              },
+              {
+                property: "text-decoration",
+                type: "radio",
+                defaults: "none",
+                list: [
+                  { value: "none", name: "None", className: "fa fa-times" },
+                  {
+                    value: "underline",
+                    name: "underline",
+                    className: "fa fa-underline",
+                  },
+                  {
+                    value: "line-through",
+                    name: "Line-through",
+                    className: "fa fa-strikethrough",
+                  },
+                ],
+              },
+              {
+                property: "text-shadow",
+                properties: [
+                  { name: "X position", property: "text-shadow-h" },
+                  { name: "Y position", property: "text-shadow-v" },
+                  { name: "Blur", property: "text-shadow-blur" },
+                  { name: "Color", property: "text-shadow-color" },
+                ],
+              },
+            ],
           },
           {
-            name: 'Border',
+            name: "Decorations",
+            open: false,
+            buildProps: [
+              "opacity",
+              "border-radius",
+              "border",
+              "box-shadow",
+              "background-bg",
+            ],
+            properties: [
+              {
+                type: "slider",
+                property: "opacity",
+                defaults: 1,
+                step: 0.01,
+                max: 1,
+                min: 0,
+              },
+              {
+                property: "border-radius",
+                properties: [
+                  { name: "Top", property: "border-top-left-radius" },
+                  { name: "Right", property: "border-top-right-radius" },
+                  { name: "Bottom", property: "border-bottom-left-radius" },
+                  { name: "Left", property: "border-bottom-right-radius" },
+                ],
+              },
+              {
+                property: "box-shadow",
+                properties: [
+                  { name: "X position", property: "box-shadow-h" },
+                  { name: "Y position", property: "box-shadow-v" },
+                  { name: "Blur", property: "box-shadow-blur" },
+                  { name: "Spread", property: "box-shadow-spread" },
+                  { name: "Color", property: "box-shadow-color" },
+                  { name: "Shadow type", property: "box-shadow-type" },
+                ],
+              },
+              {
+                id: "background-bg",
+                property: "background",
+                type: "bg",
+              },
+            ],
+          },
+          {
+            name: "Extra",
+            open: false,
+            buildProps: ["transition", "perspective", "transform"],
+            properties: [
+              {
+                property: "transition",
+                properties: [
+                  { name: "Property", property: "transition-property" },
+                  { name: "Duration", property: "transition-duration" },
+                  { name: "Easing", property: "transition-timing-function" },
+                ],
+              },
+              {
+                property: "transform",
+                properties: [
+                  { name: "Rotate X", property: "transform-rotate-x" },
+                  { name: "Rotate Y", property: "transform-rotate-y" },
+                  { name: "Rotate Z", property: "transform-rotate-z" },
+                  { name: "Scale X", property: "transform-scale-x" },
+                  { name: "Scale Y", property: "transform-scale-y" },
+                  { name: "Scale Z", property: "transform-scale-z" },
+                ],
+              },
+            ],
+          },
+          {
+            name: "Flex",
             open: false,
             properties: [
-              { name: 'Border Width', property: 'border-width', type: 'number', units: ['px'], defaults: '1px' },
-              { name: 'Border Style', property: 'border-style', type: 'select', options: [{ value: 'none', name: 'None' }, { value: 'solid', name: 'Solid' }, { value: 'dotted', name: 'Dotted' }, { value: 'dashed', name: 'Dashed' }] },
-              { name: 'Border Color', property: 'border-color', type: 'color', defaults: '#000000' },
-              { name: 'Border Radius', property: 'border-radius', type: 'number', units: ['px', '%'], defaults: '0' }
-            ]
-          }
-        ]
+              {
+                name: "Flex Container",
+                property: "display",
+                type: "select",
+                defaults: "block",
+                list: [
+                  { value: "block", name: "Disable" },
+                  { value: "flex", name: "Enable" },
+                ],
+              },
+              {
+                name: "Flex Parent",
+                property: "label-parent-flex",
+                type: "integer",
+              },
+              {
+                name: "Direction",
+                property: "flex-direction",
+                type: "radio",
+                defaults: "row",
+                list: [
+                  {
+                    value: "row",
+                    name: "Row",
+                    className: "icons-flex icon-dir-row",
+                    title: "Row",
+                  },
+                  {
+                    value: "row-reverse",
+                    name: "Row reverse",
+                    className: "icons-flex icon-dir-row-rev",
+                    title: "Row reverse",
+                  },
+                  {
+                    value: "column",
+                    name: "Column",
+                    title: "Column",
+                    className: "icons-flex icon-dir-col",
+                  },
+                  {
+                    value: "column-reverse",
+                    name: "Column reverse",
+                    title: "Column reverse",
+                    className: "icons-flex icon-dir-col-rev",
+                  },
+                ],
+              },
+              {
+                name: "Justify",
+                property: "justify-content",
+                type: "radio",
+                defaults: "flex-start",
+                list: [
+                  {
+                    value: "flex-start",
+                    className: "icons-flex icon-just-start",
+                    title: "Start",
+                  },
+                  {
+                    value: "flex-end",
+                    title: "End",
+                    className: "icons-flex icon-just-end",
+                  },
+                  {
+                    value: "space-between",
+                    title: "Space between",
+                    className: "icons-flex icon-just-sp-bet",
+                  },
+                  {
+                    value: "space-around",
+                    title: "Space around",
+                    className: "icons-flex icon-just-sp-ar",
+                  },
+                  {
+                    value: "center",
+                    title: "Center",
+                    className: "icons-flex icon-just-sp-cent",
+                  },
+                ],
+              },
+              {
+                name: "Align",
+                property: "align-items",
+                type: "radio",
+                defaults: "center",
+                list: [
+                  {
+                    value: "flex-start",
+                    title: "Start",
+                    className: "icons-flex icon-al-start",
+                  },
+                  {
+                    value: "flex-end",
+                    title: "End",
+                    className: "icons-flex icon-al-end",
+                  },
+                  {
+                    value: "stretch",
+                    title: "Stretch",
+                    className: "icons-flex icon-al-str",
+                  },
+                  {
+                    value: "center",
+                    title: "Center",
+                    className: "icons-flex icon-al-center",
+                  },
+                ],
+              },
+              {
+                name: "Flex Children",
+                property: "label-parent-flex",
+                type: "integer",
+              },
+              {
+                name: "Order",
+                property: "order",
+                type: "integer",
+                defaults: 0,
+                min: 0,
+              },
+              {
+                name: "Flex",
+                property: "flex",
+                type: "composite",
+                properties: [
+                  {
+                    name: "Grow",
+                    property: "flex-grow",
+                    type: "integer",
+                    defaults: 0,
+                    min: 0,
+                  },
+                  {
+                    name: "Shrink",
+                    property: "flex-shrink",
+                    type: "integer",
+                    defaults: 0,
+                    min: 0,
+                  },
+                  {
+                    name: "Basis",
+                    property: "flex-basis",
+                    type: "integer",
+                    units: ["px", "%", ""],
+                    unit: "",
+                    defaults: "auto",
+                  },
+                ],
+              },
+              {
+                name: "Align",
+                property: "align-self",
+                type: "radio",
+                defaults: "auto",
+                list: [
+                  {
+                    value: "auto",
+                    name: "Auto",
+                  },
+                  {
+                    value: "flex-start",
+                    title: "Start",
+                    className: "icons-flex icon-al-start",
+                  },
+                  {
+                    value: "flex-end",
+                    title: "End",
+                    className: "icons-flex icon-al-end",
+                  },
+                  {
+                    value: "stretch",
+                    title: "Stretch",
+                    className: "icons-flex icon-al-str",
+                  },
+                  {
+                    value: "center",
+                    title: "Center",
+                    className: "icons-flex icon-al-center",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       }
+      
       
     });
 
     setEditor(editor);
     return () => editor.destroy();
-  }, []);
+  }, [tabState]);
 
   return (
-    <div className="h-screen pt-4 gap-y-5 justify-center items-center flex flex-col bg-gradient-to-r from-[#373b44] to-[#4286f4]">
+    <div className="h-screen justify-center items-center flex flex-col bg-[whitesmoke]">
 
-      <Toolbar />
+      <Toolbar title="E-commerce website"/>
 
-      <div className="flex-1 flex w-[95%] gap-x-5 pb-3">
+      <div className="flex-1 flex w-full bg-[whitesmoke]">
 
-        <PanelFiles />
+        <LeftPanel />
 
-        <div className="flex-1 w-[500px] rounded-2xl bg-white p-2">
-            <div id="gjs" className="h-full w-[400px] rounded-2xl"></div>
+        <div className="flex justify-center w-[100%] bg-[whitesmoke] py-5">
+            <div id="gjs" className="h-full w-[40%]  bg-[whitesmoke]"></div>
         </div>
 
-        <PanelStyles />
+        <PanelStyles setTabState={setTabState} tabState={tabState} />
 
       </div>
 
