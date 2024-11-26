@@ -88,6 +88,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <br />
     </section>
   );
 };

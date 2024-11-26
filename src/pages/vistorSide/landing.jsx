@@ -7,14 +7,14 @@ import Features from "../../components/landing/Features";
 import Header from "../../components/landing/Header";
 import LazyShow from "../../components/landing/LazyShow";
 import MainHero from "../../components/landing/MainHero";
+import Contact from "../../components/landing/Contact";
 import MainHeroImage from "../../components/landing/MainHeroImage";
 import Pricing from "../../components/landing/Pricing";
 import Product from "../../components/landing/Product";
-import Contact from "../../components/landing/Contact";
 
 export default function Landing() {
   return (
-    <div className={`bg-background grid gap-y-16 overflow-hidden`}>
+    <div className={`bg-background grid overflow-hidden`}>
       <div className={`relative bg-background`}>
         <div className="max-w-7xl mx-auto">
           <div
@@ -39,15 +39,19 @@ export default function Landing() {
           {/* <Canvas /> */}
         </>
       </LazyShow>
+      <LazyShow>{/* <Pricing /> */}</LazyShow>
+
       <LazyShow>
-        {" "}
-        <Contact />
+        {/* Contact */}
+        <Contact></Contact>
       </LazyShow>
+
       <LazyShow>
         <>
           <About />
         </>
       </LazyShow>
+
       <Analytics />
     </div>
   );
