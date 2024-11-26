@@ -131,9 +131,13 @@ const Style = () => {
               </button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent style={{ 
+              backgroundColor: "black", 
+              border: "1px solid #333",
+              color: "white"
+            }}>
               <DialogHeader>
-                <DialogTitle style={{ color: "black" }}>
+                <DialogTitle style={{ color: "white" }}>
                   Select a Website Template
                 </DialogTitle>
               </DialogHeader>
@@ -153,14 +157,14 @@ const Style = () => {
                     style={{
                       border:
                         selectedTemplate === index
-                          ? "2px solid #000"
-                          : "1px solid #ccc",
+                          ? "2px solid #fff"
+                          : "1px solid #333",
                       borderRadius: "8px",
                       padding: "10px",
                       textAlign: "center",
                       cursor: "pointer",
                       backgroundColor:
-                        selectedTemplate === index ? "#f0f0f0" : "white",
+                        selectedTemplate === index ? "#333" : "#111",
                     }}
                   >
                     {palette.colors.map((color, idx) => (
@@ -181,7 +185,7 @@ const Style = () => {
                             marginRight: "10px",
                           }}
                         ></div>
-                        <p style={{ margin: 0, color: "black" }}>
+                        <p style={{ margin: 0, color: "white" }}>
                           {palette.descriptions[idx]}
                         </p>
                       </div>
@@ -198,8 +202,8 @@ const Style = () => {
                   style={{
                     padding: "10px 20px",
                     backgroundColor:
-                      selectedTemplate !== null ? "black" : "#ccc",
-                    color: "white",
+                      selectedTemplate !== null ? "#fff" : "#333",
+                    color: selectedTemplate !== null ? "black" : "#666",
                     border: "none",
                     borderRadius: "4px",
                     cursor:
