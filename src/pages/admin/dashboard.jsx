@@ -1,14 +1,11 @@
-import Layout from "./layoute";
+import Layout from "./layoute"; // Assurez-vous que le chemin est correct et le fichier "layoute" existe.
 
 export function Admin() {
   return (
     <Layout>
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
-        <div className="aspect-video rounded-xl bg-muted/50" />
+      <div className="ml-auto flex items-center space-x-4">
+        Générateur de Sites Web
       </div>
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
     </Layout>
   );
 }
