@@ -22,7 +22,7 @@ const MainHero: React.FC = () => {
   const handleCommencezClick = (): void => {
     setLoading(true);
     setTimeout(() => {
-      navigate('/stepper');
+      navigate('/login');
     }, 1000);
   };
 
