@@ -4,26 +4,29 @@ export const Preview = ({ editor }) => {
         const pageHtml = currentPage.getMainComponent().toHTML();
         const pageCss = editor.getCss();
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const previewTab = window.open('', '_blank');
 
-        const previewWindow = window.open('', 'Preview', `width=${width},height=${height}`);
-        previewWindow.document.open();
-        previewWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    ${pageCss}
-                </style>
-            </head>
-            <body>
-                ${pageHtml}
-            </body>
-            </html>
-        `);
-        previewWindow.document.close();
+        if (previewTab) {
+            previewTab.document.open();
+            previewTab.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Page Preview</title>
+                    <style>
+                        ${pageCss}
+                    </style>
+                </head>
+                <body>
+                    ${pageHtml}
+                </body>
+                </html>
+            `);
+            previewTab.document.close();
+        } else {
+            alert('Unable to open preview. Please allow pop-ups for this site.');
+        }
     } else {
         alert('No page selected');
     }
-}
+};
