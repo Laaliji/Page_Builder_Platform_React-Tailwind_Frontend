@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 
 export default function PanelStyles({tabState,setTabState}){
     return <>
-        <div className="w-[35%] bg-white  pt-2 px-2">
+        <div className="w-[35%] bg-white  pt-2 px-2" id="">
             <Tabs defaultValue="composants">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger onClick={()=>setTabState(!tabState)} value="styles">Styles</TabsTrigger>

@@ -20,7 +20,14 @@ import Button from "./Button";
 
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import SegmentedControl from "../ui/SegmentedControl";
-export default function Toolbar({ title }){
+import DialogeRenameProject from "./DialogeRenameProject";
+import RenameDialog from "./DialogeRenameProject";
+import DeleteDialog from "./DialogeDeleteProject";
+import DialogeNewPage from "./DialogeNewPage";
+import DialogeExtractCode from "./DialogeExtractCode";
+import { Preview } from "@/functions/editor/Preview";
+import DialogeShare from "./DialogeShare";
+export default function Toolbar({ title , editor }){
     const Pages = [
         {label:"homepage"   , value:"homepage"   },
         {label:"aboutpage"  , value:"aboutpage"  },
@@ -36,8 +43,27 @@ export default function Toolbar({ title }){
         { value: "computer", label: "Computer", icon: LaptopMinimal },
         { value: "phone", label: "Phone", icon: Smartphone },
     ]
+    const [isRenameDialogOpen , setIsRenameDialogOpen] = useState(false)
+    const [isDeleteDialogOpen , setIsDeleteDialogOpen] = useState(false)
+    const [isNewPageDialogOpen,setIsNewPageDialogOpen] = useState(false)
+    const [isExtractCodeDialogOpen,setIsExtractCodeDialogOpen] = useState(false)
+    const [isShareDialogOpen,setIsShareDialogOpen] = useState(false)
+
+    const selectDevice = (value) => {
+        setSelectedDevice(value);
+        const deviceManager = editor.DeviceManager;
+        const device = deviceManager.get(value);
+        deviceManager.select(device);
+    };
+    
 
     return <>
+        {/* Components  */}
+        <DialogeShare isShareDialogOpen={isShareDialogOpen} setIsShareDialogOpen={setIsShareDialogOpen}/>
+        <DialogeExtractCode isExtractCodeDialogOpen={isExtractCodeDialogOpen} setIsExtractCodeDialogOpen={setIsExtractCodeDialogOpen} editor={editor} />
+        <RenameDialog isRenameDialogOpen={isRenameDialogOpen} setIsRenameDialogOpen={setIsRenameDialogOpen} />
+        <DeleteDialog isDeleteDialogOpen={isDeleteDialogOpen} setIsDeleteDialogOpen={setIsDeleteDialogOpen} />
+        <DialogeNewPage isNewPageDialogOpen={isNewPageDialogOpen} setIsNewPageDialogOpen={setIsNewPageDialogOpen}/>
         <div className="w-full overflow-hidden bg-white py-[9px]  flex flex-row items-center border-b-[1px] border-black/15 border-solid">
             <div className="ml-3 flex items-center gap-5">
                 <img src="/assets/images/logo.png" width="30" className="cursor-pointer"/>
@@ -49,12 +75,12 @@ export default function Toolbar({ title }){
                                 <EllipsisVertical size="17" className="text-black/50 cursor-pointer"/>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-fit border border-black/10 border-solid">
-                                    <DropdownMenuItem className="cursor-pointer flex gap-2">
-                                       <FolderPen /> Renommer le projet
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer flex gap-2">
-                                       <FolderX /> Supprimer le projet
-                                    </DropdownMenuItem>
+                                <DropdownMenuItem onClick={()=> setIsRenameDialogOpen(true)} className="cursor-pointer flex gap-2">
+                                    <FolderPen /> Renommer le projet
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={()=> setIsDeleteDialogOpen(true)} className="cursor-pointer flex gap-2">
+                                    <FolderX /> Supprimer le projet
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -104,7 +130,9 @@ export default function Toolbar({ title }){
                                     </CommandItem>
                                 ))}
                                 <CommandItem className="flex cursor-pointer">
-                                    <Plus /> nouveau page
+                                    <div onClick={()=>setIsNewPageDialogOpen(true)} className="flex items-center gap-2">
+                                        <Plus /> nouveau page
+                                    </div>
                                 </CommandItem>
                                 </CommandGroup>
                             </CommandList>
@@ -119,14 +147,14 @@ export default function Toolbar({ title }){
                     <SegmentedControl
                         options={options}
                         value={selectedDevice}
-                        onChange={setSelectedDevice}
+                        onChange={selectDevice}
                     />
                 </div>
-                <div className="p-[7px] rounded-sm hover:bg-green-100">
+                <div className="p-[7px] rounded-sm hover:bg-green-100" onClick={()=>Preview(editor)}>
                     <Play fill="#b7dfba" size="20" className="text-green-700 cursor-pointer"/>
                 </div>
-                <Button title="Extraire" className="bg-black/10 hover:bg-black/15  text-black" icon={<CodeXml size={"16"}/>}/>
-                <Button title="Partager" className="bg-black/10 hover:bg-black/15 text-black" icon={<Forward size={"16"}/>}/>
+                <Button title="Extraire" className="bg-black/10 hover:bg-black/15  text-black" icon={<CodeXml size={"16"}/>} onClick={()=>setIsExtractCodeDialogOpen(true)} />
+                <Button title="Partager" className="bg-black/10 hover:bg-black/15 text-black" icon={<Forward size={"16"}/>} onClick={()=>setIsShareDialogOpen(true)}/>
                 <Button title="Publier" className="bg-secondary hover:bg-primary text-white" icon={<Github size={"16"}/>}/>
             </div>
         </div>
