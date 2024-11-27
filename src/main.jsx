@@ -5,23 +5,21 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Landing from './pages/vistorSide/landing.jsx';
 import StepperPage from './pages/stepper/stepperPage.jsx';
 import Layout from './pages/vistorSide/layoute.jsx'
+import Editor from './pages/panelSide/editor.jsx'
+import { LoginPage } from './pages/authSide/LoginPage';
 
 const router = createBrowserRouter([
-
-  { path: '/', element: <Landing /> },
+  {
+    path: '/',
+    element: <Layout/>,
+    children: [
+      { path: '', element: <Landing/> },
+      { path: 'editor', element: <Editor /> },
+      { path: 'login', element : <LoginPage/>}
+    ]
+  },
   { path: '/stepper', element: <StepperPage /> },
 ]);
-
-  { 
-    path : '/' ;
-    element : <Layout/> ;
-    children: [
-      { path: '/' , element : <Landing/> },
-      {},
-      {}
-    ] 
-  }
-
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
