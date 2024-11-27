@@ -53,18 +53,18 @@ export default function LeftPanel({ editor }){
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-fit border border-black/10 border-solid" side="right">
                             <DropdownMenuItem  >
-                                <div className="cursor-pointer flex gap-2" onClick={()=>editor.Commands.run('core:canvas-clear')}>
+                                <div className="cursor-pointer flex gap-2 items-center" onClick={()=>editor.Commands.run('core:canvas-clear')}>
                                    <SquareX/> Effacer le contenu de la page 
                                 </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem  >
-                                <div className="cursor-pointer flex gap-2" onClick={()=>editor.Commands.run('core:redo')}>
+                                <div className="cursor-pointer flex gap-2 items-center" onClick={()=>editor.Commands.run('core:redo')}>
                                     <Redo2/> Refaire
                                 </div>                               
                             </DropdownMenuItem>
                             <DropdownMenuItem  >
-                                <div className="cursor-pointer flex gap-2" onClick={()=>editor.Commands.run('core:undo')}>
+                                <div className="cursor-pointer flex gap-2 items-center" onClick={()=>editor.Commands.run('core:undo')}>
                                     <Undo2/> Défaire
                                 </div>
                             </DropdownMenuItem>
