@@ -9,6 +9,8 @@ import Landing from "./pages/vistorSide/landing.jsx";
 import Editor from "./pages/panelSide/editor.jsx";
 import Admin from "./pages/admin/dashboard.jsx";
 
+import Profil from "./pages/admin/profil.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -20,6 +22,11 @@ const router = createBrowserRouter([
     path: "/",
     element: <LayoutAdmin />,
     children: [{ path: "/admin", element: <Admin /> }, {}, {}],
+  },
+  {
+    path: "/",
+    element: <LayoutAdmin />,
+    children: [{ path: "/profil", element: <Profil /> }, {}, {}],
   },
 ]);
 

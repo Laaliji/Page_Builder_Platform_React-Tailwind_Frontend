@@ -10,8 +10,23 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  CreditCard,
+  LogOut,
+  Sparkles,
+} from "lucide-react";
+
+import { useNavigate } from "react-router-dom";
 
 export function UserNav() {
+  const navigate = useNavigate();
+
+  const handleNavigation = () => {
+    navigate("/profil");
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,27 +53,36 @@ export function UserNav() {
 
         {/* Options du menu */}
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Billing
-            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>New Team</DropdownMenuItem>
+          <DropdownMenuGroup>
+            <DropdownMenuItem>
+              <Sparkles />
+              Upgrade to Pro
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={handleNavigation}>
+              <BadgeCheck />
+              Account
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <CreditCard />
+              Billing
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Bell />
+              Notifications
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
         {/* Déconnexion */}
         <DropdownMenuItem>
+          <LogOut />
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

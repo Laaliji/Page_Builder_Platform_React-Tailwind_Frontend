@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-import config from "../../template/config/index.json";
+import config from "@/template/config/index.json";
 
 export function TeamSwitcher({ teams }) {
   const { isMobile } = useSidebar();
