@@ -1,21 +1,23 @@
-import * as React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/Card";
+import { useNavigate } from "react-router-dom";
+import TopBarProgress from "react-topbar-progress-indicator";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/Label";
+import { Label } from "../../components/ui/label";
 import { FaGithub } from "react-icons/fa";
 
-const handleGitHubLogin = () => {
-  console.log("GitHub signup clicked");
-};
+
+TopBarProgress.config({
+  barColors: {
+    "0": "#2563eb",
+    "1.0": "#1d4ed8",
+  },
+  shadowBlur: 5,
+});
 
 export function SignupPage() {
+  const [loading, setLoading] = useState(false);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [username, setUsername] = useState("");
@@ -26,13 +28,38 @@ export function SignupPage() {
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const navigate = useNavigate();
 
-  const logo = "../../../public/assets/images/logo.png";
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    const githubId = urlParams.get("github_id");
+    const email = urlParams.get("email");
+    const firstname = urlParams.get("firstname");
+    const lastname = urlParams.get("lastname");
+    const username = urlParams.get("username");
+
+    if (token && githubId && email) {
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("githubId", githubId);
+      localStorage.setItem("email", email);
+
+      if (firstname) setFirstname(firstname);
+      if (lastname) setLastname(lastname);
+      if (username) setUsername(username);
+      if (email) setEmail(email);
+    }
+  }, []);
+
+  const handleGitHubLogin = () => {
+    setLoading(true);
+    window.location.href = "http://localhost:8000/auth/github/login";
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Clear previous error messages
+    
     setFirstnameError("");
     setLastnameError("");
     setUsernameError("");
@@ -41,7 +68,7 @@ export function SignupPage() {
 
     let formIsValid = true;
 
-    // Validation
+    
     if (!firstname) {
       setFirstnameError("First name is required");
       formIsValid = false;
@@ -64,17 +91,21 @@ export function SignupPage() {
     }
 
     if (formIsValid) {
-      // Handle successful form submission here
       console.log("Form submitted", { firstname, lastname, username, email, password });
+
+      
+      setTimeout(() => {
+        navigate("/login"); 
+      }, 500);
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      {loading && <TopBarProgress />}
       <div className="flex flex-col items-center justify-center w-full">
-        {/* Logo */}
         <a href="#">
-          <img alt="logo" className="h-9 w-auto sm:h-9" src={logo} />
+          <img alt="logo" className="h-9 w-auto sm:h-9" src="/assets/images/logo.png" />
         </a>
 
         <Card className="w-[400px] shadow-md border-none mt-6">
@@ -82,21 +113,16 @@ export function SignupPage() {
             <CardTitle>Signup</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* GitHub signup button */}
             <div className="mt-4 flex justify-center">
               <Button
                 className="w-full text-white bg-gray-800 flex items-center justify-center gap-2"
                 onClick={handleGitHubLogin}
               >
-                <FaGithub color="white" /> {/* GitHub Icon with white color */}
+                <FaGithub color="white" />
                 Signup with GitHub
               </Button>
             </div>
-            {/* OR text */}
-            <div className="mt-4 text-center text-sm text-gray-600">
-              OR
-            </div>
-            {/* Form */}
+            <div className="mt-4 text-center text-sm text-gray-600">or</div>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4 w-full items-center mt-4">
                 <div className="flex flex-col space-y-1.5">
@@ -104,7 +130,7 @@ export function SignupPage() {
                   <Input
                     id="firstname"
                     type="text"
-                    placeholder="Entrez votre Prénom"
+                    placeholder="Enter your first name"
                     value={firstname}
                     onChange={(e) => setFirstname(e.target.value)}
                     className={firstnameError ? "border-red-500" : ""}
@@ -116,7 +142,7 @@ export function SignupPage() {
                   <Input
                     id="lastname"
                     type="text"
-                    placeholder="Entrez votre Nom"
+                    placeholder="Enter your last name"
                     value={lastname}
                     onChange={(e) => setLastname(e.target.value)}
                     className={lastnameError ? "border-red-500" : ""}
@@ -125,11 +151,11 @@ export function SignupPage() {
                 </div>
               </div>
               <div className="flex flex-col space-y-1.5 mt-4">
-                <Label htmlFor="username">User Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Entrez votre Nom d'utilisateur"
+                  placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className={usernameError ? "border-red-500" : ""}
@@ -141,7 +167,7 @@ export function SignupPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Entrez votre email"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={emailError ? "border-red-500" : ""}
@@ -149,11 +175,11 @@ export function SignupPage() {
                 {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               </div>
               <div className="flex flex-col space-y-1.5 mt-4">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Entrez votre mot de passe"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={passwordError ? "border-red-500" : ""}
@@ -164,7 +190,6 @@ export function SignupPage() {
                 Signup
               </Button>
             </form>
-            {/* Existing user login link */}
             <div className="mt-4 text-center text-sm text-gray-600">
               <p>
                 Already have an account?{" "}
