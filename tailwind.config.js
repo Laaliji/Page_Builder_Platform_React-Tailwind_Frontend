@@ -21,9 +21,12 @@ export default {
   		'6xl': '4rem'
   	},
   	extend: {
+		screens: {
+			'middle': '500px', // Custom breakpoint
+		},
   		colors: {
-			primary: '#1477d2',
-			secondary: '#1a8ae5',
+  			primary: '#1477d2',
+  			secondary: '#1a8ae5',
   			tertiary: '#1e97f3',
   			border: '#1a2e35',
   			ring: 'hsl(var(--ring))',
@@ -56,6 +59,16 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
   		animation: {
