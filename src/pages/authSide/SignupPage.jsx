@@ -6,15 +6,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { FaGithub } from "react-icons/fa";
-import axiosInstance,  { fetchCSRFToken, getCSRFToken }  from '../../api/axiosConfig';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-// TopBarProgress Config
 TopBarProgress.config({
   barColors: {
     "0": "#2563eb",
     "1.0": "#1d4ed8",
   },
   shadowBlur: 5,
+});
+
+const csrfToken = Cookies.get('XSRF-TOKEN');
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:8000',
+  withCredentials: true,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'XSRF-TOKEN': csrfToken
+  },
 });
 
 export function SignupPage() {
@@ -32,7 +43,6 @@ export function SignupPage() {
   
   const navigate = useNavigate();
 
-  // Debug Initial URL Data
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
@@ -42,13 +52,10 @@ export function SignupPage() {
     const lastname = urlParams.get("lastname");
     const username = urlParams.get("username");
 
-    console.log("URL Params:", { token, githubId, email, firstname, lastname, username });
-
     if (token && githubId && email) {
       localStorage.setItem("authToken", token);
       localStorage.setItem("githubId", githubId);
-
-      // Pre-fill form with GitHub data if available
+      
       if (firstname) setFirstname(firstname);
       if (lastname) setLastname(lastname);
       if (username) setUsername(username);
@@ -56,18 +63,14 @@ export function SignupPage() {
     }
   }, []);
 
-  // Handle GitHub Login
   const handleGitHubLogin = () => {
     setLoading(true);
-    console.log("Redirecting to GitHub login...");
     window.location.href = "http://localhost:8000/auth/github/login";
   };
 
-  // Form Validation
   const validateForm = () => {
     let isValid = true;
 
-    // Validate email
     if (!email) {
       setEmailError("Email is required.");
       isValid = false;
@@ -75,7 +78,6 @@ export function SignupPage() {
       setEmailError("");
     }
 
-    // Validate password
     if (!password) {
       setPasswordError("Password is required.");
       isValid = false;
@@ -83,7 +85,6 @@ export function SignupPage() {
       setPasswordError("");
     }
 
-    // Validate other fields
     if (!firstname) {
       setFirstnameError("First name is required.");
       isValid = false;
@@ -111,51 +112,30 @@ export function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Reset previous errors
     setEmailError("");
     setPasswordError("");
     setFirstnameError("");
     setLastnameError("");
     setUsernameError("");
   
-    console.log("Submitting form:", { firstname, lastname, username, email, password });
-  
     const isValid = validateForm();
     if (!isValid) return;
   
     try {
-      // Step 1: Fetch CSRF token and set it in cookies
-      await fetchCSRFToken();  // Make sure the CSRF token is set in cookies
-  
-      // Step 2: Retrieve CSRF token from cookies
-      const csrfToken = getCSRFToken();
-      if (!csrfToken) {
-        alert('CSRF token is missing!');
-        return;
-      }
-  
       setLoading(true);
   
-      // Step 3: Make the POST request with CSRF token in headers
-      const response = await axiosInstance.post("/auth/signup", {
+      const response = await axiosInstance.post("auth/signup", {
         firstname,
         lastname,
         username,
         email,
         password,
         password_confirmation: password,
-      }, {
-        headers: {
-          'X-CSRF-TOKEN': csrfToken,  // Attach the CSRF token here
-        },
       });
   
-      console.log("User registered successfully:", response.data);
       navigate("/login");
   
     } catch (error) {
-      console.error("Full Error Object:", error);
-  
       if (error.response) {
         const errors = error.response.data.errors;
         if (errors) {
@@ -176,7 +156,6 @@ export function SignupPage() {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

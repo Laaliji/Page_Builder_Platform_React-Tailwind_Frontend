@@ -3,16 +3,12 @@ import { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import TopBarProgress from 'react-topbar-progress-indicator';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/Label";
+import { Label } from "../../components/ui/label";
 import { FaGithub } from "react-icons/fa";
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 TopBarProgress.config({
   barColors: {
@@ -22,9 +18,19 @@ TopBarProgress.config({
   shadowBlur: 5,
 });
 
+const csrfToken = Cookies.get('XSRF-TOKEN');
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:8000',
+  withCredentials: true,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'XSRF-TOKEN': csrfToken
+  },
+});
 
 const handleGitHubLogin = () => {
-  window.location.href = 'http://localhost:8000/auth/github/login';
+  window.location.href = 'http://localhost:8000/api/auth/github';
 };
 
 export function LoginPage() {
@@ -36,7 +42,6 @@ export function LoginPage() {
   const [passwordError, setPasswordError] = useState("");
   const logo = "/assets/images/logo.png";
 
-  
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -51,26 +56,58 @@ export function LoginPage() {
     }
   }, [navigate]);
 
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setEmailError("");
-    setPasswordError("");
-
-    let formIsValid = true;
-
+  const validateForm = () => {
+    let isValid = true;
     if (!email) {
       setEmailError("Email is required");
-      formIsValid = false;
+      isValid = false;
+    } else {
+      setEmailError("");
     }
 
     if (!password) {
       setPasswordError("Password is required");
-      formIsValid = false;
+      isValid = false;
+    } else {
+      setPasswordError("");
     }
 
-    if (formIsValid) {
-      console.log("Form submitted", { email, password });
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setEmailError("");
+    setPasswordError("");
+  
+    const isValid = validateForm();
+    if (!isValid) return;
+
+    try {
+      setLoading(true);
+      const response = await axiosInstance.post("auth/login", {
+        email,
+        password,
+      });
+
+      localStorage.setItem("authToken", response.data.token);
+      navigate('/stepper');
+    } catch (error) {
+      if (error.response) {
+        const errors = error.response.data.errors;
+        if (errors) {
+          if (errors.email) setEmailError(errors.email[0]);
+          if (errors.password) setPasswordError(errors.password[0]);
+        } else {
+          alert(error.response.data.message || "Login failed");
+        }
+      } else if (error.request) {
+        alert("Network error. Please check your connection.");
+      } else {
+        alert("An unexpected error occurred.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,45 +143,42 @@ export function LoginPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
-              <div className="grid w-full items-center gap-4 mt-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={emailError ? "border-red-500" : ""}
-                  />
-                  {emailError && (
-                    <p className="text-red-500 text-xs">{emailError}</p>
-                  )}
-                </div>
-
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={passwordError ? "border-red-500" : ""}
-                  />
-                  {passwordError && (
-                    <p className="text-red-500 text-xs">{passwordError}</p>
-                  )}
-                </div>
+              <div className="flex flex-col space-y-1.5 mt-4">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={emailError ? "border-red-500" : ""}
+                />
+                {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               </div>
-
-              <Button className="w-full mt-4 text-white bg-black" type="submit">
-                Login
-              </Button>
+              <div className="flex flex-col space-y-1.5 mt-4">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={passwordError ? "border-red-500" : ""}
+                />
+                {passwordError && <p className="text-red-500 text-xs">{passwordError}</p>}
+              </div>
+              <div className="flex flex-col items-center justify-center mt-8">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-500 text-white py-2 rounded-lg"
+                  disabled={loading}
+                >
+                  {loading ? "Logging in..." : "Login"}
+                </Button>
+              </div>
             </form>
-
-            {/* New user sign-up link */}
-            <div className="mt-4 text-center text-sm text-gray-600">
+          {/* New user sign-up link */}
+          <div className="mt-4 text-center text-sm text-gray-600">
               <p>
                 New user?{" "}
                 <a href="/signup" className="text-blue-600 hover:underline">

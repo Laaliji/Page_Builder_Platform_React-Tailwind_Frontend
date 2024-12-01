@@ -54,7 +54,7 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
   );
 
   return (
-    <div className="mt-10 mb-16 px-8">
+    <div className="mt-10 mb-16 ">
       <h2 className="text-2xl font-semibold text-slate-900 mb-6">Quick Review</h2>
       <div className="grid grid-cols-2 gap-8">
         {/* Left Column */}

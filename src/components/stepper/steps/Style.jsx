@@ -206,7 +206,7 @@ const Style = () => {
                       selectedTemplate !== null ? "pointer" : "not-allowed",
                   }}
                 >
-                  Save
+                  Next
                 </button>
               </div>
             </DialogContent>
