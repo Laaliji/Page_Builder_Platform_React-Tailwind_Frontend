@@ -132,3 +132,15 @@
     @apply px-4;
   }
 }
+
+.password-strength-bar {
+  height: 5px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+}
+
+.password-strength-bar-inner {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  border-radius: 4px;
+}

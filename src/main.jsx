@@ -10,6 +10,7 @@ import Editor from "./pages/panelSide/editor.jsx";
 import Admin from "./pages/admin/dashboard.jsx";
 
 import Profil from "./pages/admin/profil.jsx";
+import RecentComments from "./pages/admin/RecentComments.jsx";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,15 @@ const router = createBrowserRouter([
     path: "/",
     element: <LayoutAdmin />,
     children: [{ path: "/profil", element: <Profil /> }, {}, {}],
+  },
+  {
+    path: "/",
+    element: <LayoutAdmin />,
+    children: [
+      { path: "/RecentComments", element: <RecentComments /> },
+      {},
+      {},
+    ],
   },
 ]);
 

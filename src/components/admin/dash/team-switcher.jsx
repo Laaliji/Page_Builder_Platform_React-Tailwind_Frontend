@@ -37,28 +37,33 @@ export function TeamSwitcher({ teams }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div href="#">
-                <span className="sr-only">{companyName}</span>
-                <img alt="logo" className="h-9 w-auto sm:h-9" src={logo} />
+                {/* <span className="sr-only">Nom de l'entreprise</span> */}
+                <img
+                  alt="logo"
+                  className="data-[state=open]:h-9 w-auto sm:h-9 h-9 w-9"
+                  src={logo}
+                />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeTeam.name}
+                  Générateur de Sites Web
                 </span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate text-xs">Platform</span>
               </div>
-              <ChevronsUpDown className="ml-auto" />
+
+              {/* <ChevronsUpDown className="ml-auto" /> */}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
+          {/* <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             align="start"
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
+          > */}
+          {/* <DropdownMenuLabel className="text-xs text-muted-foreground">
               Teams
-            </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            </DropdownMenuLabel> */}
+          {/* {teams.map((team, index) => (
               <DropdownMenuItem
                 key={team.name}
                 onClick={() => setActiveTeam(team)}
@@ -70,15 +75,15 @@ export function TeamSwitcher({ teams }) {
                 {team.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            ))} */}
+          {/* <DropdownMenuSeparator /> */}
+          {/* <DropdownMenuItem className="gap-2 p-2">
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
               <div className="font-medium text-muted-foreground">Add team</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+            </DropdownMenuItem> */}
+          {/* </DropdownMenuContent> */}
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

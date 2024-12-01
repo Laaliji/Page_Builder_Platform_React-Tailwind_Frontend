@@ -1,15 +1,20 @@
 import * as React from "react";
 import {
-  AudioWaveform,
   BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
+  MessageSquare,
+  Layout,
+  Users,
   Settings2,
-  SquareTerminal,
+  Frame,
+  PieChart,
+  Map,
+  GalleryVerticalEnd,
+  Command,
+  AudioWaveform,
+  BarChartHorizontal,
+  UserCheck,
+  TrendingUp,
+  DollarSign,
 } from "lucide-react";
 
 import { NavMain } from "@/components/admin/dash/nav-main";
@@ -24,7 +29,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
@@ -50,107 +54,34 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Gestion Commentaires",
       url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      icon: MessageSquare,
       items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
+        { title: "Tous les Commentaires", url: "/RecentComments#" },
+        { title: "Commentaires Modérés", url: "#" },
       ],
     },
     {
-      title: "Models",
+      title: "Gestion Templates",
       url: "#",
-      icon: Bot,
+      icon: Layout,
       items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        { title: "Tous les Templates", url: "#" },
+        { title: "Nouveau Template", url: "#" },
       ],
     },
     {
-      title: "Documentation",
+      title: "Clients",
       url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
+      icon: Users,
+      items: [{ title: "Liste des Clients", url: "#" }],
     },
   ],
   projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+    { name: "Visiteurs", url: "#", icon: UserCheck },
+    { name: "Conversions", url: "#", icon: TrendingUp },
+    { name: "Revenus", url: "#", icon: DollarSign },
   ],
 };
 

@@ -1,189 +1,230 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import ImageInput from "@/components/admin/dash/inputImage";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Camera, KeyRound, Mail, User, Eye, EyeOff } from "lucide-react"; // Import Eye and EyeOff icons
+import ImageProfil from "@/components/admin/dash/ImageProfil";
 
-const Profil = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+export default function Profil() {
+  const [showPassword, setShowPassword] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleNewPasswordVisibility = () =>
-    setShowNewPassword(!showNewPassword);
+  const [passwordStrength, setPasswordStrength] = useState("");
+
+  const handlePasswordChange = (value, field) => {
+    if (field === "newPassword") {
+      let strength = "";
+
+      if (value.length < 4) {
+        strength = "Faible"; // Trop court
+      } else if (value.length >= 4 && value.length < 8) {
+        strength = "Moyen"; // Longueur correcte mais manque de complexité
+      } else {
+        if (
+          /[A-Z]/.test(value) && // Contient une majuscule
+          /[a-z]/.test(value) && // Contient une minuscule
+          /[0-9]/.test(value) && // Contient un chiffre
+          /[^A-Za-z0-9]/.test(value) // Contient un caractère spécial
+        ) {
+          strength = "Fort"; // Complexe et assez long
+        } else {
+          strength = "Moyen"; // Long mais manque de diversité
+        }
+      }
+
+      setPasswordStrength(strength);
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handleEmailVerification = () => {
+    alert("Vérification de l'email en cours...");
+  };
 
   return (
-    <div className="space-y-8 px-4 md:px-8 lg:px-16 py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Section Avatar et Détails Utilisateur */}
-        <Card className="w-full lg:w-1/3 bg-white hover:bg-gray-100 flex-shrink-0">
-          <CardHeader className="flex flex-col items-center space-y-4">
-            <img
-              src="/assets/images/Hnioua.jpg"
-              alt="Avatar"
-              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white shadow-lg"
-            />
-            <CardTitle className="text-lg sm:text-2xl font-semibold text-center">
-              Hnioua Abdessamad
-            </CardTitle>
-            <p className="text-gray-500 text-sm sm:text-base text-center">
-              abdessamadhnioua@gmail.com
-            </p>
-          </CardHeader>
-        </Card>
+    <>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-medium">Compte Administrateur</h3>
+          <p className="text-sm text-muted-foreground">
+            Gérez les paramètres et préférences de votre compte administrateur.
+          </p>
+        </div>
 
-        {/* Formulaire de Modification de Profil */}
-        <Card className="w-full lg:w-2/3 bg-white hover:bg-gray-100">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">
-              Modifier votre Profil:
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Nom d'utilisateur et Email */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="w-full">
-                  <label
-                    htmlFor="username"
-                    className="text-gray-600 font-medium text-sm sm:text-base"
-                  >
-                    Nom d'utilisateur:
+        <div className="grid gap-6 overflow-y-scroll max-h-screen hiddenScroll">
+          {/* Photo de Profil */}
+          <ImageProfil />
+          <Card className="border border-black/20 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg md:text-xl">
+                Informations Personnelles
+              </CardTitle>
+              <CardDescription className="text-sm md:text-base">
+                Mettez à jour vos informations personnelles
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Prénom:
                   </label>
                   <Input
-                    type="text"
-                    id="username"
-                    placeholder="Nom d'utilisateur"
-                    className="text-sm sm:text-base"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="John"
+                    className="w-full"
                   />
                 </div>
-                <div className="w-full">
-                  <label
-                    htmlFor="email"
-                    className="text-gray-600 font-medium text-sm sm:text-base"
-                  >
-                    E-mail:
-                  </label>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Nom:</label>
+                  <Input
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Dupont"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Email:</label>
+                <div className="flex flex-col md:flex-row gap-4">
                   <Input
                     type="email"
-                    id="email"
-                    placeholder="Email"
-                    className="text-sm sm:text-base"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="jean.dupont@exemple.com"
+                    className="w-full md:flex-grow"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleEmailVerification}
+                    className="w-full md:w-auto mt-2 md:mt-0"
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Vérifier l'email
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Mot de Passe */}
+          <Card className="border border-black/20 shadow-sm">
+            <CardHeader>
+              <CardTitle>Mot de Passe</CardTitle>
+              <CardDescription>Changez votre mot de passe</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative">
+                <label className="block text-sm font-medium">
+                  Mot de passe actuel:
+                </label>
+                <Input
+                  type={showPassword.currentPassword ? "text" : "password"}
+                  className="pr-10"
+                />
+                {/* <span
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                  onClick={() => togglePasswordVisibility("currentPassword")}
+                >
+                  {showPassword.currentPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </span> */}
+              </div>
+
+              {/* Nouveau mot de passe */}
+              <div className="relative">
+                <label className="block text-sm font-medium">
+                  Nouveau mot de passe:
+                </label>
+                <Input
+                  className="pr-10"
+                  type={showPassword.newPassword ? "text" : "password"}
+                  onChange={(e) =>
+                    handlePasswordChange(e.target.value, "newPassword")
+                  }
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$"
+                  title="Le mot de passe doit contenir au moins 8 caractères, avec une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial."
+                  required
+                />
+                <span
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                  onClick={() => togglePasswordVisibility("newPassword")}
+                >
+                  {showPassword.newPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </span>
+                <div className="password-strength-bar mt-2">
+                  <div
+                    className={`password-strength-bar-inner ${
+                      passwordStrength === "Faible"
+                        ? "bg-red-500 w-1/4"
+                        : passwordStrength === "Moyen"
+                        ? "bg-orange-500 w-2/4"
+                        : passwordStrength === "Fort"
+                        ? "bg-green-500 w-full"
+                        : "" // Valeur par défaut si vide
+                    }`}
                   />
                 </div>
               </div>
 
-              {/* Champs de mot de passe */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="w-full relative">
-                  <label
-                    htmlFor="password"
-                    className="text-gray-600 font-medium text-sm sm:text-base"
-                  >
-                    Mot de passe:
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      placeholder="Mot de passe"
-                      className="text-sm sm:text-base"
-                    />
-                    <button
-                      type="button"
-                      onClick={togglePasswordVisibility}
-                      className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                    >
-                      {showPassword ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13.875 18.825a10.05 10.05 0 004.126-4.1m-8.002.41a10.05 10.05 0 01-4.126-4.1M21 12a9.992 9.992 0 00-18 0m9 9c4.973 0 9-4.028 9-9 0-4.973-4.027-9-9-9-4.973 0-9 4.028-9 9 0 4.973 4.027 9 9 9z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 15a3 3 0 100-6 3 3 0 000 6z"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M3 3l18 18M13.875 18.825a10.05 10.05 0 004.126-4.1M21 12a9.992 9.992 0 00-18 0m9 9c4.973 0 9-4.028 9-9 0-4.973-4.027-9-9-9-4.973 0-9 4.028-9 9 0 4.973 4.027 9 9 9z"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="w-full relative">
-                  <label
-                    htmlFor="new-password"
-                    className="text-gray-600 font-medium text-sm sm:text-base"
-                  >
-                    Nouveau mot de passe:
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type={showNewPassword ? "text" : "password"}
-                      id="new-password"
-                      placeholder="Nouveau mot de passe"
-                      className="text-sm sm:text-base"
-                    />
-                    <button
-                      type="button"
-                      onClick={toggleNewPasswordVisibility}
-                      className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                    >
-                      {showNewPassword ? (
-                        <svg /* Icon visible */>...</svg>
-                      ) : (
-                        <svg /* Icon hidden */>...</svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Image de profil */}
-              <div>
-                <label
-                  htmlFor="bio"
-                  className="text-gray-600 font-medium text-sm sm:text-base"
-                >
-                  Image Profil:
+              <div className="relative">
+                <label className="block text-sm font-medium">
+                  Confirmez le nouveau mot de passe:
                 </label>
-                <ImageInput />
+                <Input
+                  type={showPassword.confirmPassword ? "text" : "password"}
+                  className="pr-10"
+                />
+                {/* <span
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                  onClick={() => togglePasswordVisibility("confirmPassword")}
+                >
+                  {showPassword.confirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </span> */}
               </div>
 
-              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm sm:text-base">
-                Enregistrer les modifications
+              <Button type="submit" className="text-white">
+                <KeyRound className="mr-2 h-4 w-4" />
+                Mettre à jour le mot de passe
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
-};
-
-export default Profil;
+}

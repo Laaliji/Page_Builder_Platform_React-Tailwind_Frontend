@@ -11,8 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server: {
-    host: "192.168.1.165", // Remplacez par l'adresse IP souhaitée
-    port: 3000, // Vous pouvez changer le port si nécessaire
-  },
+  // server: {
+  //   host: "192.168.1.165", // Remplacez par l'adresse IP souhaitée
+  //   port: 3000, // Vous pouvez changer le port si nécessaire
+  // },
 });

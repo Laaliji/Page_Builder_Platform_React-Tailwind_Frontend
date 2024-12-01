@@ -7,26 +7,25 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { BadgeCheck, Bell, LogOut } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 export function UserNav() {
   const navigate = useNavigate();
 
-  const handleNavigation = () => {
-    navigate("/profil");
+  const handleNavigation = (event) => {
+    const elementId = event.currentTarget.id; // Récupérer l'ID de l'élément cliqué
+    console.log("Element ID:", elementId); // Affichez l'ID pour vérification
+    if (elementId == "Compte") {
+      navigate("/profil");
+    } else {
+      navigate("/");
+    }
   };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,7 +38,6 @@ export function UserNav() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-56" align="end" forceMount>
-        {/* Profil utilisateur */}
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">Hnioua</p>
@@ -51,38 +49,22 @@ export function UserNav() {
 
         <DropdownMenuSeparator />
 
-        {/* Options du menu */}
         <DropdownMenuGroup>
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Sparkles />
-              Upgrade to Pro
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={handleNavigation}>
-              <BadgeCheck />
-              Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <CreditCard />
-              Billing
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell />
-              Notifications
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleNavigation} id="Compte">
+            <BadgeCheck />
+            Compte
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Bell />
+            Notifications
+          </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
-        {/* Déconnexion */}
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleNavigation}>
           <LogOut />
-          Log out
+          Déconnexion
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

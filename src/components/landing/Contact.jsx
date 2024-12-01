@@ -1,6 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
 
 const Contact = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const newErrors = {};
+
+    // Validation des champs
+    if (!name) newErrors.name = true;
+    if (!email || !validateEmail(email)) newErrors.email = true;
+    if (!phone.match(/^\d{10}$/)) newErrors.phone = true;
+    if (!message) newErrors.message = true;
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        const response = await fetch("https://example.com/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, phone, message }),
+        });
+
+        if (response.ok) {
+          setSuccessMessage("Votre message a été envoyé avec succès !");
+          setName("");
+          setEmail("");
+          setPhone("");
+          setMessage("");
+        } else {
+          setSuccessMessage(
+            "Erreur lors de l'envoi du message. Veuillez réessayer."
+          );
+        }
+      } catch (error) {
+        setSuccessMessage("Erreur de connexion.API (-_-).");
+      }
+    }
+  };
+
   return (
     <section className="py-0 bg-white">
       <div className="container mx-auto max-w-5xl">
@@ -8,18 +59,15 @@ const Contact = () => {
           Nous contacter
         </h2>
         <div className="flex flex-wrap bg-white shadow-lg rounded-lg overflow-hidden">
-          {/* Colonne gauche */}
           <div className="w-full md:w-1/2 flex items-center justify-center p-6 bg-gray-100">
             <img
               src="/assets/images/Contact2.png"
-              alt="Placeholder"
+              alt="Contact"
               className="w-full h-full"
             />
           </div>
-
-          {/* Colonne droite */}
           <div className="w-full md:w-1/2 p-8">
-            <div className="space-y-4">
+            <form className="space-y-4">
               <div>
                 <label
                   htmlFor="name"
@@ -30,7 +78,11 @@ const Contact = () => {
                 <input
                   type="text"
                   id="name"
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100 text-gray-700 placeholder-gray-500"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    errors.name ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="Entrez votre nom"
                 />
               </div>
@@ -44,22 +96,30 @@ const Contact = () => {
                 <input
                   type="email"
                   id="email"
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100 text-gray-700 placeholder-gray-500"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="Entrez votre email"
                 />
               </div>
               <div>
                 <label
-                  htmlFor="subject"
+                  htmlFor="phone"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Sujet:
+                  Téléphone:
                 </label>
                 <input
-                  type="text"
-                  id="subject"
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100 text-gray-700 placeholder-gray-500"
-                  placeholder="Entrez le sujet"
+                  type="tel"
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    errors.phone ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Entrez votre numéro de téléphone"
                 />
               </div>
               <div>
@@ -72,7 +132,11 @@ const Contact = () => {
                 <textarea
                   id="message"
                   rows="4"
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-100 text-gray-700 placeholder-gray-500"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    errors.message ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="Écrivez votre message"
                 ></textarea>
               </div>
@@ -80,15 +144,16 @@ const Contact = () => {
                 <button
                   type="submit"
                   className="w-full py-2 px-4 text-white bg-blue-500 hover:bg-blue-600 rounded-lg font-bold"
+                  onClick={handleSubmit}
                 >
                   Envoyer E-mail →
                 </button>
+                <p className="text-green-500 text-sm mt-4">{successMessage}</p>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
-      <br />
     </section>
   );
 };
