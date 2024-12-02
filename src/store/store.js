@@ -1,2 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import {  } from './valueSlicer'
+import valueSlicer from "./valueSlicer"; 
+
+const store = configureStore({
+    reducer : {
+        values : valueSlicer
+    }
+})
