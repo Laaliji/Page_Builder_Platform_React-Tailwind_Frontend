@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { FaGithub } from "react-icons/fa";
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import axios from "axios";
+import Cookies from "js-cookie";
+
 
 TopBarProgress.config({
   barColors: {
@@ -17,14 +18,15 @@ TopBarProgress.config({
   shadowBlur: 5,
 });
 
-const csrfToken = Cookies.get('XSRF-TOKEN');
+
+const csrfToken = Cookies.get("XSRF-TOKEN");
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: "http://localhost:8000",
   withCredentials: true,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'XSRF-TOKEN': csrfToken
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "XSRF-TOKEN": csrfToken,
   },
 });
 
@@ -34,96 +36,52 @@ export function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [firstnameError, setFirstnameError] = useState("");
-  const [lastnameError, setLastnameError] = useState("");
-  const [usernameError, setUsernameError] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  
   const navigate = useNavigate();
 
   useEffect(() => {
+    
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     const githubId = urlParams.get("github_id");
     const email = urlParams.get("email");
-    const firstname = urlParams.get("firstname");
-    const lastname = urlParams.get("lastname");
-    const username = urlParams.get("username");
 
     if (token && githubId && email) {
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("githubId", githubId);
       
-      if (firstname) setFirstname(firstname);
-      if (lastname) setLastname(lastname);
-      if (username) setUsername(username);
-      if (email) setEmail(email);
+      localStorage.setItem("auth_token", token);
+      localStorage.setItem("github_id", githubId);
+      localStorage.setItem("email", email);
+
+      
+      navigate("/login");
     }
-  }, []);
+  }, [navigate]);
 
   const handleGitHubLogin = () => {
+    
     setLoading(true);
-    window.location.href = "http://localhost:8000/auth/github/login";
+    window.location.href = "http://localhost:8000/api/auth/github";
   };
 
   const validateForm = () => {
-    let isValid = true;
+    const errors = {};
+    if (!email) errors.email = "Email is required.";
+    if (!password) errors.password = "Password is required.";
+    if (!firstname) errors.firstname = "First name is required.";
+    if (!lastname) errors.lastname = "Last name is required.";
+    if (!username) errors.username = "Username is required.";
 
-    if (!email) {
-      setEmailError("Email is required.");
-      isValid = false;
-    } else {
-      setEmailError("");
-    }
-
-    if (!password) {
-      setPasswordError("Password is required.");
-      isValid = false;
-    } else {
-      setPasswordError("");
-    }
-
-    if (!firstname) {
-      setFirstnameError("First name is required.");
-      isValid = false;
-    } else {
-      setFirstnameError("");
-    }
-
-    if (!lastname) {
-      setLastnameError("Last name is required.");
-      isValid = false;
-    } else {
-      setLastnameError("");
-    }
-
-    if (!username) {
-      setUsernameError("Username is required.");
-      isValid = false;
-    } else {
-      setUsernameError("");
-    }
-
-    return isValid;
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    setEmailError("");
-    setPasswordError("");
-    setFirstnameError("");
-    setLastnameError("");
-    setUsernameError("");
-  
-    const isValid = validateForm();
-    if (!isValid) return;
-  
+    if (!validateForm()) return;
+
     try {
       setLoading(true);
-  
       const response = await axiosInstance.post("auth/signup", {
         firstname,
         lastname,
@@ -132,25 +90,14 @@ export function SignupPage() {
         password,
         password_confirmation: password,
       });
-  
+      
+      
       navigate("/login");
-  
     } catch (error) {
-      if (error.response) {
-        const errors = error.response.data.errors;
-        if (errors) {
-          if (errors.email) setEmailError(errors.email[0]);
-          if (errors.username) setUsernameError(errors.username[0]);
-          if (errors.password) setPasswordError(errors.password[0]);
-          if (errors.firstname) setFirstnameError(errors.firstname[0]);
-          if (errors.lastname) setLastnameError(errors.lastname[0]);
-        } else {
-          alert(error.response.data.message || "Signup failed");
-        }
-      } else if (error.request) {
-        alert("Network error. Please check your connection.");
+      if (error.response && error.response.data.errors) {
+        setErrors(error.response.data.errors);
       } else {
-        alert("An unexpected error occurred.");
+        alert("An unexpected error occurred. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -160,102 +107,87 @@ export function SignupPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       {loading && <TopBarProgress />}
-      <div className="flex flex-col items-center justify-center w-full">
-        <a href="#">
-          <img alt="logo" className="h-9 w-auto sm:h-9" src="/assets/images/logo.png" />
-        </a>
-
-        <Card className="w-[400px] shadow-md border-none mt-6">
-          <CardHeader className="text-center">
-            <CardTitle>Signup</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="mt-4 flex justify-center">
-              <Button
-                className="w-full text-white bg-gray-800 flex items-center justify-center gap-2"
-                onClick={handleGitHubLogin}
-              >
-                <FaGithub color="white" />
-                Signup with GitHub
+      <Card className="w-[400px] shadow-md border-none">
+        <CardHeader className="text-center">
+          <CardTitle>Signup</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mt-4 flex justify-center">
+            <Button
+              className="w-full bg-gray-800 text-white flex items-center gap-2"
+              onClick={handleGitHubLogin}
+            >
+              <FaGithub size={20} />
+              Signup with GitHub
+            </Button>
+          </div>
+          <div className="mt-4 text-center text-sm text-gray-600">or</div>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <Label>First Name</Label>
+                <Input
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  className={errors.firstname ? "border-red-500" : ""}
+                />
+                {errors.firstname && <p className="text-red-500 text-xs">{errors.firstname}</p>}
+              </div>
+              <div>
+                <Label>Last Name</Label>
+                <Input
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
+                  className={errors.lastname ? "border-red-500" : ""}
+                />
+                {errors.lastname && <p className="text-red-500 text-xs">{errors.lastname}</p>}
+              </div>
+            </div>
+            <div className="mt-4">
+              <Label>Username</Label>
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className={errors.username ? "border-red-500" : ""}
+              />
+              {errors.username && <p className="text-red-500 text-xs">{errors.username}</p>}
+            </div>
+            <div className="mt-4">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={errors.email ? "border-red-500" : ""}
+              />
+              {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+            </div>
+            <div className="mt-4">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={errors.password ? "border-red-500" : ""}
+              />
+              {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
+            </div>
+            <div className="mt-6">
+              <Button type="submit" className="w-full bg-blue-500 text-white">
+                {loading ? "Processing..." : "Sign Up"}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm text-gray-600">or</div>
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4 w-full items-center mt-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="firstname">First Name</Label>
-                  <Input
-                    id="firstname"
-                    type="text"
-                    placeholder="Enter your first name"
-                    value={firstname}
-                    onChange={(e) => setFirstname(e.target.value)}
-                    className={firstnameError ? "border-red-500" : ""}
-                  />
-                  {firstnameError && <p className="text-red-500 text-xs">{firstnameError}</p>}
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="lastname">Last Name</Label>
-                  <Input
-                    id="lastname"
-                    type="text"
-                    placeholder="Enter your last name"
-                    value={lastname}
-                    onChange={(e) => setLastname(e.target.value)}
-                    className={lastnameError ? "border-red-500" : ""}
-                  />
-                  {lastnameError && <p className="text-red-500 text-xs">{lastnameError}</p>}
-                </div>
-              </div>
-              <div className="flex flex-col space-y-1.5 mt-4">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className={usernameError ? "border-red-500" : ""}
-                />
-                {usernameError && <p className="text-red-500 text-xs">{usernameError}</p>}
-              </div>
-              <div className="flex flex-col space-y-1.5 mt-4">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={emailError ? "border-red-500" : ""}
-                />
-                {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
-              </div>
-              <div className="flex flex-col space-y-1.5 mt-4">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={passwordError ? "border-red-500" : ""}
-                />
-                {passwordError && <p className="text-red-500 text-xs">{passwordError}</p>}
-              </div>
-              <div className="flex flex-col items-center justify-center mt-8">
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-500 text-white py-2 rounded-lg"
-                  disabled={loading}
-                >
-                  {loading ? "Creating Account..." : "Signup"}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+          </form>
+          <div className="mt-4 text-center text-sm text-gray-600">
+            <p>
+              Already have account?{" "}
+              <a href="/login" className="text-blue-600 hover:underline">
+                login
+              </a>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
