@@ -8,19 +8,24 @@ import { getProjects } from "@/functions/projects/CRUD"
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import DeleteDialog from "@/components/userdashboard/DeleteDialog"
+import { useSelector } from "react-redux"
+import { SortableRowLading } from "@/components/userdashboard/SortableRowLoading"
+import EditProjectDialoge from "@/components/userdashboard/EditProjectDialoge"
 
 export default function Projects() {
+  const { refrecher } = useSelector((state) => state.values);
+
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [filterValue, setFilterValue] = useState("")
   const [isDeleteDialogOpen,setIsDeleteDialogOpen] = useState(false)
+  const [isEditProjectDialogeOpen,setIsEditProjectDialogeOpen] = useState(false)
 
   const [currentPage, setCurrentPage] = useState(1)
   const projectsPerPage = 5
@@ -40,13 +45,14 @@ export default function Projects() {
       setLoading(false)
     }
     GetProjects()
-  }, [])
+  }, [refrecher])
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
 
   return <>
+    <EditProjectDialoge isEditProjectDialogeOpen={isEditProjectDialogeOpen} setIsEditProjectDialogeOpen={setIsEditProjectDialogeOpen}/>
     <DeleteDialog isDeleteDialogOpen={isDeleteDialogOpen} setIsDeleteDialogOpen={setIsDeleteDialogOpen}/>
     <div className="w-full space-y-[11px]">
       <div>
@@ -59,9 +65,9 @@ export default function Projects() {
           onChange={(e) => setFilterValue(e.target.value)}
           className="max-w-sm border border-black/20"
         />
-        <Button className="text-white flex items-center">
+        <Button className="text-white flex items-center" onClick={()=>setIsNewProjectDialogeOpen(true)}>
           <FolderPlus />
-          <span className="-mt-[2px]">Ajouter Nouveau</span>
+          <span className="-mt-[2px]">Modifier Le Projet</span>
         </Button>
       </div>
 
@@ -76,13 +82,17 @@ export default function Projects() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentProjects.filter(project=>(project.title).includes(filterValue)).map((project) => (
-              <SortableRow
-                key={project.id}
-                project={project}
-                setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-              />
-            ))}
+            {!loading
+            ? currentProjects.filter(project=>(project.title).includes(filterValue)).map((project) => (
+                <SortableRow
+                  key={project.id}
+                  project={project}
+                  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+                  setIsEditProjectDialogeOpen={setIsEditProjectDialogeOpen}
+                />
+              ))
+            : <SortableRowLading />
+          }
           </TableBody>
         </Table>
       </div>

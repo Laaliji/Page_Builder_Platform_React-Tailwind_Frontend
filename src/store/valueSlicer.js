@@ -1,18 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit" 
+import { createSlice } from "@reduxjs/toolkit"
 
-const initialStates = {
-    selectedProjectDeleteID : '' 
+const initialState = {
+    selectedProjectDeleteID: null,
+    refrecher : false
 }
 
 const valueSlicer = createSlice({
-    name : 'selectedProjectDeleteID',
-    initialStates,
-    reducers : {
-        setSelectedProjectDeleteID : (state,action) => {
+    name: 'selectedProjectDeleteID',
+    initialState, 
+    reducers: {
+        setSelectedProjectDeleteID: (state, action) => {
             state.selectedProjectDeleteID = action.payload
+        },
+        setRefrecher : (state,action) => {
+            state.refrecher = action.payload
         }
     }
 })
 
-export const { selectedProjectDeleteID } = valueSlicer.actions
+export const { setSelectedProjectDeleteID , setRefrecher } = valueSlicer.actions 
 export default valueSlicer.reducer

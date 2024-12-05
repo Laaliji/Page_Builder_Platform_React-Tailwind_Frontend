@@ -1,7 +1,8 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useDispatch } from "react-redux"
+import { setSelectedProjectDeleteID } from '@/store/valueSlicer'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, GripVertical } from 'lucide-react'
+import { MoreHorizontal } from 'lucide-react'
 
 
-export function SortableRow({ project , setIsDeleteDialogOpen }) {
+export function SortableRow({ project , setIsDeleteDialogOpen , setIsEditProjectDialogeOpen }) {
+
+  const dispatch = useDispatch()
+
   const {
     attributes,
     listeners,
@@ -50,8 +54,8 @@ export function SortableRow({ project , setIsDeleteDialogOpen }) {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer">Voir les détails</DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">Modifier le projet</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600 cursor-pointer"><span onClick={()=>setIsDeleteDialogOpen(true)}>Supprimer</span></DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer"><span onClick={()=>setIsEditProjectDialogeOpen(true)}>Modifier le projet</span></DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600 cursor-pointer"><span onClick={()=>{dispatch(setSelectedProjectDeleteID(project.idP));setIsDeleteDialogOpen(true)}}>Supprimer</span></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
