@@ -67,7 +67,7 @@ const Contact = () => {
             />
           </div>
           <div className="w-full md:w-1/2 p-8">
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="name"
@@ -144,7 +144,6 @@ const Contact = () => {
                 <button
                   type="submit"
                   className="w-full py-2 px-4 text-white bg-blue-500 hover:bg-blue-600 rounded-lg font-bold"
-                  onClick={handleSubmit}
                 >
                   Envoyer E-mail →
                 </button>

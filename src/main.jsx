@@ -11,6 +11,7 @@ import Admin from "./pages/admin/dashboard.jsx";
 
 import Profil from "./pages/admin/profil.jsx";
 import RecentComments from "./pages/admin/RecentComments.jsx";
+import Client from "./pages/admin/client.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,11 @@ const router = createBrowserRouter([
       {},
       {},
     ],
+  },
+  {
+    path: "/",
+    element: <LayoutAdmin />,
+    children: [{ path: "/client", element: <Client /> }, {}, {}],
   },
 ]);
 
