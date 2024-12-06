@@ -1,15 +1,17 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
-import Layout from './pages/vistorSide/layoute.jsx'
 import Landing from './pages/vistorSide/landing.jsx'
 import Editor from './pages/panelSide/editor.jsx'
 import UserDashBoardLayout from './pages/userSide/layout'
 import Home from './pages/userSide/Home'
 import Projects from './pages/userSide/Projects'
 import Account from './pages/userSide/Account'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import StepperPage from './pages/stepper/stepperPage.jsx';
+import Layout from './pages/vistorSide/layoute.jsx';
+import { LoginPage } from './pages/authSide/LoginPage.jsx';
+import { SignupPage } from './pages/authSide/SignupPage.jsx';
 
 const router = createBrowserRouter([
   { 
@@ -23,6 +25,9 @@ const router = createBrowserRouter([
   },
 
   { path : '/editor' , element : <Editor /> },
+  { path: 'stepper', element: <StepperPage /> },
+  { path: 'login', element: <LoginPage /> },
+  { path: 'signup', element: <SignupPage /> },
   
   { 
     path : '/dash/user', 
@@ -35,8 +40,11 @@ const router = createBrowserRouter([
   }
 ]) 
 
+
+
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>,
-)
+  </StrictMode>
+);
