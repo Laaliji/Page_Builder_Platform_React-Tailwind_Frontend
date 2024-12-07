@@ -18,23 +18,23 @@ export default function Template() {
     {
       id: "personal",
       Icon: User,
-      title: "Personal Project",
-      description: "Create a website for your personal portfolio, blog, or hobby project.",
-      examples: ["Blog", "Portfolio", "Hobby Project"],
+      title: "Projet Personnel",
+      description: "Créez un site Web pour votre portfolio personnel, votre blog ou votre projet de loisir.",
+      examples: ["Blog", "Portfolio", "Projet de loisir"],
     },
     {
       id: "business",
       Icon: BriefcaseBusiness,
-      title: "Business Project",
-      description: "Develop a professional website for your business or organization.",
-      examples: ["Company Website", "E-commerce", "Landing Page"],
+      title: "Projet d'entreprise",
+      description: "Développez un site Web professionnel pour votre entreprise ou organisation.",
+      examples: ["Site Web d'entreprise", "E-commerce", "Page d'acceuil"],
     },
     {
       id: "freelance",
       Icon: Code,
-      title: "Freelance Project",
-      description: "Build a website for a client or your freelance business.",
-      examples: ["Client Projects", "Landing Page", "Service Showcase"],
+      title: "Projet de Freelance",
+      description: "Créez un site Web pour un client ou votre entreprise indépendante.",
+      examples: ["Projets des clients", "Page d'acceuil", "Présentation des services"],
     },
   ];
 
@@ -44,15 +44,15 @@ export default function Template() {
   };
 
   return (
+    <div className="mt-10 mb-16">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {projectTypes.map((type) => (
         <GlareCard
-          key={type.id}
-          onClick={() => handleCardSelect(type.id)}
-          className={`relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50 ${
-            selectedType === type.id ? 'border-2 border-black' : ''
-          }`}
-        >
+        key={type.id}
+        isSelected={selectedType === type.id}
+        onClick={() => handleCardSelect(type.id)}
+        className="relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50"
+      >
           <div className="flex flex-col items-center gap-4">
             <div className={`p-4 rounded-full ${getColorClasses(type.id)}`}>
               <type.Icon className="w-6 h-6" />
@@ -78,6 +78,7 @@ export default function Template() {
           </div>
         </GlareCard>
       ))}
+    </div>
     </div>
   );
 }

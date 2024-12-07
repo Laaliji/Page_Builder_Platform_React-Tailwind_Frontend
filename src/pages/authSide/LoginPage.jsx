@@ -59,14 +59,14 @@ export function LoginPage() {
   const validateForm = () => {
     let isValid = true;
     if (!email) {
-      setEmailError("Email is required");
+      setEmailError("Email est requis");
       isValid = false;
     } else {
       setEmailError("");
     }
 
     if (!password) {
-      setPasswordError("Password is required");
+      setPasswordError("Mot de passe est requis");
       isValid = false;
     } else {
       setPasswordError("");
@@ -99,12 +99,12 @@ export function LoginPage() {
           if (errors.email) setEmailError(errors.email[0]);
           if (errors.password) setPasswordError(errors.password[0]);
         } else {
-          alert(error.response.data.message || "Login failed");
+          alert(error.response.data.message || "Login a échoué");
         }
       } else if (error.request) {
-        alert("Network error. Please check your connection.");
+        alert("Erreur réseau. Veuillez vérifier votre connexion.");
       } else {
-        alert("An unexpected error occurred.");
+        alert("Une erreur inattendue s'est produite.");
       }
     } finally {
       setLoading(false);
@@ -122,7 +122,7 @@ export function LoginPage() {
 
         <Card className="w-[400px] shadow-md border-none mt-6">
           <CardHeader className="text-center">
-            <CardTitle>Login</CardTitle>
+            <CardTitle>Se connecter</CardTitle>
           </CardHeader>
           <CardContent>
             {/* GitHub login button */}
@@ -134,12 +134,12 @@ export function LoginPage() {
                   handleGitHubLogin();
                 }}
               >
-                <FaGithub color="white" /> Login with GitHub
+                <FaGithub color="white" /> Se connecter avec Github
               </Button>
             </div>
 
             {/* OR text */}
-            <div className="mt-4 text-center text-sm text-gray-600">or</div>
+            <div className="mt-4 text-center text-sm text-gray-600">ou</div>
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
@@ -148,7 +148,7 @@ export function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Entrez votre email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={emailError ? "border-red-500" : ""}
@@ -156,11 +156,11 @@ export function LoginPage() {
                 {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               </div>
               <div className="flex flex-col space-y-1.5 mt-4">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Entrez votre mot de passe"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={passwordError ? "border-red-500" : ""}
@@ -173,16 +173,16 @@ export function LoginPage() {
                   className="w-full bg-blue-500 text-white py-2 rounded-lg"
                   disabled={loading}
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  {loading ? "Connexion..." : "Se connecter"}
                 </Button>
               </div>
             </form>
           {/* New user sign-up link */}
           <div className="mt-4 text-center text-sm text-gray-600">
               <p>
-                New user?{" "}
+                Nouveau utilisateur?{" "}
                 <a href="/signup" className="text-blue-600 hover:underline">
-                  Sign up
+                S'inscrire
                 </a>
               </p>
             </div>

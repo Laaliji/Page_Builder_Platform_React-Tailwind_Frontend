@@ -13,7 +13,7 @@ import {
 const Style = () => {
   const [color, setColor] = useState("#dfe1ec");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleColorChange = (selectedColor) => {
     setColor(selectedColor.hex);
@@ -85,188 +85,190 @@ const Style = () => {
   const handleSave = () => {
     if (selectedTemplate !== null) {
       console.log(`Saved template: ${selectedTemplate}`);
-      setIsDialogOpen(false); 
+      setIsDialogOpen(false);
     } else {
       alert("Please select a template before saving.");
     }
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "20px",
-        fontFamily: "Arial, sans-serif",
-        color: "black",
-        padding: "20px",
-      }}
-    >
+    <div className="mt-10 mb-16">
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
           gap: "20px",
+          fontFamily: "Arial, sans-serif",
+          color: "black",
+          padding: "20px",
         }}
       >
-        {/* Left Section */}
-        <div style={{ flex: "1", fontFamily: "Arial, sans-serif" }}>
-          <h1 style={{ marginBottom: "10px" }}>Color Palette</h1>
-          <p style={{ fontSize: "18px", marginBottom: "20px" }}>
-            Choose the color palette for your website.
-          </p>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <button
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "black",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                Select Template
-              </button>
-            </DialogTrigger>
-
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle style={{ color: "black" }}>
-                  Select a Website Template
-                </DialogTitle>
-              </DialogHeader>
-
-              <div
-                style={{
-                  marginTop: "40px",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "20px",
-                }}
-              >
-                {colorPalettes.map((palette, index) => (
-                  <div
-                    key={index}
-                    onClick={() => setSelectedTemplate(index)}
-                    style={{
-                      border:
-                        selectedTemplate === index
-                          ? "2px solid #000"
-                          : "1px solid #ccc",
-                      borderRadius: "8px",
-                      padding: "10px",
-                      textAlign: "center",
-                      cursor: "pointer",
-                      backgroundColor:
-                        selectedTemplate === index ? "#f0f0f0" : "white",
-                    }}
-                  >
-                    {palette.colors.map((color, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "50%",
-                            backgroundColor: color,
-                            marginRight: "10px",
-                          }}
-                        ></div>
-                        <p style={{ margin: 0, color: "black" }}>
-                          {palette.descriptions[idx]}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              {/* Save Button */}
-              <div style={{ marginTop: "20px", textAlign: "right" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: "20px",
+          }}
+        >
+          {/* Left Section */}
+          <div style={{ flex: "1", fontFamily: "Arial, sans-serif" }}>
+            <h1 style={{ marginBottom: "10px" }}>Color Palette</h1>
+            <p style={{ fontSize: "18px", marginBottom: "20px" }}>
+              Choose the color palette for your website.
+            </p>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
                 <button
-                  onClick={handleSave}
-                  disabled={selectedTemplate === null}
                   style={{
                     padding: "10px 20px",
-                    backgroundColor:
-                      selectedTemplate !== null ? "black" : "#ccc",
+                    backgroundColor: "black",
                     color: "white",
                     border: "none",
                     borderRadius: "4px",
-                    cursor:
-                      selectedTemplate !== null ? "pointer" : "not-allowed",
+                    cursor: "pointer",
                   }}
                 >
-                  Next
+                  Select Template
                 </button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogTrigger>
 
-        {/* Right Section */}
-        <div
-          style={{
-            flex: "1",
-            backgroundColor: "white",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            padding: "20px",
-          }}
-        >
-          <div style={{ display: "flex", gap: "20px" }}>
-            <div style={{ flex: "1" }}>
-              <ChromePicker color={color} onChange={handleColorChange} />
-            </div>
-            <div style={{ flex: "1" }}>
-              <h3 style={{ color: "black" }}>HEX</h3>
-              <input
-                type="text"
-                value={color}
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  marginBottom: "10px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-              />
-              <h3 style={{ color: "black" }}>RGB</h3>
-              <input
-                type="text"
-                value={hexToRgb(color)}
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  marginBottom: "10px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-              />
-              <h3 style={{ color: "black" }}>HSL</h3>
-              <input
-                type="text"
-                value={hexToHsl(color)}
-                readOnly
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  marginBottom: "10px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-              />
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle style={{ color: "black" }}>
+                    Select a Website Template
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div
+                  style={{
+                    marginTop: "40px",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: "20px",
+                  }}
+                >
+                  {colorPalettes.map((palette, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedTemplate(index)}
+                      style={{
+                        border:
+                          selectedTemplate === index
+                            ? "2px solid #000"
+                            : "1px solid #ccc",
+                        borderRadius: "8px",
+                        padding: "10px",
+                        textAlign: "center",
+                        cursor: "pointer",
+                        backgroundColor:
+                          selectedTemplate === index ? "#f0f0f0" : "white",
+                      }}
+                    >
+                      {palette.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "50%",
+                              backgroundColor: color,
+                              marginRight: "10px",
+                            }}
+                          ></div>
+                          <p style={{ margin: 0, color: "black" }}>
+                            {palette.descriptions[idx]}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Save Button */}
+                <div style={{ marginTop: "20px", textAlign: "right" }}>
+                  <button
+                    onClick={handleSave}
+                    disabled={selectedTemplate === null}
+                    style={{
+                      padding: "10px 20px",
+                      backgroundColor:
+                        selectedTemplate !== null ? "black" : "#ccc",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor:
+                        selectedTemplate !== null ? "pointer" : "not-allowed",
+                    }}
+                  >
+                    Next
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Right Section */}
+          <div
+            style={{
+              flex: "1",
+              backgroundColor: "white",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "20px",
+            }}
+          >
+            <div style={{ display: "flex", gap: "20px" }}>
+              <div style={{ flex: "1" }}>
+                <ChromePicker color={color} onChange={handleColorChange} />
+              </div>
+              <div style={{ flex: "1" }}>
+                <h3 style={{ color: "black" }}>HEX</h3>
+                <input
+                  type="text"
+                  value={color}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                  }}
+                />
+                <h3 style={{ color: "black" }}>RGB</h3>
+                <input
+                  type="text"
+                  value={hexToRgb(color)}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                  }}
+                />
+                <h3 style={{ color: "black" }}>HSL</h3>
+                <input
+                  type="text"
+                  value={hexToHsl(color)}
+                  readOnly
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>

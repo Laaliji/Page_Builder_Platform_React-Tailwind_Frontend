@@ -54,7 +54,7 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
   );
 
   return (
-    <div className="mt-10 mb-16 ">
+    <div className="mt-10 mb-16">
       <h2 className="text-2xl font-semibold text-slate-900 mb-6">Quick Review</h2>
       <div className="grid grid-cols-2 gap-8">
         {/* Left Column */}
@@ -82,7 +82,7 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
         </Card>
 
         {/* Right Column - Combined Template and Color Card */}
-        <Card className="h-full">
+        <Card className="h-full max-h-[500px] overflow-y-auto">
           <CardContent className="p-6">
             <SectionHeader title="Template starter" stepNumber={3} />
             <ReviewItem
@@ -103,7 +103,7 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
               }
             />
             {/* Added empty ReviewItem to maintain consistent card height */}
-            <div className="h-[68px]" /> 
+            <div className="h-[68px]" />
           </CardContent>
         </Card>
       </div>

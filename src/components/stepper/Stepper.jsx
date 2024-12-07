@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Check } from "lucide-react"; 
-
+import { Check } from "lucide-react";
 
 const Stepper = ({ steps, currentStep }) => {
   const [newStep, setNewStep] = useState([]);
@@ -36,7 +35,9 @@ const Stepper = ({ steps, currentStep }) => {
           <div
             key={index}
             className={
-              index !== newStep.length - 1 ? "flex items-center w-full" : "flex items-center"
+              index !== newStep.length - 1
+                ? "flex items-center w-full"
+                : "flex items-center"
             }
           >
             <div className="relative flex flex-col items-center text-teal-600">
@@ -46,9 +47,9 @@ const Stepper = ({ steps, currentStep }) => {
                   border-2 h-12 w-12 flex items-center justify-center
                   ${
                     step.completed
-                      ? "bg-black text-white border-black"
+                      ? "bg-[#1d4ed8] text-white border-[#1d4ed8]"
                       : step.highlighted
-                      ? "bg-[#1d4ed8] text-white border-[#1d4ed8]" 
+                      ? "bg-black text-white border-black"
                       : "bg-white border-gray-300 text-black"
                   }`}
               >

@@ -25,7 +25,7 @@ const Project = () => {
           <form className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="projectName">
-                Project Name
+                Intitulé du projet
               </Label>
               <input
                 type="text"
@@ -34,14 +34,14 @@ const Project = () => {
                 value={formData.projectName}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your project name"
+                placeholder="Entrez votre intitulé du projet"
                 required
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="websiteTitle">
-                Website Title/Domain
+              Titre/Nom de domaine du site Web
               </Label>
               <input
                 type="text"
@@ -57,7 +57,7 @@ const Project = () => {
 
             <div className="space-y-2">
               <Label htmlFor="repoUrl">
-                Repository URL
+                URL du dépôt sur Github <span className='text-sky-500'>(optionnel)</span>
               </Label>
               <input
                 type="url"

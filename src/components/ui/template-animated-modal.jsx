@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { cn } from "../../template/utils/ui-utils";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
@@ -28,7 +28,8 @@ export const useModal = () => {
 
 export function Modal({
   children,
-  initialOpen = false
+  initialOpen = false,
+  closeButton = true
 }) {
   return <ModalProvider initialOpen={initialOpen}>{children}</ModalProvider>;
 }
@@ -52,7 +53,8 @@ export const ModalTrigger = ({
 
 export const ModalBody = ({
   children,
-  className
+  className,
+  disableOutsideClick = true
 }) => {
   const { open } = useModal();
 
@@ -66,7 +68,9 @@ export const ModalBody = ({
 
   const modalRef = useRef(null);
   const { setOpen } = useModal();
-  useOutsideClick(modalRef, () => setOpen(false));
+  
+  // Only add outside click handler if not disabled
+  useOutsideClick(modalRef, disableOutsideClick ? () => {} : () => setOpen(false));
 
   return (
     (<AnimatePresence>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import TopBarProgress from "react-topbar-progress-indicator";
 
 TopBarProgress.config({
@@ -43,38 +43,36 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev, onFinish }) =
 
   return (
     <div className="container flex justify-between items-center mt-4 mb-4 w-full">
-    {loading && <TopBarProgress />}
-    <Button
-      onClick={handlePrev}
-      disabled={currentStep === 1}
-      variant="secondary"
-      className={`uppercase font-semibold ${
-        currentStep === 1
-          ? "opacity-50 cursor-not-allowed"
-          : "bg-black hover:bg-slate-700 hover:text-white mr-4"
-      }`}
-    >
-      Back
-    </Button>
-    {currentStep === totalSteps ? (
-      <Button
-        onClick={handleFinish}
-        className="uppercase font-semibold bg-[#1d4ed8] hover:bg-blue-700"
-      >
-        Finish
-      </Button>
-    ) : (
-      <Button
-        onClick={handleNext}
-        className="uppercase font-semibold bg-black hover:bg-slate-700 hover:text-white"
-      >
-        Next
-      </Button>
-    )}
-  </div>
-  
-  
+      {loading && <TopBarProgress />}
 
+      {/* Back Button */}
+      <Button
+        onClick={handlePrev}
+        disabled={currentStep === 1}
+        className={`uppercase font-semibold bg-black text-white ${
+          currentStep === 1 ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        Back
+      </Button>
+
+      {/* Conditional Rendering for Finish or Next Button */}
+      {currentStep === totalSteps ? (
+        <Button
+          onClick={handleFinish}
+          className="uppercase font-semibold bg-black text-white"
+        >
+          Finish
+        </Button>
+      ) : (
+        <Button
+          onClick={handleNext}
+          className="uppercase font-semibold bg-black text-white"
+        >
+          Next
+        </Button>
+      )}
+    </div>
   );
 };
 

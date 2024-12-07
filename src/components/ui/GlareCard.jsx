@@ -1,5 +1,5 @@
 import { cn } from "../../template/utils/ui-utils";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export const GlareCard = ({
   children,
@@ -7,6 +7,7 @@ export const GlareCard = ({
   width = "280px",
   height = "380px",
   onClick,
+  isSelected = false, 
 }) => {
   const isPointerInside = useRef(false);
   const refElement = useRef(null);
@@ -70,7 +71,9 @@ export const GlareCard = ({
   return (
     <div
       style={containerStyle}
-      className="relative isolate [contain:layout_style] [perspective:600px] transition-transform duration-[var(--duration)] ease-[var(--easing)] delay-[var(--delay)] will-change-transform"
+      className={cn(
+        "relative isolate [contain:layout_style] [perspective:600px] transition-transform duration-[var(--duration)] ease-[var(--easing)] will-change-transform cursor-pointer", 
+      )}
       ref={refElement}
       onClick={onClick}
       onPointerMove={(event) => {
@@ -121,7 +124,12 @@ export const GlareCard = ({
       }}
     >
       <div
-        className="h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] delay-[var(--delay)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] border border-black hover:[--opacity:0.6] hover:[--duration:200ms] hover:[--easing:linear] hover:filter-none overflow-hidden"
+        className={cn(
+          "h-full grid will-change-transform origin-center transition-transform duration-[var(--duration)] ease-[var(--easing)] delay-[var(--delay)] [transform:rotateY(var(--r-x))_rotateX(var(--r-y))] rounded-[var(--radius)] hover:[--opacity:0.6] hover:[--duration:200ms] hover:[--easing:linear] hover:filter-none overflow-hidden",
+          isSelected 
+            ? "border-2 border-[#1d4ed8]" 
+            : "border border-black" 
+        )}
       >
         <div className="w-full h-full grid [grid-area:1/1] mix-blend-soft-light [clip-path:inset(0_0_0_0_round_var(--radius))]">
           <div className={cn("h-full w-full bg-white", className)}>
