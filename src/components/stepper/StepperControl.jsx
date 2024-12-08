@@ -50,7 +50,7 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev, onFinish }) =
         onClick={handlePrev}
         disabled={currentStep === 1}
         className={`uppercase font-semibold bg-black text-white ${
-          currentStep === 1 ? "opacity-50 cursor-not-allowed" : ""
+          currentStep === 1 ? "bg-[#1d4ed8] cursor-not-allowed" : ""
         }`}
       >
         Back

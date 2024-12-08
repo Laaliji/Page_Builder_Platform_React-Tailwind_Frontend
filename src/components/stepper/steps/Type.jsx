@@ -44,15 +44,14 @@ export default function Template() {
   };
 
   return (
-    <div className="mt-10 mb-16">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
       {projectTypes.map((type) => (
         <GlareCard
-        key={type.id}
-        isSelected={selectedType === type.id}
-        onClick={() => handleCardSelect(type.id)}
-        className="relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50"
-      >
+    key={type.id}
+    isSelected={selectedType === type.id}
+    onClick={() => handleCardSelect(type.id)}
+    className="relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50"
+  >
           <div className="flex flex-col items-center gap-4">
             <div className={`p-4 rounded-full ${getColorClasses(type.id)}`}>
               <type.Icon className="w-6 h-6" />
@@ -78,7 +77,6 @@ export default function Template() {
           </div>
         </GlareCard>
       ))}
-    </div>
     </div>
   );
 }

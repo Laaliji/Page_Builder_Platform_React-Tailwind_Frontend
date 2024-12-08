@@ -7,17 +7,17 @@ import Style from "../../components/stepper/steps/Style";
 import Final from "../../components/stepper/steps/Final";
 import TemplateStarter from "../../components/stepper/steps/TemplateStarter";
 import AnimatedModalDemo from "../../components/stepper/steps/AnimatedModalDemo"
+import TemplateAndStyle from "../../components/stepper/steps/TemplateAndStyle"
+
 
 function StepperPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const steps = [
     "Informations du projet",
     "Type du projet",
-    "Template de démarrage",
-    "Style et palette de couleurs",
+    "Modèle et Style",
     "Aperçu général et confirmation",
   ];
-
   const displayStep = (step) => {
     switch (step) {
       case 1:
@@ -25,20 +25,16 @@ function StepperPage() {
       case 2:
         return <Template />;
       case 3:
-        return <AnimatedModalDemo setCurrentStep={setCurrentStep} />;
+        return <TemplateAndStyle setCurrentStep={setCurrentStep} currentStep={currentStep} />;
       case 4:
-        return <Style />;
-      case 5:
         return <Final onNavigateToStep={(step) => setCurrentStep(step)} />;
       default:
         return null;
     }
   };
-
   const handleNext = () => {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length));
   };
-
   return (
     <div className="w-full min-h-screen bg-white flex justify-center items-center ">
       <div className="w-full max-w-7xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -63,5 +59,4 @@ function StepperPage() {
     </div>
   );
 }
-
 export default StepperPage;

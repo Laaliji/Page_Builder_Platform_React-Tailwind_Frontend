@@ -1,21 +1,30 @@
 import React from 'react';
 import { Card, CardContent } from '../../ui/Card';
-import { Check, Edit2 } from 'lucide-react';
+import { Check, Edit2, Palette } from 'lucide-react';
 import { Button } from '../../ui/button';
 
 const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }) => {
-  
   const demoProjectData = {
     projectName: "My Awesome Project",
     websiteTitle: "awesome-project.com",
     repoUrl: "https://github.com/username/awesome-project"
   };
+  
   const demoTemplate = "personal";
-  const demoColor = "#dfe1ec";
-
+  const demoPalette = {
+    id: "custom",
+    name: "Personnalisé",
+    colors: [
+      { label: "Primaire", value: "#FFFFFF" },
+      { label: "Secondaire", value: "#F3F4F6" },
+      { label: "Tertiaire", value: "#E5E7EB" },
+      { label: "Quaternaire", value: "#D1D5DB" }
+    ]
+  };
+  
   const data = projectData || demoProjectData;
   const template = selectedTemplate || demoTemplate;
-  const color = colorPalette || demoColor;
+  const palette = colorPalette || demoPalette;
 
   const getTemplateTitle = (templateId) => {
     const templates = {
@@ -26,14 +35,15 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
     return templates[templateId] || "Not Selected";
   };
 
-  const ReviewItem = ({ label, value }) => (
+  const ReviewItem = ({ label, value, children }) => (
     <div className="flex items-center gap-3 mb-4">
       <div className="rounded-full bg-black text-white p-1">
         <Check className="h-4 w-4" />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col flex-1">
         <span className="text-sm font-medium text-slate-500">{label}</span>
-        <span className="text-slate-900">{value}</span>
+        {value && <span className="text-slate-900">{value}</span>}
+        {children}
       </div>
     </div>
   );
@@ -73,37 +83,41 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
               label="Repository URL"
               value={data.repoUrl}
             />
+          </CardContent>
+        </Card>
+        
+        {/* Right Column - Combined Template and Color Card */}
+        <Card className="h-full max-h-[500px] overflow-y-auto">
+          <CardContent className="p-6">
             <SectionHeader title="Project Type" stepNumber={2} />
             <ReviewItem
               label="Selected Template"
               value={getTemplateTitle(template)}
             />
-          </CardContent>
-        </Card>
-
-        {/* Right Column - Combined Template and Color Card */}
-        <Card className="h-full max-h-[500px] overflow-y-auto">
-          <CardContent className="p-6">
-            <SectionHeader title="Template starter" stepNumber={3} />
-            <ReviewItem
-              label="Selected Starter"
-              value={getTemplateTitle(template)}
-            />
-            <SectionHeader title="Style and Color Palette" stepNumber={4} />
-            <ReviewItem
-              label="Primary Color"
-              value={
-                <div className="flex items-center gap-2">
+            
+            <SectionHeader title="Color Palette" stepNumber={3} />
+            <ReviewItem label="Palette Name">
+              <div className="flex items-center gap-2">
+                <Palette className="h-5 w-5 text-slate-600" />
+                <span className="text-slate-900">{palette.name}</span>
+              </div>
+            </ReviewItem>
+            
+            {/* Color Palette Visualization */}
+            <div className="flex justify-between items-center mt-4">
+              {palette.colors.map((color, index) => (
+                <div key={index} className="flex flex-col items-center">
                   <div
-                    className="w-6 h-6 rounded-full border border-gray-200"
-                    style={{ backgroundColor: color }}
+                    className="w-10 h-10 rounded-full shadow-md"
+                    style={{ backgroundColor: color.value }}
                   />
-                  <span>{color}</span>
+                  <span className="text-xs text-slate-600 mt-1">{color.label}</span>
                 </div>
-              }
-            />
-            {/* Added empty ReviewItem to maintain consistent card height */}
-            <div className="h-[68px]" />
+              ))}
+            </div>
+            
+            {/* Maintain consistent card height */}
+            <div className="h-[40px]" />
           </CardContent>
         </Card>
       </div>

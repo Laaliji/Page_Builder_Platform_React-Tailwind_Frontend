@@ -57,7 +57,7 @@ const Project = () => {
 
             <div className="space-y-2">
               <Label htmlFor="repoUrl">
-                URL du dépôt sur Github <span className='text-sky-500'>(optionnel)</span>
+                URL du dépôt sur Github <span className='text-[#1d4ed8]'>(optionnel)</span>
               </Label>
               <input
                 type="url"

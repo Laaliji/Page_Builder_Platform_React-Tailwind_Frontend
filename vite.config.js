@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
+        },
   },
   proxy: {
     '/login': 'http://localhost:3000',  // Proxy API calls to your Laravel backend

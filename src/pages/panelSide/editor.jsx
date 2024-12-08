@@ -1,19 +1,14 @@
-// Editor.jsx
 import React, { useEffect, useState } from 'react';
-import { Settings, Download, FileText, Plus } from 'lucide-react';
-import {grapesjs} from 'grapesjs';
-
-import 'grapesjs/dist/css/grapes.min.css';
-import gjsBlockBasic from 'grapesjs-blocks-basic';
-import Toolbar from '../../components/editor/Toolbar';
+import { grapesjs } from 'grapesjs';
+import 'grapesjs/dist/css/grapes.min.css'; 
+import Toolbar from '../../components/editor/Toolbar'; 
 import PanelStyles from '@/components/editor/PanelStyles';
-import LeftPanel from '@/components/editor/LeftPanel';
+import LeftPanel from '@/components/editor/LeftPanel'; 
 import { BlockManager, DeviceManager, LayerManager, Panels, StorageManager, StyleManager } from '@/lib/editorConfig';
 
 const Editor = () => {
-  const [tabState,setTabState] = useState(false);
   const [editor, setEditor] = useState(null);
-  const [showNewPageModal, setShowNewPageModal] = useState(false);
+  const [activePanel, setActivePanel] = useState('block'); // Track active panel (block, style, etc.)
   const [pages, setPages] = useState([
     { id: 1, name: 'Home', path: '/home' },
     { id: 2, name: 'About', path: '/about' },
@@ -21,43 +16,46 @@ const Editor = () => {
   ]);
 
   useEffect(() => {
-    const editor = grapesjs.init({
+    const editorInstance = grapesjs.init({
       container: '#gjs',
       height: '100%',
       width: '95%',
-      storageManager : StorageManager,
-      panels         : Panels,
-      deviceManager  : DeviceManager,
-      blockManager   : BlockManager,
-      styleManager   : StyleManager,
-      layerManager   : LayerManager,
+      storageManager: StorageManager,
+      panels: Panels,
+      deviceManager: DeviceManager,
+      blockManager: BlockManager,
+      styleManager: StyleManager,
+      layerManager: LayerManager,
     });
-    
 
+    setEditor(editorInstance);
+    return () => editorInstance.destroy();
+  }, []);
 
-    setEditor(editor);
-    return () => editor.destroy();
-  }, [tabState]);
+  useEffect(() => {
+    // Update panel visibility based on the active panel state
+    if (editor) {
+      const blockPanel = editor.Panels.getPanel('blocks');
+      const stylePanel = editor.Panels.getPanel('styles');
 
+      // Only set visibility if panel exists
+      if (blockPanel) blockPanel.set('visible', activePanel === 'block');
+      if (stylePanel) stylePanel.set('visible', activePanel === 'style');
+      // Add other panels if needed
+    }
+  }, [activePanel, editor]);
 
-  
   return (
     <div className="h-screen justify-center items-center flex flex-col bg-[whitesmoke]">
-
-      <Toolbar title="E-commerce website" editor={editor}/>
+      <Toolbar title="E-commerce website" editor={editor} />
 
       <div className="flex-1 flex w-full bg-[whitesmoke]">
-
-        <LeftPanel editor={editor}/>
-
+        <LeftPanel editor={editor} />
         <div className="flex justify-center w-[100%] bg-[whitesmoke] py-5">
-            <div id="gjs" className="h-full w-[40%]  bg-[whitesmoke]"></div>
+          <div id="gjs" className="h-full w-[40%] bg-[whitesmoke]"></div>
         </div>
-
-        <PanelStyles setTabState={setTabState} tabState={tabState} />
-        
+        <PanelStyles setTabState={setActivePanel} tabState={activePanel} />
       </div>
-
 
       <style jsx global>{`
         .gjs-block {
