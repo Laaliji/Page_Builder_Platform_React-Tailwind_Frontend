@@ -1,32 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveTab } from "../../store/tabSlicer"; // Import setActiveTab action
+import { setActiveTab } from "../../store/tabSlicer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export default function PanelStyles() {
+export default function PanelStyles({ editorInstance }) {
   const dispatch = useDispatch();
-  const activeTab = useSelector((state) => state.tab.activeTab);  
+  const activeTab = useSelector((state) => state.tab.activeTab);
+
   const [scrollPositions, setScrollPositions] = useState({
     composants: 0,
     styles: 0,
     page: 0,
   });
 
-  // Local state for page form
   const [pageState, setPageState] = useState({
     pageName: "",
     pageTitle: "",
   });
 
-  // Handle tab change
+  const [tabContent, setTabContent] = useState({
+    composants: null,
+    styles: null,
+    page: null,
+  });
+
   const handleTabChange = (value) => {
-    dispatch(setActiveTab(value));  // Dispatch action to update the active tab in the Redux store
+    console.log("Tab changed to:", value);
+    dispatch(setActiveTab(value));
+    setTabContent((prev) => ({ ...prev, [value]: null }));
   };
 
-  // Save the scroll position when the content of a tab is scrolled
   const handleScroll = (tab, event) => {
     setScrollPositions((prev) => ({
       ...prev,
@@ -34,8 +40,8 @@ export default function PanelStyles() {
     }));
   };
 
-  // Restore scroll position when switching tabs
   useEffect(() => {
+    console.log("Active tab changed:", activeTab);
     const currentScrollPosition = scrollPositions[activeTab];
     const scrollElement = document.getElementById(`scroll-${activeTab}`);
     if (scrollElement) {
@@ -43,7 +49,6 @@ export default function PanelStyles() {
     }
   }, [activeTab, scrollPositions]);
 
-  // Handle page form input changes
   const handlePageInputChange = (e) => {
     const { name, value } = e.target;
     setPageState((prevState) => ({
@@ -52,28 +57,77 @@ export default function PanelStyles() {
     }));
   };
 
-  // Content rendering (for dynamically added components like GrapesJS)
-  const renderComposantsContent = () => {
-    // Dynamically add content or blocks for composants
-    return (
-      <div id="blocks" className="w-full">
-        {/* Blocks will be dynamically added by GrapesJS */}
-      </div>
-    );
-  };
+  const renderComposants = useCallback(() => {
+    console.log("Rendering Composants tab");
+    if (!editorInstance || !editorInstance.BlockManager) {
+      console.warn("Editor instance or BlockManager not available");
+      return null;
+    }
+    const blocksContainer = document.createElement("div");
+    blocksContainer.id = "blocks";
+    blocksContainer.appendChild(editorInstance.BlockManager.render());
+    return blocksContainer;
+  }, [editorInstance]);
 
-  const renderStylesContent = () => {
-    // Dynamically add styles-related content
+  const renderStyles = useCallback(() => {
+    console.log("Rendering Styles tab");
+    if (!editorInstance || !editorInstance.StyleManager) {
+      console.warn("Editor instance or StyleManager not available");
+      return null;
+    }
+    const stylesContainer = document.createElement("div");
+    stylesContainer.id = "styles";
+    stylesContainer.appendChild(editorInstance.StyleManager.render());
+    return stylesContainer;
+  }, [editorInstance]);
+
+  const renderPage = useCallback(() => {
+    console.log("Rendering Page tab");
     return (
-      <div id="styles-content" className="w-full">
-        
+      <div className="p-4 space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="pageName">Nom de Page</Label>
+          <Input
+            type="text"
+            id="pageName"
+            name="pageName"
+            value={pageState.pageName}
+            onChange={handlePageInputChange}
+            placeholder="Nom"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="pageTitle">Titre de Page</Label>
+          <Input
+            type="text"
+            id="pageTitle"
+            name="pageTitle"
+            value={pageState.pageTitle}
+            onChange={handlePageInputChange}
+            placeholder="Titre"
+          />
+        </div>
       </div>
     );
-  };
+  }, [pageState, handlePageInputChange]);
+
+  useEffect(() => {
+    if (activeTab === "composants" && !tabContent.composants) {
+      setTabContent((prev) => ({ ...prev, composants: renderComposants() }));
+    } else if (activeTab === "styles" && !tabContent.styles) {
+      setTabContent((prev) => ({ ...prev, styles: renderStyles() }));
+    } else if (activeTab === "page" && !tabContent.page) {
+      setTabContent((prev) => ({ ...prev, page: renderPage() }));
+    }
+  }, [activeTab, renderComposants, renderStyles, renderPage, tabContent]);
 
   return (
     <div className="w-[35%] h-full bg-background pt-2 px-2 min-w-[300px] border-l">
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="composants">Composants</TabsTrigger>
           <TabsTrigger value="styles">Styles</TabsTrigger>
@@ -86,7 +140,11 @@ export default function PanelStyles() {
             className="h-full w-full rounded-md border p-4"
             onScroll={(e) => handleScroll("composants", e)}
           >
-            {renderComposantsContent()}
+            {tabContent.composants && (
+              <div
+                ref={(node) => node && node.appendChild(tabContent.composants)}
+              />
+            )}
           </ScrollArea>
         </TabsContent>
 
@@ -96,40 +154,21 @@ export default function PanelStyles() {
             className="h-full w-full rounded-md border p-4"
             onScroll={(e) => handleScroll("styles", e)}
           >
-            {renderStylesContent()}
+            {tabContent.styles && (
+              <div
+                ref={(node) => node && node.appendChild(tabContent.styles)}
+              />
+            )}
           </ScrollArea>
         </TabsContent>
 
         <TabsContent value="page" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-page"
-            className="h-full w-full rounded-md border"
+            className="h-full w-full rounded-md border p-4"
             onScroll={(e) => handleScroll("page", e)}
           >
-            <div className="p-4 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="pageName">Nom de Page</Label>
-                <Input
-                  type="text"
-                  id="pageName"
-                  name="pageName"
-                  value={pageState.pageName}
-                  onChange={handlePageInputChange}
-                  placeholder="Nom"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pageTitle">Titre de Page</Label>
-                <Input
-                  type="text"
-                  id="pageTitle"
-                  name="pageTitle"
-                  value={pageState.pageTitle}
-                  onChange={handlePageInputChange}
-                  placeholder="Titre"
-                />
-              </div>
-            </div>
+            {tabContent.page}
           </ScrollArea>
         </TabsContent>
       </Tabs>
