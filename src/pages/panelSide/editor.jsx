@@ -115,7 +115,6 @@ const Editor = () => {
         },
       });
 
-      // Wait for the editor to be fully loaded
       await new Promise((resolve) => editor.on("load", resolve));
 
       setEditorInstance(editor);
