@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
 import grapesjs from "grapesjs";
+import plugin from "grapesjs-blocks-basic";
 import "grapesjs/dist/css/grapes.min.css";
 import {
   LayoutGrid,
@@ -109,9 +110,18 @@ const Editor = () => {
         },
         styleManager: StyleManager,
         layerManager: LayerManager,
-        plugins: [gjsBlocksBasic],
+        plugins: [plugin],
         pluginsOpts: {
-          gjsBlocksBasic: { blocks: BlockManager.blocks },
+          [plugin]: {
+            blocks: ["column1", "column2", "column3", "column3-7"],
+            flexGrid: true,
+            addBasicStyle: true,
+            category: "Layout",
+            labelColumn1: "1 Column",
+            labelColumn2: "2 Columns",
+            labelColumn3: "3 Columns",
+            labelColumn37: "2 Columns 3/7",
+          },
         },
       });
 
@@ -176,13 +186,6 @@ const Editor = () => {
           overflow: hidden;
         }
 
-        .gjs-block:hover {
-          box-shadow: 0 8px 16px rgba(59, 130, 246, 0.12);
-          border-color: #3b82f6;
-          transform: translateY(-2px);
-          background: linear-gradient(to bottom right, #ffffff, #f8faff);
-        }
-
         .gjs-block:active {
           transform: translateY(0px);
         }
@@ -213,10 +216,6 @@ const Editor = () => {
           font-weight: 500;
           margin-top: 6px;
           transition: color 0.2s ease;
-        }
-
-        .gjs-block:hover .block-label {
-          color: #3b82f6;
         }
 
         .gjs-one-bg {
@@ -252,11 +251,6 @@ const Editor = () => {
           border: 1px solid #e5e7eb;
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
           transition: all 0.2s ease;
-        }
-
-        .gjs-pn-btn:hover {
-          background-color: #f8faff;
-          border-color: #3b82f6;
         }
 
         .gjs-pn-btn.gjs-pn-active {
