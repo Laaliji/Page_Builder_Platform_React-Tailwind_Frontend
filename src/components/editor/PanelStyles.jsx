@@ -94,6 +94,7 @@ export default function PanelStyles({ editorInstance }) {
             value={pageState.pageName}
             onChange={handlePageInputChange}
             placeholder="Nom"
+            className="border-black/15"
           />
         </div>
         <div className="space-y-2">
@@ -105,6 +106,7 @@ export default function PanelStyles({ editorInstance }) {
             value={pageState.pageTitle}
             onChange={handlePageInputChange}
             placeholder="Titre"
+            className="border-black/15"
           />
         </div>
       </div>
@@ -122,7 +124,8 @@ export default function PanelStyles({ editorInstance }) {
   }, [activeTab, renderComposants, renderStyles, renderPage, tabContent]);
 
   return (
-    <div className="w-[35%] h-full bg-background pt-2 px-2 min-w-[300px] border-l">
+    <div className="w-[25%] h-full bg-background pt-2 px-2 min-w-[300px] border-l border-black/15">
+      {" "}
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
@@ -137,7 +140,7 @@ export default function PanelStyles({ editorInstance }) {
         <TabsContent value="composants" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-composants"
-            className="h-full w-full rounded-md border p-4"
+            className="h-full w-full rounded-md  p-4"
             onScroll={(e) => handleScroll("composants", e)}
           >
             {tabContent.composants && (
@@ -151,7 +154,7 @@ export default function PanelStyles({ editorInstance }) {
         <TabsContent value="styles" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-styles"
-            className="h-full w-full rounded-md border p-4"
+            className="h-full w-full rounded-md  p-4"
             onScroll={(e) => handleScroll("styles", e)}
           >
             {tabContent.styles && (
@@ -165,7 +168,7 @@ export default function PanelStyles({ editorInstance }) {
         <TabsContent value="page" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-page"
-            className="h-full w-full rounded-md border p-4"
+            className="h-full w-full rounded-md  p-4"
             onScroll={(e) => handleScroll("page", e)}
           >
             {tabContent.page}

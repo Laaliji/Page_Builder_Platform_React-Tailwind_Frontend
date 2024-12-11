@@ -99,7 +99,7 @@ const Editor = () => {
                 <div className="block-icon-wrapper">
                   {React.createElement(IconComponent, {
                     className: "block-icon",
-                    size: 24,
+                    size: 28, // Updated icon size
                     strokeWidth: 1.5,
                   })}
                   <span className="block-label">{block.label}</span>
@@ -116,7 +116,7 @@ const Editor = () => {
             blocks: ["column1", "column2", "column3", "column3-7"],
             flexGrid: true,
             addBasicStyle: true,
-            category: "Layout",
+            category: "Mise en page",
             labelColumn1: "1 Column",
             labelColumn2: "2 Columns",
             labelColumn3: "3 Columns",
@@ -161,16 +161,17 @@ const Editor = () => {
             setTabState={setActivePanel}
             tabState={activePanel}
             editorInstance={editorInstance}
+            className="w-[25%] min-w-[250px]"
           />
         )}
       </div>
       <style jsx global>{`
         .gjs-block {
-          width: calc(50% - 20px);
+          width: calc(33.33% - 8px);
           height: auto;
-          min-height: 90px;
-          margin: 10px;
-          padding: 16px;
+          min-height: 80px;
+          margin: 4px;
+          padding: 12px;
           background: #ffffff;
           border: 1px solid #e5e7eb;
           border-radius: 12px;
@@ -186,8 +187,16 @@ const Editor = () => {
           overflow: hidden;
         }
 
-        .gjs-block:active {
-          transform: translateY(0px);
+        .block-icon {
+          color: #6b7280;
+          transition: color 0.2s ease, transform 0.2s ease;
+          width: 32px;
+          height: 32px;
+        }
+
+        .gjs-block:hover .block-icon {
+          transform: scale(1.1);
+          color: #3b82f6;
         }
 
         .block-icon-wrapper {
@@ -198,15 +207,6 @@ const Editor = () => {
           width: 100%;
           height: 100%;
           gap: 8px;
-        }
-
-        .block-icon {
-          color: #3b82f6;
-          transition: transform 0.2s ease;
-        }
-
-        .gjs-block:hover .block-icon {
-          transform: scale(1.1);
         }
 
         .block-label {
@@ -281,7 +281,7 @@ const Editor = () => {
         }
 
         .gjs-blocks-c {
-          padding: 16px;
+          padding: 8px;
           background: #ffffff;
         }
 

@@ -117,7 +117,7 @@ export const BlockManager = {
     {
       id: "section",
       label: "Section",
-      category: "Composants",
+      category: "Basique",
       content:
         '<section class="section"><h1>Section Title</h1><p>Section content goes here</p></section>',
       attributes: { class: "gjs-block-section" },
@@ -125,7 +125,7 @@ export const BlockManager = {
     {
       id: "text",
       label: "Text",
-      category: "Composants",
+      category: "Basique",
       content: {
         type: "text",
         content: "Insert your text here",
@@ -136,49 +136,49 @@ export const BlockManager = {
     {
       id: "image",
       label: "Image",
-      category: "Composants",
+      category: "Basique",
       content: { type: "image" },
       attributes: { class: "gjs-block-image" },
     },
     {
       id: "button",
       label: "Button",
-      category: "Composants",
+      category: "Basique",
       content: '<button class="button">Click me</button>',
       attributes: { class: "gjs-block-button" },
     },
 
     // Layout Components
-    {
-      id: "grid",
-      label: "Grid",
-      category: "Mise en page",
-      content:
-        '<div class="grid-container"><div class="grid-item">1</div><div class="grid-item">2</div><div class="grid-item">3</div><div class="grid-item">4</div></div>',
-      attributes: { class: "gjs-block-grid" },
-    },
-    {
-      id: "two-cols",
-      label: "Two Columns",
-      category: "Mise en page",
-      content:
-        '<div class="two-cols-container"><div class="col">Column 1</div><div class="col">Column 2</div></div>',
-      attributes: { class: "gjs-block-two-cols" },
-    },
-    {
-      id: "float",
-      label: "Float Layout",
-      category: "Mise en page",
-      content:
-        '<div class="float-container"><div class="float-item" style="float:left; width:50%;">Left</div><div class="float-item" style="float:right; width:50%;">Right</div></div>',
-      attributes: { class: "gjs-block-float" },
-    },
+    // {
+    //   id: "grid",
+    //   label: "Grid",
+    //   category: "Mise en page",
+    //   content:
+    //     '<div class="grid-container"><div class="grid-item">1</div><div class="grid-item">2</div><div class="grid-item">3</div><div class="grid-item">4</div></div>',
+    //   attributes: { class: "gjs-block-grid" },
+    // },
+    // {
+    //   id: "two-cols",
+    //   label: "Two Columns",
+    //   category: "Mise en page",
+    //   content:
+    //     '<div class="two-cols-container"><div class="col">Column 1</div><div class="col">Column 2</div></div>',
+    //   attributes: { class: "gjs-block-two-cols" },
+    // },
+    // {
+    //   id: "float",
+    //   label: "Float Layout",
+    //   category: "Mise en page",
+    //   content:
+    //     '<div class="float-container"><div class="float-item" style="float:left; width:50%;">Left</div><div class="float-item" style="float:right; width:50%;">Right</div></div>',
+    //   attributes: { class: "gjs-block-float" },
+    // },
 
     // Advanced Components
     {
       id: "card",
       label: "Card",
-      category: "Avancé",
+      category: "Basique",
       content:
         '<div class="card"><h2>Card Title</h2><p>Card content goes here</p><button>Click Me</button></div>',
       attributes: { class: "gjs-block-card" },
@@ -186,7 +186,7 @@ export const BlockManager = {
     {
       id: "list",
       label: "List",
-      category: "Avancé",
+      category: "Basique",
       content:
         '<ul class="list"><li>List Item 1</li><li>List Item 2</li><li>List Item 3</li></ul>',
       attributes: { class: "gjs-block-list" },
@@ -194,7 +194,7 @@ export const BlockManager = {
     {
       id: "form",
       label: "Form",
-      category: "Avancé",
+      category: "Basique",
       content:
         '<form class="form"><input type="text" placeholder="Enter text" /><button type="submit">Submit</button></form>',
       attributes: { class: "gjs-block-form" },
@@ -267,7 +267,7 @@ export const BlockManager = {
     {
       id: "quote",
       label: "Quote",
-      category: "Composants",
+      category: "Basique",
       content: '<blockquote class="quote">This is a quote</blockquote>',
       attributes: { class: "gjs-block-quote" },
     },
@@ -313,7 +313,7 @@ export const BlockManager = {
     {
       id: "contact-form",
       label: "Contact Form",
-      category: "Forms",
+      category: "Formulaires",
       content:
         '<form class="contact-form"><input type="text" placeholder="Name" /><input type="email" placeholder="Email" /><textarea placeholder="Message"></textarea><button type="submit">Send</button></form>',
       attributes: { class: "gjs-block-contact-form" },
@@ -321,7 +321,7 @@ export const BlockManager = {
     {
       id: "login-form",
       label: "Login Form",
-      category: "Forms",
+      category: "Formulaires",
       content:
         '<form class="login-form"><input type="text" placeholder="Username" /><input type="password" placeholder="Password" /><button type="submit">Login</button></form>',
       attributes: { class: "gjs-block-login-form" },
@@ -329,7 +329,7 @@ export const BlockManager = {
     {
       id: "register-form",
       label: "Register Form",
-      category: "Forms",
+      category: "Formulaires",
       content:
         '<form class="register-form"><input type="text" placeholder="Username" /><input type="email" placeholder="Email" /><input type="password" placeholder="Password" /><button type="submit">Register</button></form>',
       attributes: { class: "gjs-block-register-form" },
@@ -345,7 +345,7 @@ export const BlockManager = {
     {
       id: "newsletter",
       label: "Newsletter",
-      category: "Forms",
+      category: "Formulaires",
       content:
         '<form class="newsletter"><input type="email" placeholder="Email" /><button type="submit">Subscribe</button></form>',
       attributes: { class: "gjs-block-newsletter" },
