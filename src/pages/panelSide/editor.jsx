@@ -1,8 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ReactDOMServer from "react-dom/server";
 import grapesjs from "grapesjs";
 import plugin from "grapesjs-blocks-basic";
 import "grapesjs/dist/css/grapes.min.css";
+import Toolbar from "../../components/editor/Toolbar";
+import PanelStyles from "../../components/editor/PanelStyles";
+import LeftPanel from "../../components/editor/LeftPanel";
+import {
+  BlockManager,
+  DeviceManager,
+  LayerManager,
+  Panels,
+  StorageManager,
+  StyleManager,
+} from "@/lib/editorConfig";
 import {
   LayoutGrid,
   Type,
@@ -31,18 +42,6 @@ import {
   Newspaper,
   Link,
 } from "lucide-react";
-import Toolbar from "../../components/editor/Toolbar";
-import PanelStyles from "@/components/editor/PanelStyles";
-import gjsBlocksBasic from "grapesjs-blocks-basic";
-import LeftPanel from "@/components/editor/LeftPanel";
-import {
-  BlockManager,
-  DeviceManager,
-  LayerManager,
-  Panels,
-  StorageManager,
-  StyleManager,
-} from "@/lib/editorConfig";
 
 const blockIcons = {
   section: LayoutGrid,
@@ -79,27 +78,139 @@ const blockIcons = {
 const Editor = () => {
   const [editorInstance, setEditorInstance] = useState(null);
   const [activePanel, setActivePanel] = useState("block");
+  const [pages, setPages] = useState([
+    {
+      id: "homepage",
+      title: "Home",
+      content: {
+        components: "",
+        styles: "",
+      },
+    },
+    {
+      id: "about",
+      title: "About",
+      content: {
+        components: "",
+        styles: "",
+      },
+    },
+    {
+      id: "contact",
+      title: "Contact",
+      content: {
+        components: "",
+        styles: "",
+      },
+    },
+  ]);
+  const [currentPage, setCurrentPage] = useState("homepage");
 
+  const saveCurrentPageContent = useCallback(() => {
+    if (editorInstance) {
+      const pageContent = {
+        components: editorInstance.getHtml(),
+        styles: editorInstance.getCss(),
+      };
+
+      setPages((prevPages) =>
+        prevPages.map((page) =>
+          page.id === currentPage ? { ...page, content: pageContent } : page
+        )
+      );
+    }
+  }, [editorInstance, currentPage]);
+
+  const loadPageContent = useCallback(
+    (pageId) => {
+      if (editorInstance) {
+        const pageToLoad = pages.find((page) => page.id === pageId);
+
+        if (pageToLoad && pageToLoad.content) {
+          // Clear existing content first
+          editorInstance.setComponents("");
+          editorInstance.setStyle("");
+
+          // Restore page-specific content
+          if (pageToLoad.content.components) {
+            editorInstance.setComponents(pageToLoad.content.components);
+          }
+          if (pageToLoad.content.styles) {
+            editorInstance.setStyle(pageToLoad.content.styles);
+          }
+        }
+      }
+    },
+    [editorInstance, pages]
+  );
+
+  // Page change handler
+  const handlePageChange = useCallback(
+    (pageId) => {
+      // Save current page content before switching
+      saveCurrentPageContent();
+
+      // Update current page and load its content
+      setCurrentPage(pageId);
+      loadPageContent(pageId);
+    },
+    [saveCurrentPageContent, loadPageContent]
+  );
+
+  // New page creation handler
+  const handleNewPage = useCallback(
+    (newPage) => {
+      // Prevent duplicate pages
+      if (pages.some((page) => page.id === newPage.id)) return;
+
+      setPages((prevPages) => [
+        ...prevPages,
+        {
+          ...newPage,
+          content: {
+            components: "",
+            styles: "",
+          },
+        },
+      ]);
+
+      // Automatically switch to the new page
+      handlePageChange(newPage.id);
+    },
+    [pages, handlePageChange]
+  );
+
+  // Effect to manage panel visibility
+  useEffect(() => {
+    if (editorInstance) {
+      const blockPanel = editorInstance.Panels.getPanel("blocks");
+      const stylePanel = editorInstance.Panels.getPanel("styles");
+      if (blockPanel) blockPanel.set("visible", activePanel === "block");
+      if (stylePanel) stylePanel.set("visible", activePanel === "style");
+    }
+  }, [activePanel, editorInstance]);
+
+  // Editor initialization effect
   useEffect(() => {
     const initEditor = async () => {
       const editor = grapesjs.init({
         container: "#gjs",
         height: "100%",
         width: "95%",
-        storageManager: StorageManager,
+        storageManager: false,
         panels: Panels,
         deviceManager: DeviceManager,
         blockManager: {
           ...BlockManager,
           blocks: BlockManager.blocks.map((block) => {
-            const IconComponent = blockIcons[block.id] || Link;
+            const IconComponent = blockIcons[block.id] || blockIcons.link;
             return {
               ...block,
               label: ReactDOMServer.renderToString(
                 <div className="block-icon-wrapper">
                   {React.createElement(IconComponent, {
                     className: "block-icon",
-                    size: 28, // Updated icon size
+                    size: 30,
                     strokeWidth: 1.5,
                   })}
                   <span className="block-label">{block.label}</span>
@@ -123,11 +234,18 @@ const Editor = () => {
             labelColumn37: "2 Columns 3/7",
           },
         },
+        events: {
+          "component:add": saveCurrentPageContent,
+          "component:remove": saveCurrentPageContent,
+          "component:update": saveCurrentPageContent,
+          "style:update": saveCurrentPageContent,
+        },
       });
 
       await new Promise((resolve) => editor.on("load", resolve));
 
       setEditorInstance(editor);
+      loadPageContent(currentPage); // Load initial page content after editor is initialized
     };
 
     initEditor();
@@ -139,18 +257,17 @@ const Editor = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (editorInstance) {
-      const blockPanel = editorInstance.Panels.getPanel("blocks");
-      const stylePanel = editorInstance.Panels.getPanel("styles");
-      if (blockPanel) blockPanel.set("visible", activePanel === "block");
-      if (stylePanel) stylePanel.set("visible", activePanel === "style");
-    }
-  }, [activePanel, editorInstance]);
-
   return (
     <div className="h-screen justify-center items-center flex flex-col bg-white">
-      <Toolbar title="E-commerce website" editor={editorInstance} />
+      <Toolbar
+        title="E-commerce website"
+        editor={editorInstance}
+        pages={pages}
+        setPages={setPages}
+        currentPage={currentPage}
+        setCurrentPage={handlePageChange}
+        handleNewPage={handleNewPage}
+      />
       <div className="flex-1 flex w-full bg-white">
         <LeftPanel editor={editorInstance} />
         <div className="flex justify-center w-[100%] bg-white py-5">
