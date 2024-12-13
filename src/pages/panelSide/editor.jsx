@@ -245,7 +245,7 @@ const Editor = () => {
       await new Promise((resolve) => editor.on("load", resolve));
 
       setEditorInstance(editor);
-      loadPageContent(currentPage); // Load initial page content after editor is initialized
+      loadPageContent(currentPage);
     };
 
     initEditor();
