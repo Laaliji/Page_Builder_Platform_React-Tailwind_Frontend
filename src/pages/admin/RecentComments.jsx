@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -8,60 +8,76 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { FiTrash, FiMoreHorizontal } from "react-icons/fi";
+import ConfirmDeleteModal from "@/components/admin/dash/ConfirmDeleteModal"; // Import the modal component
 
 function CommentsTable() {
-  const initialComments = [
-    {
-      id: 1,
-      user: "Olivia Martin",
-      email: "olivia.martin@email.com",
-      avatar: "/avatars/01.png",
-      status: "Pas encore",
-      dateReceived: "2024-12-01",
-      dateReply: null,
-    },
-    {
-      id: 2,
-      user: "Jackson Lee",
-      email: "jackson.lee@email.com",
-      avatar: "/avatars/02.png",
-      status: "Répondu",
-      dateReceived: "2024-11-28",
-      dateReply: "2024-11-29",
-    },
-  ];
-
-  const [comments, setComments] = useState(initialComments);
+  const [contacts, setContacts] = useState([]); // Stockage des contacts
   const [filterValue, setFilterValue] = useState("");
-  const [visibleColumns, setVisibleColumns] = useState({
-    user: true,
-    email: true,
-    dateReceived: true,
-    dateReply: true,
-    status: true,
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState(null); // Store contact to delete
 
-  const handleDelete = (id) => {
-    setComments((prev) => prev.filter((comment) => comment.id !== id));
+  // Récupérer les contacts depuis l'API Laravel
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/contacts");
+        const data = await response.json();
+        setContacts(data); // Mettre à jour les contacts avec les données récupérées
+      } catch (error) {
+        console.error("Erreur lors de la récupération des contacts:", error);
+      }
+    };
+
+    fetchContacts();
+  }, []);
+
+  // Filtrer les contacts par email
+  const filteredContacts = contacts.filter((contact) =>
+    contact.email.toLowerCase().includes(filterValue.toLowerCase())
+  );
+
+  // Ouvrir la modal de confirmation de suppression
+  const handleOpenModal = (id) => {
+    setContactToDelete(id);
+    setIsModalOpen(true);
   };
 
-  const filteredComments = comments.filter((comment) =>
-    comment.email.toLowerCase().includes(filterValue.toLowerCase())
-  );
+  // Fonction pour supprimer un contact
+  const handleDelete = async () => {
+    if (contactToDelete) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/contacts/${contactToDelete}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (response.ok) {
+          setContacts((prevContacts) =>
+            prevContacts.filter((contact) => contact.id !== contactToDelete)
+          );
+          setIsModalOpen(false); // Close the modal after deletion
+        } else {
+          console.error("Erreur lors de la suppression du contact.");
+        }
+      } catch (error) {
+        console.error("Erreur de connexion:", error);
+      }
+    }
+  };
+
+  // Fermer la modal sans supprimer
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setContactToDelete(null);
+  };
 
   return (
     <div className="w-full space-y-4">
-      <h3 className="text-lg font-medium">Commentaires</h3>
+      <h3 className="text-lg font-medium">Contacts</h3>
       <div className="flex items-center justify-between">
         <Input
           placeholder="Filtrer par email..."
@@ -75,41 +91,27 @@ function CommentsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              {visibleColumns.user && <TableHead>Nom d'utilisateur</TableHead>}
-              {visibleColumns.email && <TableHead>Email</TableHead>}
-              {visibleColumns.status && <TableHead>Status</TableHead>}
-              {visibleColumns.dateReceived && <TableHead>Date Reçue</TableHead>}
-              {visibleColumns.dateReply && <TableHead>Date Réponse</TableHead>}
+              <TableHead>Nom d'utilisateur</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date Reçue</TableHead>
+              <TableHead>Date Réponse</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredComments.map((comment) => (
-              <TableRow key={comment.id}>
-                {visibleColumns.user && <TableCell>{comment.user}</TableCell>}
-                {visibleColumns.email && <TableCell>{comment.email}</TableCell>}
-                {visibleColumns.status && (
-                  <TableCell
-                    className={
-                      comment.status === "Répondu"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }
-                  >
-                    {comment.status}
-                  </TableCell>
-                )}
-                {visibleColumns.dateReceived && (
-                  <TableCell>{comment.dateReceived}</TableCell>
-                )}
-                {visibleColumns.dateReply && (
-                  <TableCell>{comment.dateReply || "Non répondu"}</TableCell>
-                )}
+            {filteredContacts.map((contact) => (
+              <TableRow key={contact.id}>
+                <TableCell>{contact.name}</TableCell>
+                <TableCell>{contact.email}</TableCell>
+                <TableCell>{contact.status}</TableCell>
+                <TableCell>{contact.contact_date}</TableCell>
+                <TableCell>{contact.response_date || "Non répondu"}</TableCell>
                 <TableCell className="flex space-x-2">
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={() => handleDelete(comment.id)}
+                    onClick={() => handleOpenModal(contact.id)} // Open the modal on delete click
                   >
                     <FiTrash />
                   </Button>
@@ -122,6 +124,13 @@ function CommentsTable() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Confirmation modal */}
+      <ConfirmDeleteModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

@@ -27,7 +27,7 @@ const Contact = () => {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        const response = await fetch("https://example.com/api/contact", {
+        const response = await fetch("http://127.0.0.1:8000/api/contact", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -53,7 +53,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="py-0 bg-white">
+    <section className="py-4 bg-white">
       <div className="container mx-auto max-w-5xl">
         <h2 className="text-3xl font-bold text-center mb-6 text-black">
           Nous contacter
