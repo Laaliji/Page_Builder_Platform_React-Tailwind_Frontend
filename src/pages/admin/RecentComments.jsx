@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -10,23 +11,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FiTrash, FiMoreHorizontal } from "react-icons/fi";
-import ConfirmDeleteModal from "@/components/admin/dash/ConfirmDeleteModal"; // Import the modal component
+import ConfirmDeleteModal from "@/components/admin/dash/ConfirmDeleteModal";
 
 function CommentsTable() {
   const [contacts, setContacts] = useState([]); // Stockage des contacts
-  const [filterValue, setFilterValue] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [contactToDelete, setContactToDelete] = useState(null); // Store contact to delete
+  const [filterValue, setFilterValue] = useState(""); // Filtre par email
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal de suppression
+  const [contactToDelete, setContactToDelete] = useState(null); // Contact à supprimer
+  const [contactToReponse, setContactToReponse] = useState(null); // Contact à répondre
+
+  const navigate = useNavigate(); // Hook pour la navigation
 
   // Récupérer les contacts depuis l'API Laravel
   useEffect(() => {
     const fetchContacts = async () => {
       try {
         const response = await fetch("http://127.0.0.1:8000/api/contacts");
-        const data = await response.json();
-        setContacts(data); // Mettre à jour les contacts avec les données récupérées
+        if (response.ok) {
+          const data = await response.json();
+          setContacts(data); // Mettre à jour les contacts
+        } else {
+          console.error("Erreur lors de la récupération des contacts.");
+        }
       } catch (error) {
-        console.error("Erreur lors de la récupération des contacts:", error);
+        console.error("Erreur de connexion :", error);
       }
     };
 
@@ -44,7 +52,7 @@ function CommentsTable() {
     setIsModalOpen(true);
   };
 
-  // Fonction pour supprimer un contact
+  // Supprimer un contact
   const handleDelete = async () => {
     if (contactToDelete) {
       try {
@@ -59,13 +67,34 @@ function CommentsTable() {
           setContacts((prevContacts) =>
             prevContacts.filter((contact) => contact.id !== contactToDelete)
           );
-          setIsModalOpen(false); // Close the modal after deletion
+          setIsModalOpen(false); // Fermer la modal après suppression
         } else {
           console.error("Erreur lors de la suppression du contact.");
         }
       } catch (error) {
-        console.error("Erreur de connexion:", error);
+        console.error("Erreur de connexion :", error);
       }
+    }
+  };
+
+  // Afficher les détails d'un contact
+  const handleReponse = async (id) => {
+    setContactToReponse(id); // Stocker l'ID du contact
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/contacts/${id}`, {
+        method: "GET",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Détails du contact :", data);
+        // Naviguer vers la page de détails du contact
+        navigate("/mail", { state: { contactDetails: data } });
+      } else {
+        console.error("Erreur lors de l'affichage des détails du contact.");
+      }
+    } catch (error) {
+      console.error("Erreur de connexion :", error);
     }
   };
 
@@ -111,11 +140,15 @@ function CommentsTable() {
                   <Button
                     size="sm"
                     variant="destructive"
-                    onClick={() => handleOpenModal(contact.id)} // Open the modal on delete click
+                    onClick={() => handleOpenModal(contact.id)} // Ouvrir la modal de suppression
                   >
                     <FiTrash />
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleReponse(contact.id)} // Afficher les détails
+                  >
                     <FiMoreHorizontal />
                   </Button>
                 </TableCell>
