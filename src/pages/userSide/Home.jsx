@@ -1,9 +1,25 @@
+import { useSuccessToast } from "@/components/toast";
 import ProjectCard from "@/components/userdashboard/Card";
 import HomeLoading from "@/components/userdashboard/HomeLoading";
+import { backend_url } from "@/constant/global";
 import { getProjects } from "@/functions/projects/CRUD";
 import { Suspense, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function Home(){
+
+    const successToast = useSuccessToast()
+
+    const location = useLocation();
+
+    useEffect(() => {
+      const queryParams = new URLSearchParams(location.search);
+      const projectd = queryParams.get("projectd");
+
+      if (projectd === "true") {
+        successToast('le projet a étè supprimer avec succés')
+      }
+    }, []);
 
     const [projets,setProjects] = useState([])
     const [loading,setLoading] = useState(true)
@@ -28,7 +44,7 @@ export default function Home(){
             {loading
             ? <HomeLoading />
             : projets.map((project,indx)=>{
-              return  <ProjectCard key={indx} title={project.title} image={project.image_url} description={(project.desctiption).substring(0,60)+' ...'} />
+              return  <ProjectCard key={indx} id={project.idP} title={project.title} image={backend_url+project.image_url} description={(project.desctiption).substring(0,40)+' ...'} />
             })}
         </div>
     </>

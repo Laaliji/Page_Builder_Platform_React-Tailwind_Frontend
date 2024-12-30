@@ -9,9 +9,10 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card"
+import { Link } from 'react-router-dom'
 
 
-export default function ProjectCard({ title,description,image }) {
+export default function ProjectCard({ id,title,description,image }) {
   return (
     <Card className={cn("w-full border border-black/20 shadow-sm")}>
       <CardHeader>
@@ -26,9 +27,9 @@ export default function ProjectCard({ title,description,image }) {
         />
       </CardContent>
       <CardFooter>
-        <Button className="w-full text-white">
-            <ExternalLink /> <span>Ouvrir</span>
-        </Button>
+        <Link to={`/project/${id}`} className='w-full gap-2 text-white bg-primary rounded-md p-2 flex items-center justify-center'>
+          <ExternalLink size={18}/> <span>Ouvrir</span>
+        </Link>
       </CardFooter>
     </Card>
   )
