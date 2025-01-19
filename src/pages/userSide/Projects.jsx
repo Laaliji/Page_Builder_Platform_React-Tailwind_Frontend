@@ -17,14 +17,20 @@ import DeleteDialog from "@/components/userdashboard/DeleteDialog"
 import { useSelector } from "react-redux"
 import { SortableRowLading } from "@/components/userdashboard/SortableRowLoading"
 import EditProjectDialoge from "@/components/userdashboard/EditProjectDialoge"
+import ViewProjectDialoge from "@/components/userdashboard/ViewProjectDialoge"
+import { useNavigate , replace } from "react-router-dom"
 
 export default function Projects() {
   const { refrecher } = useSelector((state) => state.values);
 
+  const navigation = useNavigate()
+
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [filterValue, setFilterValue] = useState("")
+
   const [isDeleteDialogOpen,setIsDeleteDialogOpen] = useState(false)
+  const [isViewProjectDialogeOpen,setIsViewProjectDialogeOpen] = useState(false)
   const [isEditProjectDialogeOpen,setIsEditProjectDialogeOpen] = useState(false)
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -52,6 +58,7 @@ export default function Projects() {
   }
 
   return <>
+    <ViewProjectDialoge setIsEditProjectDialogeOpen={setIsEditProjectDialogeOpen} isViewProjectDialogeOpen={isViewProjectDialogeOpen} setIsViewProjectDialogeOpen={setIsViewProjectDialogeOpen}/>
     <EditProjectDialoge isEditProjectDialogeOpen={isEditProjectDialogeOpen} setIsEditProjectDialogeOpen={setIsEditProjectDialogeOpen}/>
     <DeleteDialog isDeleteDialogOpen={isDeleteDialogOpen} setIsDeleteDialogOpen={setIsDeleteDialogOpen}/>
     <div className="w-full space-y-[11px]">
@@ -65,9 +72,9 @@ export default function Projects() {
           onChange={(e) => setFilterValue(e.target.value)}
           className="max-w-sm border border-black/20"
         />
-        <Button className="text-white flex items-center" onClick={()=>setIsNewProjectDialogeOpen(true)}>
+        <Button onClick={()=> navigation('/stepper',{replace})} className="text-white flex items-center">
           <FolderPlus />
-          <span className="-mt-[2px]">Modifier Le Projet</span>
+          <span className="-mt-[2px]">Ajouter une Projet</span>
         </Button>
       </div>
 
@@ -89,6 +96,7 @@ export default function Projects() {
                   project={project}
                   setIsDeleteDialogOpen={setIsDeleteDialogOpen}
                   setIsEditProjectDialogeOpen={setIsEditProjectDialogeOpen}
+                  setIsViewProjectDialogeOpen={setIsViewProjectDialogeOpen}
                 />
               ))
             : <SortableRowLading />

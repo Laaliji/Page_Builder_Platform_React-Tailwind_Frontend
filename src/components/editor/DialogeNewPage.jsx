@@ -10,27 +10,37 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2, Save } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsDiaglogAddPageOpen, setNoPages, setRefrecher, setSelectedPageId } from "@/store/valueSlicer";
+import { createPage } from "@/functions/editor/CRUD";
 
 const DialogeNewPage = ({
   isNewPageDialogOpen,
   setIsNewPageDialogOpen,
   onNewPage,
   existingPages,
+  idProject,
+  pages
 }) => {
+  const dispatch = useDispatch();
+
+  const { refrecher , firstPage } = useSelector((state) => state.values);
+
+  const [loading, setLoading] = useState(false);
   const [newPageTitle, setNewPageTitle] = useState("");
   const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
 
-    // Validate page title
     const trimmedTitle = newPageTitle.trim();
     if (!trimmedTitle) {
       setError("Page title cannot be empty");
       return;
     }
 
-    // Check for duplicate page titles
     const isDuplicate = existingPages.some(
       (page) => page.title.toLowerCase() === trimmedTitle.toLowerCase()
     );
@@ -40,38 +50,51 @@ const DialogeNewPage = ({
       return;
     }
 
-    // Create new page with unique ID
     const newPage = {
-      id: nanoid(), // Generate a unique ID
+      id: nanoid(),
       title: trimmedTitle,
-      content: {}, // Initialize with empty content
+      content: {},
     };
 
-    // Reset state and close dialog
+    const response = (await createPage({
+      id: newPage.id,
+      idProject: idProject,
+      title: newPage.title,
+    }))
+
+    setLoading(false);
+    dispatch(setIsDiaglogAddPageOpen(false))
+
+    dispatch(setSelectedPageId(null))
+
+    if(firstPage || pages.length == 0){
+      dispatch(setRefrecher(!refrecher))
+    }
+    dispatch(setNoPages(false))
     onNewPage(newPage);
     setNewPageTitle("");
     setError(null);
-    setIsNewPageDialogOpen(false);
   };
 
   return (
-    <Dialog open={isNewPageDialogOpen} onOpenChange={setIsNewPageDialogOpen}>
+    <Dialog
+      open={isNewPageDialogOpen}
+      onOpenChange={() => dispatch(setIsDiaglogAddPageOpen(false))}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Page</DialogTitle>
+          <DialogTitle>Créer Une Nouveau Page</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="pageTitle" className="text-right">
-                Page Title
-              </Label>
+          <div className="grid gap-4 pt-2">
+            <div className="flex flex-col gap-4">
+              <Label htmlFor="pageTitle">Titre de Page</Label>
               <Input
                 id="pageTitle"
                 value={newPageTitle}
                 onChange={(e) => {
                   setNewPageTitle(e.target.value);
-                  setError(null); // Clear error on typing
+                  setError(null); 
                 }}
                 className="col-span-3"
                 placeholder="Enter page title"
@@ -82,8 +105,21 @@ const DialogeNewPage = ({
             )}
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={!newPageTitle.trim()}>
-              Create Page
+            <Button
+              className="mt-3 text-white"
+              type="submit"
+              disabled={!newPageTitle.trim()}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" /> Ajouter ...
+                </>
+              ) : (
+                <>
+                  <Save />
+                  <span>Enregistrer</span>
+                </>
+              )}
             </Button>
           </DialogFooter>
         </form>

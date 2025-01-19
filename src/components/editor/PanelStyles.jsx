@@ -5,10 +5,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
-export default function PanelStyles({ editorInstance }) {
+import { Button } from "@/components/ui/button";
+import { Loader2, Trash } from "lucide-react";
+import { deletePage } from "@/functions/editor/CRUD";
+import { setNoPages, setRefrecher , setSelectedPageId } from "@/store/valueSlicer";
+export default function PanelStyles({ editorInstance, setCurrentPage, currentPageID , pages, setPages }) {
   const dispatch = useDispatch();
   const activeTab = useSelector((state) => state.tab.activeTab);
+
+    const { noPages , selectedPageId } = useSelector((state) => state.values);
+  
+
+  const [loading, setLoading] = useState(false);
 
   const [scrollPositions, setScrollPositions] = useState({
     composants: 0,
@@ -81,6 +89,18 @@ export default function PanelStyles({ editorInstance }) {
     return stylesContainer;
   }, [editorInstance]);
 
+  const DeletePage = async () => {
+    const response = await deletePage({ idPage: selectedPageId }); //currentPageID
+    setPages(pages.filter((page) => page.id !== selectedPageId)); //currentPageID
+    dispatch(setActiveTab("composants"));
+
+    if(pages.length == 1){
+      dispatch(setNoPages(true));
+    }
+    dispatch(setSelectedPageId(pages[0].id))
+    //setCurrentPage(pages[0].id)
+  };
+
   const renderPage = useCallback(() => {
     console.log("Rendering Page tab");
     return (
@@ -108,6 +128,14 @@ export default function PanelStyles({ editorInstance }) {
             placeholder="Titre"
             className="border-black/15"
           />
+        </div>
+        <div className="space-y-2">
+          <Button
+            onClick={() => DeletePage()}
+            className="w-full bg-red-600 hover:bg-red-500 text-white"
+          >
+            <Trash /> <span className="-mt-[1px]">Supprimer cette page</span>
+          </Button>
         </div>
       </div>
     );
@@ -140,7 +168,7 @@ export default function PanelStyles({ editorInstance }) {
         <TabsContent value="composants" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-composants"
-            className="h-full w-full rounded-md  p-4"
+            className="h-full w-full rounded-md  p-2"
             onScroll={(e) => handleScroll("composants", e)}
           >
             {tabContent.composants && (
@@ -154,7 +182,7 @@ export default function PanelStyles({ editorInstance }) {
         <TabsContent value="styles" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-styles"
-            className="h-full w-full rounded-md  p-4"
+            className="h-full w-full rounded-md  p-2"
             onScroll={(e) => handleScroll("styles", e)}
           >
             {tabContent.styles && (
@@ -168,7 +196,7 @@ export default function PanelStyles({ editorInstance }) {
         <TabsContent value="page" className="mt-4 h-[calc(100vh-120px)]">
           <ScrollArea
             id="scroll-page"
-            className="h-full w-full rounded-md  p-4"
+            className="h-full w-full rounded-md  p-2"
             onScroll={(e) => handleScroll("page", e)}
           >
             {tabContent.page}

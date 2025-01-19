@@ -1,50 +1,30 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button as Btn } from "../ui/button";
-import { useToast } from "@/hooks/use-toast";
-import {  AlertTriangle, CheckCircle, CheckIcon, FolderX, Loader2, Trash, TriangleAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle, FolderX, Loader2, Trash, TriangleAlert } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteProject } from "@/functions/projects/CRUD";
 import { useState } from "react";
 import { setRefrecher } from "@/store/valueSlicer";
+import { useErrorToast, useSuccessToast } from "../toast";
 export default function DeleteDialog({ isDeleteDialogOpen,setIsDeleteDialogOpen }){
     const { selectedProjectDeleteID } = useSelector((state) => state.values);
-    const { toast } = useToast()
+    
     const dispatch = useDispatch()
     const { refrecher } = useSelector((state) => state.values);
 
     const [loadingDelete,setLoadingDelete] = useState(false)
+
+    const successToast = useSuccessToast();
+    const errorToast = useErrorToast();
+
     const DeleteProject = async () => {
         setLoadingDelete(true)
         const STATE = await deleteProject({idProject : selectedProjectDeleteID})
         setLoadingDelete(false)
         if(STATE == "OK"){
-            toast({
-                
-                variant: "custom",
-                className: 'bg-[#23861e] border-none text-white text-md py-5 pl-2 font-[Poppins]',
-                action: (
-                    <div className="w-full flex items-center -p-1">
-                      <CheckCircle className="mr-3" />
-                      Projet supprimé avec succès
-                    </div>
-                ),
-            });
+            successToast("Projet supprimé avec succès")
         }else{
-            toast({
-                variant: "destructive",
-                className: 'text-white text-md py-5 pl-2 font-[Poppins]',
-                action: (
-                    <div className="w-full flex items-center -p-1">
-                      <div>
-                        <div className="text-lg flex items-center">
-                            <AlertTriangle className="mr-3" size="20"/>
-                            Oups ! Une erreur s'est produite.
-                        </div>
-                        <span className="text-sm opacity-80">Il y a eu un problème lors de la suppression du projet.</span>
-                      </div>
-                    </div>
-                ),
-            })
+            errorToast("Il y a eu un problème lors de la modification du projet.")
         }
         setIsDeleteDialogOpen(false)
         dispatch(setRefrecher(!refrecher))

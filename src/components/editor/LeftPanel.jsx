@@ -23,8 +23,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useNavigate , replace } from "react-router-dom";
 
 export default function LeftPanel({ editor }) {
+  const navigation = useNavigate()
   return (
     <>
       <div className="w-[5%] bg-white  pt-2 px-2 border-r-[1px] border-black/15 border-solid flex flex-col justify-center mb-3 items-center gap-y-2">
@@ -60,7 +62,7 @@ export default function LeftPanel({ editor }) {
                 className="w-fit border border-black/10 border-solid"
                 side="right"
               >
-                <DropdownMenuItem className="cursor-pointer flex gap-2">
+                <DropdownMenuItem onClick={()=>navigation('/dash/user/home',{replace})} className="cursor-pointer flex gap-2">
                   <LayoutDashboard /> Retour au tableau de bord
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer flex gap-2">
