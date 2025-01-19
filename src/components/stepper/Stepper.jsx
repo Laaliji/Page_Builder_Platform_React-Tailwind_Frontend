@@ -56,7 +56,9 @@ const Stepper = ({ steps, currentStep }) => {
                 {step.completed ? (
                   <Check className="h-6 w-6" />
                 ) : (
-                  <span className={step.highlighted ? "text-white" : "text-black"}>
+                  <span
+                    className={step.highlighted ? "text-white" : "text-black"}
+                  >
                     {index + 1}
                   </span>
                 )}

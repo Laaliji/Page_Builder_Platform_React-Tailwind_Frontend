@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import TopBarProgress from "react-topbar-progress-indicator";
-import { useNavigate } from "react-router-dom";
 
 TopBarProgress.config({
   barColors: {
@@ -16,15 +15,20 @@ const StepperControl = ({
   totalSteps,
   onNext,
   onPrev,
-  onFinish,
+  formValidations,
 }) => {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setLoading(true);
-      onNext();
+  const handleNext = async () => {
+    if (!formValidations[currentStep - 1]) {
+      alert("Please complete the form before proceeding.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await onNext();
+    } finally {
       setTimeout(() => {
         setLoading(false);
       }, 1000);
@@ -32,32 +36,16 @@ const StepperControl = ({
   };
 
   const handlePrev = () => {
-    if (currentStep > 1) {
-      setLoading(true);
-      onPrev();
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    }
-  };
-
-  const handleFinish = async () => {
     setLoading(true);
-    // Call the onFinish callback if provided
-    if (onFinish) {
-      await onFinish();
-    }
-
+    onPrev();
     setTimeout(() => {
       setLoading(false);
-      navigate("/editor");
     }, 1000);
   };
 
   return (
     <div className="container flex justify-between items-center mt-4 mb-4 w-full">
       {loading && <TopBarProgress />}
-      {/* Back Button */}
       <Button
         onClick={handlePrev}
         disabled={currentStep === 1}
@@ -67,10 +55,9 @@ const StepperControl = ({
       >
         Back
       </Button>
-      {/* Conditional Rendering for Finish or Next Button */}
       {currentStep === totalSteps ? (
         <Button
-          onClick={handleFinish}
+          onClick={handleNext}
           className="uppercase font-semibold bg-black text-white"
         >
           Finish
