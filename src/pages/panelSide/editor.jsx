@@ -125,49 +125,59 @@ const Editor = () => {
   const [currentPage, setCurrentPage] = useState("");
 
   const saveCurrentPageContent = useCallback(async () => {
-    if (!editorInstance) return;
+    if (!editorInstance || !selectedPageId) return;
 
-    const pageContent = {
-      components: editorInstance.getHtml(),
-      styles: editorInstance.getCss(),
-    };
-    dispatch(setSaveLoading(true))
-    const res = await insertContent({
-      idPage: selectedPageId,//currentPage,
-      htlmContent: pageContent.components,
-      cssContent: pageContent.styles,
-    });
+    try {
+      dispatch(setSaveLoading(true));
+      
+      const pageContent = {
+        components: editorInstance.getHtml(),
+        styles: editorInstance.getCss(),
+      };
 
-    setPages((prevPages) =>
-      prevPages.map((page) =>
-        page.id === selectedPageId ? { ...page, content: pageContent } : page //currentPage
-      )
-    );
-    dispatch(setSaveLoading(false))
-  }, [editorInstance]);
+      await insertContent({
+        idPage: selectedPageId,
+        htlmContent: pageContent.components,
+        cssContent: pageContent.styles,
+      });
 
-  const loadPageContent = useCallback(
-    (pageId) => {
-      if (editorInstance) {
-        const pageToLoad = pages.find((page) => page.id === pageId);
+      // Update local state
+      setPages(prevPages =>
+        prevPages.map(page =>
+          page.id === selectedPageId
+            ? { ...page, content: pageContent }
+            : page
+        )
+      );
+    } catch (error) {
+      console.error('Error saving content:', error);
+    } finally {
+      dispatch(setSaveLoading(false));
+    }
+  }, [editorInstance, selectedPageId, dispatch]);
 
-        if (pageToLoad && pageToLoad.content) {
-          // Clear existing content first
-          editorInstance.setComponents("");
-          editorInstance.setStyle("");
+  const loadPageContent = useCallback((pageId) => {
+    if (!editorInstance || !pageId) return;
 
-          // Restore page-specific content
-          if (pageToLoad.content.components) {
-            editorInstance.setComponents(pageToLoad.content.components);
-          }
-          if (pageToLoad.content.styles) {
-            editorInstance.setStyle(pageToLoad.content.styles);
-          }
-        }
+    const pageToLoad = pages.find(page => page.id === pageId);
+    if (!pageToLoad) return;
+
+    // Clear existing content first
+    if(editorInstance){
+      editorInstance.setComponents('');
+      editorInstance.setStyle('');
+    }
+    
+    // Load the page content
+    if (pageToLoad.content) {
+      if (pageToLoad.content.components) {
+        editorInstance.setComponents(pageToLoad.content.components);
       }
-    },
-    [editorInstance,refrecherLoad, pages]//editorInstance, pages, 
-  );
+      if (pageToLoad.content.styles) {
+        editorInstance.setStyle(pageToLoad.content.styles);
+      }
+    }
+  }, [editorInstance, pages]);
 
   // Page change handler
   const handlePageChange = useCallback(
@@ -180,28 +190,35 @@ const Editor = () => {
     [] //saveCurrentPageContent, loadPageContent
   );
 
-  // New page creation handler
-  const handleNewPage = useCallback(
-    (newPage) => {
-      // Prevent duplicate pages
-      if (pages.some((page) => page.id === newPage.id)) return;
+  useEffect(() => {
+    if (selectedPageId) {
+      loadPageContent(selectedPageId);
+    }
+  }, [selectedPageId, loadPageContent]);
 
-      setPages((prevPages) => [
-        ...prevPages,
-        {
-          ...newPage,
-          content: {
-            components: "",
-            styles: "",
-          },
-        },
-      ]);
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
 
-      // Automatically switch to the new page
-      handlePageChange(newPage.id);
-    },
-    []//[pages, handlePageChange]
-  );
+    const handleChange = () => {
+      if (selectedPageId) {
+        saveCurrentPageContent();
+      }
+    };
+
+    editor.on('component:update', handleChange);
+    editor.on('style:update', handleChange);
+
+    return () => {
+      editor.off('component:update', handleChange);
+      editor.off('style:update', handleChange);
+    };
+  }, [selectedPageId, saveCurrentPageContent]);
+
+  const handleNewPage = useCallback((newPage) => {
+    setPages(prevPages => [...prevPages, newPage]);
+    dispatch(setSelectedPageId(newPage.id));
+  }, [dispatch]);
 
   const initializeEditor = useCallback(async () => {
     if (!projectHasPages || editorRef.current) return null;
@@ -271,7 +288,7 @@ const Editor = () => {
       setIsEditorInitialized(false);
       return null;
     }
-  }, [projectHasPages]);
+  }, [projectHasPages,noPages]);
 
   useEffect(() => {
     if (!isLoading && projectHasPages && !editorRef.current) {
@@ -392,7 +409,7 @@ const Editor = () => {
     };
 
     fetchProjectData();
-  }, [id, refrecher]);
+  }, [id]);
 
   return (
     <Provider store={store}>

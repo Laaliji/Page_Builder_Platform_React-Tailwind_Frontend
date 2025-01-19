@@ -15,6 +15,21 @@ export async function getPages({idProject}){
     })
 } 
 
+export async function getPage({idPage}){
+    return useFetch({
+        method : "GET",
+        resource : `page/${idPage}`
+    })
+}
+
+export async function updatePageMetaData({ idPage , title , htmlPageTitle }){
+    return useFetch({
+        method : "POST",
+        resource : `pages/${idPage}`,
+        body : {title, html_page_title : htmlPageTitle}
+    })
+}
+
 export async function createPage({ id , idProject , title }){
     return useFetch({
         method : "POST",

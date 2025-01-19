@@ -6,14 +6,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash } from "lucide-react";
-import { deletePage } from "@/functions/editor/CRUD";
+import { Loader2, Save, Trash } from "lucide-react";
+import { deletePage, getPage, updatePageMetaData } from "@/functions/editor/CRUD";
 import { setNoPages, setRefrecher , setSelectedPageId } from "@/store/valueSlicer";
 export default function PanelStyles({ editorInstance, setCurrentPage, currentPageID , pages, setPages }) {
   const dispatch = useDispatch();
   const activeTab = useSelector((state) => state.tab.activeTab);
 
-    const { noPages , selectedPageId } = useSelector((state) => state.values);
+    const { noPages , selectedPageId , refetchSwitchPage } = useSelector((state) => state.values);
   
 
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,18 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
   };
 
   useEffect(() => {
-    console.log("Active tab changed:", activeTab);
+    const GetPage = async () => {
+      const response = await getPage({ idPage: selectedPageId })
+      if(response.STATE == "OK"){
+        setPageState({
+          pageName : response.DATA.title,
+          pageTitle : response.DATA.html_page_title
+        })
+      }
+    };GetPage();
+  },[refetchSwitchPage])  
+
+  useEffect(() => {
     const currentScrollPosition = scrollPositions[activeTab];
     const scrollElement = document.getElementById(`scroll-${activeTab}`);
     if (scrollElement) {
@@ -66,7 +77,6 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
   };
 
   const renderComposants = useCallback(() => {
-    console.log("Rendering Composants tab");
     if (!editorInstance || !editorInstance.BlockManager) {
       console.warn("Editor instance or BlockManager not available");
       return null;
@@ -78,7 +88,6 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
   }, [editorInstance]);
 
   const renderStyles = useCallback(() => {
-    console.log("Rendering Styles tab");
     if (!editorInstance || !editorInstance.StyleManager) {
       console.warn("Editor instance or StyleManager not available");
       return null;
@@ -88,6 +97,15 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
     stylesContainer.appendChild(editorInstance.StyleManager.render());
     return stylesContainer;
   }, [editorInstance]);
+
+  const UpdataPageMetaData = async () => {
+    await updatePageMetaData({ 
+      idPage: selectedPageId, 
+      title: pageState.pageName, 
+      htmlPageTitle: pageState.pageTitle 
+    });
+    dispatch(setActiveTab("composants"));
+  }
 
   const DeletePage = async () => {
     const response = await deletePage({ idPage: selectedPageId }); //currentPageID
@@ -102,7 +120,6 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
   };
 
   const renderPage = useCallback(() => {
-    console.log("Rendering Page tab");
     return (
       <div className="p-4 space-y-4">
         <div className="space-y-2">
@@ -112,7 +129,7 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
             id="pageName"
             name="pageName"
             value={pageState.pageName}
-            onChange={handlePageInputChange}
+            onChange={(e)=>setPageState({pageName:e.target.value})}
             placeholder="Nom"
             className="border-black/15"
           />
@@ -124,12 +141,18 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
             id="pageTitle"
             name="pageTitle"
             value={pageState.pageTitle}
-            onChange={handlePageInputChange}
+            onChange={(e)=>setPageState({pageTitle: e.target.value})}
             placeholder="Titre"
             className="border-black/15"
           />
         </div>
         <div className="space-y-2">
+          <Button
+            onClick={() => UpdataPageMetaData()}
+            className="w-full bg-primary hover:bg-secondary text-white"
+          >
+            <Save /> <span className="-mt-[1px]">Enregistrer cette page</span>
+          </Button>
           <Button
             onClick={() => DeletePage()}
             className="w-full bg-red-600 hover:bg-red-500 text-white"
@@ -139,7 +162,7 @@ export default function PanelStyles({ editorInstance, setCurrentPage, currentPag
         </div>
       </div>
     );
-  }, [pageState, handlePageInputChange]);
+  }, [pageState, handlePageInputChange,refetchSwitchPage]);
 
   useEffect(() => {
     if (activeTab === "composants" && !tabContent.composants) {

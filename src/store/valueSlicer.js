@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   selectedProjectDeleteID: null,
   refrecher: false,
+  refetchSwitchPage: false,
   selectedProjectUpdateID: null,
   selectedProjectViewID: null,
   selectedProjectEditorID: null,
@@ -10,7 +11,7 @@ const initialState = {
   selectedPageId: null,
   selectedProjectName: null,
   noPages: false,
-  firstPage: false,
+  firstPage: true,
   saveLoading: false,
 };
 const valueSlicer = createSlice({
@@ -50,6 +51,9 @@ const valueSlicer = createSlice({
     setSaveLoading: (state, action) => {
       state.saveLoading = action.payload;
     },
+    setRefetchSwitchPage: (state, action) => {
+      state.refetchSwitchPage = action.payload;
+    },
   },
 });
 
@@ -65,6 +69,7 @@ export const {
   setFirstPage,
   setSaveLoading,
   setRefrecher,
+  setRefetchSwitchPage
 } = valueSlicer.actions;
 
 export default valueSlicer.reducer;

@@ -49,6 +49,7 @@ import { hasPages } from "@/functions/editor/CRUD";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setIsDiaglogAddPageOpen,
+  setRefetchSwitchPage,
   setSelectedPageId,
 } from "@/store/valueSlicer";
 const Toolbar = ({
@@ -62,7 +63,7 @@ const Toolbar = ({
   idProject,
   saveCurrentPageContent,
 }) => {
-  const { saveLoading, noPages, isDiaglogAddPageOpen, selectedPageId } =
+  const { saveLoading, noPages, isDiaglogAddPageOpen, selectedPageId,refetchSwitchPage } =
     useSelector((state) => state.values);
 
   const dispatch = useDispatch();
@@ -198,13 +199,9 @@ const Toolbar = ({
                             key={page.id}
                             value={page.id}
                             onSelect={() => {
-                              //setCurrentPage(page.id);
                               dispatch(setSelectedPageId(page.id));
+                              dispatch(setRefetchSwitchPage(!refetchSwitchPage))
                               setOpen(false);
-                              // Optionally add a callback to ensure the state was updated
-                              setTimeout(() => {
-                                console.log('Selected Page ID:', page.id);
-                              }, 0);
                             }}
                           >
                             {page.title}

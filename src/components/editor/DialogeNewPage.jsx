@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Save } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsDiaglogAddPageOpen, setNoPages, setRefrecher, setSelectedPageId } from "@/store/valueSlicer";
+import { setFirstPage, setIsDiaglogAddPageOpen, setNoPages, setRefrecher, setSelectedPageId } from "@/store/valueSlicer";
 import { createPage } from "@/functions/editor/CRUD";
 
 const DialogeNewPage = ({
@@ -32,8 +32,8 @@ const DialogeNewPage = ({
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
 
     const trimmedTitle = newPageTitle.trim();
     if (!trimmedTitle) {
@@ -51,29 +51,38 @@ const DialogeNewPage = ({
     }
 
     const newPage = {
-      id: nanoid(),
-      title: trimmedTitle,
-      content: {},
-    };
+    id: nanoid(),
+    title: trimmedTitle,
+    content: {
+      components: '',
+      styles: ''
+    }
+  };
 
-    const response = (await createPage({
+  try {
+    await createPage({
       id: newPage.id,
       idProject: idProject,
       title: newPage.title,
-    }))
-
-    setLoading(false);
-    dispatch(setIsDiaglogAddPageOpen(false))
-
-    dispatch(setSelectedPageId(null))
-
-    if(firstPage || pages.length == 0){
-      dispatch(setRefrecher(!refrecher))
-    }
-    dispatch(setNoPages(false))
+    });
+    
     onNewPage(newPage);
-    setNewPageTitle("");
+    dispatch(setSelectedPageId(newPage.id)); // Set the new page as selected
+    dispatch(setIsDiaglogAddPageOpen(false));
+    dispatch(setNoPages(false));
+    setNewPageTitle('');
     setError(null);
+
+    if(pages.length == 0 && firstPage){
+      setFirstPage(false);
+      window.location.reload()
+    }
+    
+  } catch (error) {
+    setError('Error creating page');
+  } finally {
+    setLoading(false);
+  }
   };
 
   return (
