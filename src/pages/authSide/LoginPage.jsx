@@ -48,8 +48,15 @@ export function LoginPage() {
   const logo = "/assets/images/logo.png";
 
   useEffect(() => {
-    const userId = localStorage.getItem("user_id");
-    if (userId) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    const githubId = urlParams.get("github_id");
+    const email = urlParams.get("email");
+
+    if (token && githubId && email) {
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("githubId", githubId);
+      localStorage.setItem("email", email);
       navigate("/stepper");
     }
   }, [navigate]);
@@ -88,12 +95,14 @@ export function LoginPage() {
         password,
       });
 
-      // Store both token and user ID in localStorage
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem("user_id", response.data.user.id); // Make sure you're accessing the correct property
+      // Log user information in the console
+      console.log("User id:", response.data.user.id);
 
-      // For debugging
-      console.log("Stored user_id:", response.data.user.id);
+      // Save user ID in localStorage
+      localStorage.setItem("userId", response.data.user.id);
+
+      // Save the authentication token
+      localStorage.setItem("authToken", response.data.token);
 
       navigate("/stepper");
     } catch (error) {
@@ -119,6 +128,7 @@ export function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       {loading && <TopBarProgress />}
       <div className="flex flex-col items-center justify-center w-full">
+        {/* Logo */}
         <a href="#">
           <img alt="logo" className="h-9 w-auto sm:h-9" src={logo} />
         </a>
@@ -137,10 +147,11 @@ export function LoginPage() {
                   handleGitHubLogin();
                 }}
               >
-                <FaGithub color="white" />
+                <FaGithub color="white" /> Se connecter avec Github
               </Button>
             </div>
 
+            {/* OR text */}
             <div className="mt-4 text-center text-sm text-gray-600">ou</div>
 
             {/* Form */}
@@ -183,6 +194,7 @@ export function LoginPage() {
                 </Button>
               </div>
             </form>
+            {/* New user sign-up link */}
             <div className="mt-4 text-center text-sm text-gray-600">
               <p>
                 Nouveau utilisateur?{" "}

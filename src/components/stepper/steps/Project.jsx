@@ -1,8 +1,18 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent } from "../../ui/Card";
 import { Label } from "../../ui/Label";
-import axios from "axios";
 import { toast } from "react-hot-toast";
+import axios from "axios";
+
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: "http://127.0.0.1:8000",
+  withCredentials: true, // Important for CORS with credentials
+  headers: {
+    Accept: "application/json",
+    // Don't set Content-Type here as it will be automatically set with FormData
+  },
+});
 
 const Project = forwardRef(({ onValidate }, ref) => {
   const [formData, setFormData] = useState({
@@ -10,9 +20,10 @@ const Project = forwardRef(({ onValidate }, ref) => {
     projectDescription: "",
     websiteTitle: "",
     repoUrl: "",
-    image: null,
+    image_url: null,
   });
 
+  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -21,6 +32,10 @@ const Project = forwardRef(({ onValidate }, ref) => {
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -32,7 +47,12 @@ const Project = forwardRef(({ onValidate }, ref) => {
   };
 
   const isFormValid = () => {
-    return formData.projectName;
+    const newErrors = {};
+    if (!formData.projectName.trim()) {
+      newErrors.projectName = "Project name is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   useImperativeHandle(ref, () => ({
@@ -43,16 +63,16 @@ const Project = forwardRef(({ onValidate }, ref) => {
   }));
 
   const saveProject = async () => {
-    console.log("saveProject function called");
     if (!isFormValid()) {
-      console.log("Form validation failed");
-      toast.error("Please fill in the required fields");
+      toast.error("Please fill in all required fields");
       return false;
     }
 
     setIsSubmitting(true);
-    console.log("Submitting form...");
     try {
+      // First, get the CSRF cookie
+      await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
+
       const formDataToSend = new FormData();
       formDataToSend.append("projectName", formData.projectName);
       formDataToSend.append(
@@ -61,64 +81,42 @@ const Project = forwardRef(({ onValidate }, ref) => {
       );
       formDataToSend.append("websiteTitle", formData.websiteTitle || "");
       formDataToSend.append("repoUrl", formData.repoUrl || "");
-      if (formData.image) {
-        formDataToSend.append("image", formData.image);
-        console.log("Image appended to formData");
+
+      if (formData.image_url) {
+        formDataToSend.append("image_url", formData.image_url);
       }
 
-      // Get user_id from localStorage with proper error handling
-      const userId = localStorage.getItem("user_id");
+      const userId = localStorage.getItem("userId");
       if (!userId) {
-        console.log("No user_id found in localStorage");
-        toast.error("Session expired. Please login again.");
-        window.location.href = "/login";
+        toast.error("User not authenticated");
         return false;
       }
-
       formDataToSend.append("user_id", userId);
-      console.log("user_id appended to formData:", userId);
 
-      // Add authorization header
-      const authToken = localStorage.getItem("authToken");
-      const headers = {
-        "Content-Type": "multipart/form-data",
-        "X-CSRF-TOKEN": document
-          .querySelector('meta[name="csrf-token"]')
-          ?.getAttribute("content"),
-      };
+      // Log the data being sent
+      console.log("Sending data:", Object.fromEntries(formDataToSend));
 
-      if (authToken) {
-        headers["Authorization"] = `Bearer ${authToken}`;
-        console.log("Authorization token added to headers");
-      }
+      const response = await api.post("/api/projects/create", formDataToSend);
 
-      console.log("Sending POST request to /api/projects/create");
-      const response = await axios.post(
-        "/api/projects/create",
-        formDataToSend,
-        { headers }
-      );
+      console.log("Server response:", response.data);
 
-      if (response.data.success) {
-        console.log("Project created successfully:", response.data);
+      if (response.data.STATE === "OK") {
+        // Changed to match your backend response
         toast.success("Project created successfully!");
         return true;
       } else {
-        console.log("Failed to create project:", response.data);
         toast.error(response.data.message || "Failed to create project");
         return false;
       }
     } catch (error) {
       console.error("Error creating project:", error);
-      if (error.response?.status === 401) {
-        console.log("Unauthorized error - redirecting to login");
-        toast.error("Session expired. Please login again.");
-        window.location.href = "/login";
+
+      if (error.response?.status === 422) {
+        // Handle validation errors
+        const validationErrors = error.response.data.errors;
+        setErrors(validationErrors);
+        toast.error("Please correct the validation errors");
       } else {
-        console.log(
-          "Error occurred while creating the project:",
-          error.response?.data?.message || error.message
-        );
         toast.error(
           error.response?.data?.message ||
             "An error occurred while creating the project"
@@ -127,7 +125,6 @@ const Project = forwardRef(({ onValidate }, ref) => {
       return false;
     } finally {
       setIsSubmitting(false);
-      console.log("Form submission process completed");
     }
   };
 
@@ -146,18 +143,25 @@ const Project = forwardRef(({ onValidate }, ref) => {
         <CardContent className="pt-6">
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
             <div className="space-y-2">
-              <Label htmlFor="projectName">Project Name</Label>
+              <Label htmlFor="projectName">Project Name *</Label>
               <input
                 type="text"
                 id="projectName"
                 name="projectName"
                 value={formData.projectName}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.projectName ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Enter your project name"
                 required
                 disabled={isSubmitting}
               />
+              {errors.projectName && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.projectName}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -167,11 +171,20 @@ const Project = forwardRef(({ onValidate }, ref) => {
                 name="projectDescription"
                 value={formData.projectDescription}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.projectDescription
+                    ? "border-red-500"
+                    : "border-gray-300"
+                }`}
                 placeholder="Enter your project description"
                 rows="3"
                 disabled={isSubmitting}
               />
+              {errors.projectDescription && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.projectDescription}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -182,10 +195,17 @@ const Project = forwardRef(({ onValidate }, ref) => {
                 name="websiteTitle"
                 value={formData.websiteTitle}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.websiteTitle ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Enter website title"
                 disabled={isSubmitting}
               />
+              {errors.websiteTitle && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.websiteTitle}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -196,22 +216,15 @@ const Project = forwardRef(({ onValidate }, ref) => {
                 name="repoUrl"
                 value={formData.repoUrl}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  errors.repoUrl ? "border-red-500" : "border-gray-300"
+                }`}
                 placeholder="Enter GitHub repository URL"
                 disabled={isSubmitting}
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image">Upload Image</Label>
-              <input
-                type="file"
-                id="image"
-                name="image"
-                onChange={handleFileChange}
-                className="w-full text-sm text-slate-500"
-                disabled={isSubmitting}
-              />
+              {errors.repoUrl && (
+                <p className="mt-1 text-sm text-red-500">{errors.repoUrl}</p>
+              )}
             </div>
           </form>
         </CardContent>
