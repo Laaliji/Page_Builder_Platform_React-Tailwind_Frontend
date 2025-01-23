@@ -93,17 +93,27 @@ const Project = forwardRef(({ onValidate }, ref) => {
       }
       formDataToSend.append("user_id", userId);
 
-      // Log the data being sent
-      console.log("Sending data:", Object.fromEntries(formDataToSend));
-
       const response = await api.post("/api/projects/create", formDataToSend);
 
-      console.log("Server response:", response.data);
-
       if (response.data.STATE === "OK") {
-        // Changed to match your backend response
+        // Save project details to localStorage
+        const projectDetails = response.data.data;
+        localStorage.setItem(
+          "currentProject",
+          JSON.stringify({
+            idP: projectDetails.idP,
+            title: projectDetails.title,
+            description: projectDetails.description,
+            domaineName: projectDetails.domaineName,
+            repository: projectDetails.repository,
+            image_url: projectDetails.image_url,
+            user_id: projectDetails.user_id,
+            created_at: projectDetails.created_at,
+          })
+        );
+
         toast.success("Project created successfully!");
-        return true;
+        return projectDetails.idP; // Return the project ID
       } else {
         toast.error(response.data.message || "Failed to create project");
         return false;
@@ -112,7 +122,6 @@ const Project = forwardRef(({ onValidate }, ref) => {
       console.error("Error creating project:", error);
 
       if (error.response?.status === 422) {
-        // Handle validation errors
         const validationErrors = error.response.data.errors;
         setErrors(validationErrors);
         toast.error("Please correct the validation errors");
