@@ -3,10 +3,16 @@ import ProjectCard from "@/components/userdashboard/Card";
 import HomeLoading from "@/components/userdashboard/HomeLoading";
 import { backend_url } from "@/constant/global";
 import { getProjects } from "@/functions/projects/CRUD";
+import translations from "@/locale/translations";
 import { Suspense, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 export default function Home(){
+
+    const { selectedLang } = useSelector(
+      (state) => state.values
+    );
 
     const successToast = useSuccessToast()
 
@@ -17,7 +23,7 @@ export default function Home(){
       const projectd = queryParams.get("projectd");
 
       if (projectd === "true") {
-        successToast('le projet a étè supprimer avec succés')
+        successToast(translations[lang].project_deleted_successfully)
       }
     }, []);
 
@@ -34,18 +40,26 @@ export default function Home(){
     },[])
 
     return <>
-        <div>
-          <h3 className="text-lg font-medium">Accueil</h3>
-          <p className="text-sm text-muted-foreground">
-            Toutes les projets
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-3 mt-2 overflow-y-scroll max-h-screen hiddenScroll lg:grid-cols-2 pt-2">
-            {loading
-            ? <HomeLoading />
-            : projets.map((project,indx)=>{
-              return  <ProjectCard key={indx} id={project.idP} title={project.title} image={backend_url+project.image_url} description={(project.desctiption).substring(0,40)+' ...'} />
-            })}
-        </div>
-    </>
+    <div>
+      <h3 className="text-lg font-medium">{translations[selectedLang].home}</h3>
+      <p className="text-sm text-muted-foreground">
+        {translations[selectedLang].all_projects}
+      </p>
+    </div>
+    <div className="grid grid-cols-1 gap-3 mt-2 overflow-y-scroll max-h-screen hiddenScroll lg:grid-cols-2 pt-2">
+      {loading ? (
+        <HomeLoading />
+      ) : (
+        projets.map((project, indx) => (
+          <ProjectCard
+            key={indx}
+            id={project.idP}
+            title={project.title}
+            image={backend_url + project.image_url}
+            description={project.desctiption.substring(0, 40) + " ..."}
+          />
+        ))
+      )}
+    </div>
+  </>
 }

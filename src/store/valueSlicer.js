@@ -7,6 +7,7 @@ const initialState = {
   selectedProjectUpdateID: null,
   selectedProjectViewID: null,
   selectedProjectEditorID: null,
+  selectedLang: localStorage.getItem('lang') || 'en',
   isDiaglogAddPageOpen: false,
   selectedPageId: null,
   selectedProjectName: null,
@@ -54,6 +55,9 @@ const valueSlicer = createSlice({
     setRefetchSwitchPage: (state, action) => {
       state.refetchSwitchPage = action.payload;
     },
+    setSelectedLang: (state, action) => {
+      state.selectedLang = action.payload;
+    },
   },
 });
 
@@ -69,7 +73,8 @@ export const {
   setFirstPage,
   setSaveLoading,
   setRefrecher,
-  setRefetchSwitchPage
+  setRefetchSwitchPage,
+  setSelectedLang,
 } = valueSlicer.actions;
 
 export default valueSlicer.reducer;

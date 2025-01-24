@@ -29,12 +29,9 @@ import {
 } from "@/components/ui/sidebar"
 import SidebarItem from "./userdashboard/SideBarItem"
 import { Link, useLocation } from "react-router-dom"
+import { useSelector } from "react-redux"
+import translations from "@/locale/translations"
 
-const links = [
-  { label : 'Acceuil' , value : 'home' , icon : <Home size='17'/> },
-  { label : 'Projets' , value : 'projects' , icon : <PanelsTopLeft size='17'/> },
-  { label : 'Profile' , value : 'account' , icon : <User size='17'/> },
-]
 
 const data = {
   teams: [
@@ -60,6 +57,15 @@ const data = {
 
 export function AppSidebar({ pathname,...props }) {
   
+  const { selectedLang } = useSelector(
+    (state) => state.values
+  );
+
+  const links = [
+    { label : translations[selectedLang].Acceuil , value : 'home' , icon : <Home size='17'/> },
+    { label : translations[selectedLang].Projets , value : 'projects' , icon : <PanelsTopLeft size='17'/> },
+    { label : translations[selectedLang].Profile , value : 'account' , icon : <User size='17'/> },
+  ]
 
   return (
     (<Sidebar collapsible="icon" {...props}>
@@ -75,7 +81,7 @@ export function AppSidebar({ pathname,...props }) {
               </Link>
             </>)
           }
-          <SidebarItem icon={<LogOut size='18'/>} title="Déconnexion" />
+          <SidebarItem icon={<LogOut size='18'/>} title={translations[selectedLang].Déconnexion} />
         </div>
       </SidebarContent>
       <SidebarRail />

@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { TableCell, TableRow } from "@/components/ui/table"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setSelectedProjectDeleteID , setSelectedProjectUpdateID , setSelectedProjectViewID } from '@/store/valueSlicer'
 import {
   DropdownMenu,
@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from 'lucide-react'
+import translations from "@/locale/translations"
 
 
 export function SortableRow({ project , setIsDeleteDialogOpen , setIsEditProjectDialogeOpen , setIsViewProjectDialogeOpen }) {
+  const { selectedLang } = useSelector((state) => state.values);
 
   const dispatch = useDispatch()
 
@@ -51,11 +53,11 @@ export function SortableRow({ project , setIsDeleteDialogOpen , setIsEditProject
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="border border-black/20">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>{translations[selectedLang].actions}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer"><span onClick={()=>{dispatch((setSelectedProjectViewID(project.idP)));setIsViewProjectDialogeOpen(true)}}>Voir les détails</span></DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer"><span onClick={()=>{dispatch(setSelectedProjectUpdateID(project.idP));setIsEditProjectDialogeOpen(true)}}>Modifier le projet</span></DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600 cursor-pointer"><span onClick={()=>{dispatch(setSelectedProjectDeleteID(project.idP));setIsDeleteDialogOpen(true)}}>Supprimer</span></DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer"><span onClick={()=>{dispatch((setSelectedProjectViewID(project.idP)));setIsViewProjectDialogeOpen(true)}}>{translations[selectedLang].view_details}</span></DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer"><span onClick={()=>{dispatch(setSelectedProjectUpdateID(project.idP));setIsEditProjectDialogeOpen(true)}}>{translations[selectedLang].edit_project}</span></DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600 cursor-pointer"><span onClick={()=>{dispatch(setSelectedProjectDeleteID(project.idP));setIsDeleteDialogOpen(true)}}>{translations[selectedLang].delete}</span></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

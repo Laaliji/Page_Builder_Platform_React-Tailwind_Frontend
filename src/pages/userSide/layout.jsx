@@ -16,12 +16,17 @@ import {
 } from "@/components/ui/sidebar"
 import { links2 } from "@/lib/navigationConfig";
 import { Search } from "lucide-react";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { Outlet, useLocation } from "react-router-dom";
 import store from "@/store/store";
 import { Toaster } from "@/components/ui/toaster";
+import translations from "@/locale/translations";
 export default function UserDashBoardLayout() {
     const location = useLocation(); 
+
+    const { selectedLang } = useSelector(
+        (state) => state.values
+    );
     return <>
         <Provider store={store}>
             <SidebarProvider>
@@ -35,7 +40,7 @@ export default function UserDashBoardLayout() {
                         <BreadcrumbList>
                             <BreadcrumbItem className="hidden md:block">
                                 <BreadcrumbLink href="#">
-                                    Table de Bord
+                                    {translations[selectedLang].dashboard}
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator className="hidden md:block" />
@@ -46,7 +51,7 @@ export default function UserDashBoardLayout() {
                         </Breadcrumb>
                         <div className="relative ml-auto">
                             <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input type="search" id="search" placeholder="Recherche..." className="pl-8 py-1 w-56" />
+                            <Input type="search" id="search" placeholder={translations[selectedLang].search+"..."} className="pl-8 py-1 w-56" />
                         </div>
                     </div>
                     </header>

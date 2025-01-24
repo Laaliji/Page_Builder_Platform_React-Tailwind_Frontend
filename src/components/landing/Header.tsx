@@ -3,12 +3,43 @@ import React, { Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import { MenuIcon , XIcon } from 'lucide-react'
 import { Link } from 'react-scroll';
-
 import config from '../../template/config/index.json';
+import { Button } from '../../components/ui/button';
+import translations from "@/locale/translations";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { setSelectedLang } from "@/store/valueSlicer";
 
+import { useDispatch, useSelector } from "react-redux";
 const Menu = () => {
-  const { navigation, company, callToAction } = config;
+  const { company, callToAction } = config;
   const { name: companyName, logo } = company;
+
+  const { selectedLang } = useSelector(
+    (state) => state.values
+  );
+
+  const navigation = [
+    {
+      "name": translations[selectedLang].discover,
+      "href": "product"
+    },
+    {
+      "name": translations[selectedLang].features,
+      "href": "features"
+    }
+  ]
+
+  const dispatch = useDispatch()
+
+  const HandleChangeLang = (langue:any) => {
+    localStorage.setItem("lang", langue);
+    dispatch(setSelectedLang(langue));
+  }
 
   return (
     <>
@@ -44,7 +75,7 @@ const Menu = () => {
                 </div>
               </div>
             </div>
-            <div className="hidden md:block md:ml-10 md:pr-4 md:space-x-8">
+            <div className="hidden md:flex md:ml-10 md:pr-4 md:items-center md:space-x-8">
               {navigation.map((item) => (
                 <Link
                   spy={true}
@@ -61,8 +92,33 @@ const Menu = () => {
                 href="#"
                 className={`font-medium text-primary hover:text-secondary`}
               >
-                Essayez maintenant
+                {translations[selectedLang].try_now}
               </a>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <a 
+                    href="#"
+                    className="text-white font-medium rounded-md bg-primary hover:bg-secondary flex items-center gap-2 py-1 px-3 cursor-pointer"
+                  >
+                    <img src={selectedLang == "en" ? "/en.png" : "/fr.png"} width={18} className="inline-block" /> 
+                    <span>{selectedLang == "en" ? "EN" : "FR"}</span>
+                  </a>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-fit border border-black/10 border-solid ml-2">
+                  <DropdownMenuItem
+                    onClick={() => HandleChangeLang("en")}
+                    className={`cursor-pointer font-medium flex gap-3 ${selectedLang == "en" && "bg-black/15"}`}
+                  >
+                    <img src="/en.png" width={18} /> En
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => HandleChangeLang("fr")}
+                    className={`cursor-pointer font-medium flex gap-3 ${selectedLang == "fr" && "bg-black/15"} `}
+                  >
+                    <img src="/fr.png" width={18} /> Fr
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </nav>
         </div>
@@ -116,6 +172,7 @@ const Menu = () => {
               >
                 {callToAction.text}
               </a>
+
             </div>
           </Popover.Panel>
         </Transition>

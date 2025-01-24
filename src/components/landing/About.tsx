@@ -1,11 +1,28 @@
 import React from 'react';
 
 import config from '../../template/config/index.json';
+import translations from "@/locale/translations";
+import { useSelector } from 'react-redux';
 
 const About = () => {
   const { company, about } = config;
   const { logo, name: companyName } = company;
   const { socialMedia, sections } = about;
+
+  const { selectedLang } = useSelector(
+    (state) => state.values
+  );
+
+  const navigation = [
+    {
+      "name": translations[selectedLang].discover,
+      "href": "product"
+    },
+    {
+      "name": translations[selectedLang].features,
+      "href": "features"
+    }
+  ]
 
   return (
     <div
@@ -29,7 +46,7 @@ const About = () => {
           <a
             className="text-primary text-base cursor-pointer leading-4 text-gray-800"
           >
-            Essayez maintenant
+            {translations[selectedLang].try_now}
           </a>
         </div>
         <div className="flex items-center gap-x-8 mt-6 h-8">
@@ -84,7 +101,7 @@ const About = () => {
         </div>
         <div className="flex items-center mt-6">
           <p className="mt-6 text-xs font-medium opacity-55 lg:text-sm leading-none text-gray-900 ">
-            &copy; {new Date().getFullYear()} designed by Hamza OUADOUD & Hnioua Abdessamad & Zakariae LAALIJI
+            &copy; {new Date().getFullYear()} {translations[selectedLang].footer_text}
             
           </p>
         </div>

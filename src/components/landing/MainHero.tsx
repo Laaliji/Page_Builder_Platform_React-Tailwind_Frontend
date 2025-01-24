@@ -4,6 +4,8 @@ import { Typewriter } from 'react-simple-typewriter';
 import TopBarProgress from 'react-topbar-progress-indicator';
 import Button from './Button';
 import config from '../../template/config/index.json';
+import { useSelector } from 'react-redux';
+import translations from "@/locale/translations";
 
 
 TopBarProgress.config({
@@ -19,6 +21,10 @@ const MainHero: React.FC = () => {
   const navigate = useNavigate();
   const { mainHero } = config;
 
+  const { selectedLang } = useSelector(
+    (state) => state.values
+  );
+
   const handleCommencezClick = (): void => {
     setLoading(true);
     setTimeout(() => {
@@ -32,10 +38,14 @@ const MainHero: React.FC = () => {
       <div className="sm:text-center lg:text-left">
         <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
           <span className="block xl:inline">
-            <span className="block xl:inline">Créez un site web sans coder, </span>{' '}
+            <span className="block xl:inline">{translations[selectedLang].create_website_without_coding} </span>{' '}
             <span className="block text-primary xl:inline">
               <Typewriter
-                words={['Simple', 'Rapide', 'Intuitif']}
+                words={[ 
+                  translations[selectedLang].simple, 
+                  translations[selectedLang].fast, 
+                  translations[selectedLang].intuitive, 
+                ]}
                 loop={100}
                 cursor
                 cursorStyle="."
@@ -47,7 +57,7 @@ const MainHero: React.FC = () => {
           </span>
         </h1>
         <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-          La plateforme de création de sites web qui rend le développement web accessible à tous.
+          {translations[selectedLang].platform_description}
         </p>
         <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
           <div className="rounded-md shadow">
@@ -56,7 +66,7 @@ const MainHero: React.FC = () => {
               variant="primary"
               disabled={loading}
             >
-              Commencez
+              {translations[selectedLang].get_started}
             </Button>
           </div>
           <div className="mt-3 sm:mt-0 sm:ml-3">
@@ -64,7 +74,7 @@ const MainHero: React.FC = () => {
               href={mainHero.secondaryAction?.href}
               variant="primary"
             >
-              {mainHero.secondaryAction?.text}
+              {translations[selectedLang].contact_us}
             </Button>
           </div>
         </div>

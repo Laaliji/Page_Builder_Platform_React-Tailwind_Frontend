@@ -52,6 +52,8 @@ import {
   setRefetchSwitchPage,
   setSelectedPageId,
 } from "@/store/valueSlicer";
+import translations from "@/locale/translations";
+
 const Toolbar = ({
   title,
   editor,
@@ -63,10 +65,11 @@ const Toolbar = ({
   idProject,
   saveCurrentPageContent,
 }) => {
-  const { saveLoading, noPages, isDiaglogAddPageOpen, selectedPageId,refetchSwitchPage } =
+  const { saveLoading, noPages, isDiaglogAddPageOpen, selectedPageId, refetchSwitchPage } =
     useSelector((state) => state.values);
 
   const dispatch = useDispatch();
+  const lang = useSelector((state) => state.values.selectedLang); // Get selected language from Redux
 
   const [open, setOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState("computer");
@@ -80,8 +83,8 @@ const Toolbar = ({
   const [updateTitleProject, setUpdateTitleProject] = useState(null);
 
   const options = [
-    { value: "computer", label: "Computer", icon: LaptopMinimal },
-    { value: "phone", label: "Phone", icon: Smartphone },
+    { value: "computer", label: translations[lang].computer, icon: LaptopMinimal },
+    { value: "phone", label: translations[lang].phone, icon: Smartphone },
   ];
 
   const selectDevice = (value) => {
@@ -90,6 +93,7 @@ const Toolbar = ({
     const device = deviceManager.get(value);
     deviceManager.select(device);
   };
+
   useEffect(() => {
     const HasPages = async () => {
       const response = (await hasPages({ idProject: idProject })).EXISTE;
@@ -97,9 +101,8 @@ const Toolbar = ({
     };
     if (idProject) HasPages();
   }, [idProject]);
-  const pageTitle = pages.find(page => page.id === selectedPageId)?.title || "Select a page...";
 
-
+  const pageTitle = pages.find((page) => page.id === selectedPageId)?.title || translations[lang].select_page;
 
   return (
     <>
@@ -138,12 +141,10 @@ const Toolbar = ({
             className="cursor-pointer"
           />
           <div className="flex items-center gap-4">
-            {" "}
             <span className="font-[Poppins] text-[13px] font-medium">
               {updateTitleProject ? updateTitleProject : title}
             </span>
             <div className="p-[5px] hover:bg-black/5 rounded-full ml-2">
-              {" "}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <EllipsisVertical
@@ -152,18 +153,17 @@ const Toolbar = ({
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-fit border border-black/10 border-solid ml-2">
-                  {" "}
                   <DropdownMenuItem
                     onClick={() => setIsRenameDialogOpen(true)}
                     className="cursor-pointer flex gap-3"
                   >
-                    <FolderPen /> Renommer le projet
+                    <FolderPen /> {translations[lang].rename_project}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => setIsDeleteDialogOpen(true)}
                     className="cursor-pointer flex gap-3"
                   >
-                    <FolderX /> Supprimer le projet
+                    <FolderX /> {translations[lang].delete_project}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -181,18 +181,16 @@ const Toolbar = ({
                     aria-expanded={open}
                     className="w-fit py-[-50px] justify-between font-normal items-center ml-16"
                   >
-                    <File className="opacity-50 mr-2" />{" "}
+                    <File className="opacity-50 mr-2" />
                     {pageTitle}
-                    <ChevronsUpDown className="opacity-50 ml-2" />{" "}
+                    <ChevronsUpDown className="opacity-50 ml-2" />
                   </Btn>
                 </PopoverTrigger>
                 <PopoverContent className="w-[250px] p-0 border border-black/10 border-solid">
                   <Command>
-                    <CommandInput placeholder="Chercher les pages..." />{" "}
-                    {/* Added margin to input */}
+                    <CommandInput placeholder={translations[lang].search_pages} />
                     <CommandList>
-                      <CommandEmpty>No pages found</CommandEmpty>{" "}
-                      {/* Added margin */}
+                      <CommandEmpty>{translations[lang].no_pages_found}</CommandEmpty>
                       <CommandGroup>
                         {pages.map((page) => (
                           <CommandItem
@@ -200,7 +198,7 @@ const Toolbar = ({
                             value={page.id}
                             onSelect={() => {
                               dispatch(setSelectedPageId(page.id));
-                              dispatch(setRefetchSwitchPage(!refetchSwitchPage))
+                              dispatch(setRefetchSwitchPage(!refetchSwitchPage));
                               setOpen(false);
                             }}
                           >
@@ -220,18 +218,16 @@ const Toolbar = ({
                           </CommandItem>
                         ))}
                         <CommandItem
-                          className="flex cursor-pointer" // Added margin
+                          className="flex cursor-pointer"
                           onSelect={() => {
                             setIsNewPageDialogOpen(true);
                           }}
                         >
                           <div
-                            onClick={() =>
-                              dispatch(setIsDiaglogAddPageOpen(true))
-                            }
+                            onClick={() => dispatch(setIsDiaglogAddPageOpen(true))}
                             className="flex items-center gap-2"
                           >
-                            <Plus /> Nouvelle page
+                            <Plus /> {translations[lang].new_page}
                           </div>
                         </CommandItem>
                       </CommandGroup>
@@ -243,8 +239,6 @@ const Toolbar = ({
           </div>
         </div>
         <div className="ml-auto mr-3 flex items-center gap-2">
-          
-
           <div className="flex flex-col items-center justify-center bg-background">
             <SegmentedControl
               options={options}
@@ -263,19 +257,19 @@ const Toolbar = ({
             />
           </div>
           <Button
-            title="Extraire"
-            className="bg-black/10 hover:bg-black/15  text-black"
+            title={translations[lang].extract}
+            className="bg-black/10 hover:bg-black/15 text-black"
             icon={<CodeXml size={"16"} />}
             onClick={() => setIsExtractCodeDialogOpen(true)}
           />
           <Button
-            title="Partager"
+            title={translations[lang].share}
             className="bg-black/10 hover:bg-black/15 text-black"
             icon={<Forward size={"16"} />}
             onClick={() => setIsShareDialogOpen(true)}
           />
           <Button
-            title="Publier"
+            title={translations[lang].publish}
             className="bg-secondary hover:bg-primary text-white"
             icon={<Github size={"16"} />}
           />

@@ -3,37 +3,44 @@ import React from 'react';
 import config from '../../template/config/index.json';
 import { Code, Database, Grid, Palette } from 'lucide-react';
 import CardLanding from './CardLanding';
+import translations from "@/locale/translations";
+import { useSelector } from 'react-redux';
 
 const Features = () => {
+
+  const { selectedLang } = useSelector(
+    (state) => state.values
+  );
+
   const { features } = config;
   const { title, subtitle, description, items: featuresList } = features;
   const technologies = [
     {
       name: 'HTML',
       icon: <Code className="w-12 h-12 text-blue-500" />,
-      description: 'Language de balisage pour structurer et presenter le contenu web',
-      features: ['Structure semantique', 'Accessibilite', 'SEO friendly'],
+      description: translations[selectedLang].html_description,
+      features: [translations[selectedLang].html_features[0],translations[selectedLang].html_features[1],translations[selectedLang].html_features[2],],
       color: 'hover:border-blue-500'
     },
     {
       name: 'CSS',
       icon: <Palette className="w-12 h-12 text-blue-500" />,
-      description: 'Feuilles de style pour definir la presentation des documents HTML',
-      features: ['Responsive design', 'Animations', 'Flexbox/Grid'],
+      description: translations[selectedLang].css_description,
+      features: [translations[selectedLang].css_features[0],translations[selectedLang].css_features[1],translations[selectedLang].css_features[2],],
       color: 'hover:border-blue-500'
     },
     {
       name: 'PHP',
       icon: <Database className="w-12 h-12 text-blue-500" />,
-      description: 'Language de programmation cote serveur pour sites web dynamiques',
-      features: ['Backend robuste', 'Gestion BDD', 'Securite'],
+      description: translations[selectedLang].php_description,
+      features: [translations[selectedLang].php_features[0],translations[selectedLang].php_features[1],translations[selectedLang].php_features[2],],
       color: 'hover:border-blue-500'
     },
     {
       name: 'BOOTSTRAP',
       icon: <Grid className="w-12 h-12 text-blue-500" />,
-      description: 'Framework CSS pour developpement rapide interfaces responsive',
-      features: ['Composants prets', 'Systeme de grille', 'Personnalisable'],
+      description: translations[selectedLang].bootstrap_description,
+      features: [translations[selectedLang].bootstrap_features[0],translations[selectedLang].bootstrap_features[1],translations[selectedLang].bootstrap_features[2],],
       color: 'hover:border-blue-500'
     }
   ];
@@ -45,13 +52,13 @@ const Features = () => {
           <h2
             className={`text-base text-primary font-semibold tracking-wide uppercase`}
           >
-            {title}
+            {translations[selectedLang].innovative_technologies}
           </h2>
           <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            {subtitle}
+            {translations[selectedLang].best_technologies}
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            {description}
+            {translations[selectedLang].technologies_description}
           </p>
         </div>
 

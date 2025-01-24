@@ -7,6 +7,7 @@ import Toolbar from "../../components/editor/Toolbar";
 import PanelStyles from "../../components/editor/PanelStyles";
 import LeftPanel from "../../components/editor/LeftPanel";
 import store from "@/store/store";
+import translations from "@/locale/translations";
 
 import {
   BlockManager,
@@ -123,6 +124,11 @@ const Editor = () => {
   const [activePanel, setActivePanel] = useState("block");
   const [pages, setPages] = useState([]);
   const [currentPage, setCurrentPage] = useState("");
+  const [lang,setLang] = useState("en");
+
+  useEffect(()=>{
+    setLang(localStorage.getItem("lang") || "en");
+  },[])
 
   const saveCurrentPageContent = useCallback(async () => {
     if (!editorInstance || !selectedPageId) return;
@@ -328,19 +334,10 @@ const Editor = () => {
     loadPageContent(selectedPageId); //currentPage
   }, [selectedPageId, loadPageContent]);//currentPage
 
-  // Gestion des événements de l'éditeur
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
-
-    // editor.on('component:update', saveCurrentPageContent);
-    // editor.on('style:update', saveCurrentPageContent);
-
-    // return () => {
-    //   editor.off('component:update', saveCurrentPageContent);
-    //   editor.off('style:update', saveCurrentPageContent);
-    // };
-  }, []); //saveCurrentPageContent
+  }, []);
 
   useEffect(() => {
     const fetchProjectData = async () => {
