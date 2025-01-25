@@ -61,7 +61,7 @@ function Recentcontacts() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="w-full mx-auto">
       {contacts.map((contact) => (
         <div key={contact.id} className="flex items-center">
           <Avatar className="h-9 w-9">

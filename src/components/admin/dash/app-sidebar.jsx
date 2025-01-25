@@ -55,7 +55,7 @@ const data = {
   navMain: [
     {
       title: "Gestion Commentaires",
-      url: "#",
+      url: "/RecentComments#",
       icon: MessageSquare,
       items: [
         { title: "Tous les Commentaires", url: "/RecentComments#" },
@@ -73,9 +73,9 @@ const data = {
     },
     {
       title: "Clients",
-      url: "#",
+      url: "/ClientPage#",
       icon: Users,
-      items: [{ title: "Liste des Clients", url: "#" }],
+      items: [{ title: "Liste des Clients", url: "/ClientPage#" }],
     },
   ],
   projects: [

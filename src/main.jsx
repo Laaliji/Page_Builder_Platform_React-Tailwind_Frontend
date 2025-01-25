@@ -11,6 +11,7 @@ import Admin from "./pages/admin/dashboard.jsx";
 
 import Profil from "./pages/admin/profil.jsx";
 import RecentComments from "./pages/admin/RecentComments.jsx";
+import ClientPage from "./pages/admin/ClientPage.jsx";
 import Mail from "./pages/admin/mail.jsx";
 import Client from "./pages/admin/client.jsx";
 
@@ -36,7 +37,7 @@ const router = createBrowserRouter([
     element: <LayoutAdmin />,
     children: [
       { path: "/RecentComments", element: <RecentComments /> },
-      ,
+      { path: "/ClientPage", element: <ClientPage /> },
       { path: "/Mail", element: <Mail /> },
       {},
     ],
