@@ -15,6 +15,7 @@ import Layout from "./pages/vistorSide/layoute.jsx";
 import { LoginPage } from "./pages/authSide/LoginPage.jsx";
 import { SignupPage } from "./pages/authSide/SignupPage.jsx";
 import { Toaster } from "@/components/ui/toaster";
+import Share from "./pages/vistorSide/share";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [{ path: "/", element: <Landing /> }],
   },
+  { path: "/share/:id", element: <Share /> },
   { path: "/project/:id", element: <Editor /> },
   { path: "stepper", element: <StepperPage /> },
   { path: "login", element: <LoginPage /> },

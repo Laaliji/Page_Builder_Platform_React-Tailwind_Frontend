@@ -343,10 +343,10 @@ const Editor = () => {
     const fetchProjectData = async () => {
       try {
         if (!id) return;
-
+        dispatch(setSelectedProjectEditorID(id));
         setProjectID(id);
         setIsLoading(true);
-        dispatch(setSelectedProjectEditorID(id));
+        
 
         // First check if project has pages
         const pagesResponse = await hasPages({ idProject: id });

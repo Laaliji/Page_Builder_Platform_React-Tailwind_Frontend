@@ -52,3 +52,4 @@ export async function deletePage({idPage}){
         resource : `pages/${idPage}`
     })
 }
+

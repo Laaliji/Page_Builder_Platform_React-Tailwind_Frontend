@@ -107,6 +107,8 @@ const translations = {
         "page_title_placeholder": "Title",
         "save_page": "Save this page",
         "delete_page": "Delete this page",
+        "share_content_1":"Share your amazing website with others! Visit our",
+        "share_content_2":"and create your own site today.",
     },
 
     fr: {
@@ -217,6 +219,8 @@ const translations = {
         "page_title_placeholder": "Titre",
         "save_page": "Enregistrer cette page",
         "delete_page": "Supprimer cette page",
+        "share_content_1":"Partager votre site web avec d'autres ! Visitez notre ",
+        "share_content_2":"et créez votre site web professionnel.",
     }
 }
 
