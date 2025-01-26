@@ -4,13 +4,12 @@ import { GlareCard } from "../../ui/GlareCard";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
-// Create axios instance with base configuration
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000",
   withCredentials: true,
   headers: {
     Accept: "application/json",
-    "Content-Type": "application/json", // Explicitly set content type
+    "Content-Type": "application/json",
   },
 });
 
@@ -28,7 +27,6 @@ export default function Template({ onValidate }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [projectId, setProjectId] = useState(null);
 
-  // Retrieve project ID from localStorage when component mounts
   useEffect(() => {
     const currentProject = localStorage.getItem("currentProject");
     if (currentProject) {
@@ -92,28 +90,23 @@ export default function Template({ onValidate }) {
       `[DEBUG] Handling card select - Type: ${type}, ProjectId: ${projectId}`
     );
 
-    // If no projectId, just select locally
     if (!projectId) {
       console.log("[DEBUG] No project ID, selecting type locally");
       setSelectedType(type === selectedType ? null : type);
       return;
     }
 
-    // If projectId exists, attempt to update project type
     setIsSubmitting(true);
     try {
-      // First, get the CSRF cookie
       console.log("[DEBUG] Fetching CSRF cookie");
       await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
 
-      // Prepare the request payload
       const payload = {
         project_type: type,
         projectId: projectId, // Include project ID in payload
       };
       console.log("[DEBUG] Update Payload:", payload);
 
-      // Make the API call to update project type
       const response = await api.put(
         `/api/projects/update/${projectId}`,
         payload
@@ -121,7 +114,6 @@ export default function Template({ onValidate }) {
 
       console.log("[DEBUG] API Response:", response.data);
 
-      // Check the response
       if (response.data.STATE === "OK") {
         toast.success("Type de projet mis à jour avec succès!");
         setSelectedType(type);
@@ -131,10 +123,8 @@ export default function Template({ onValidate }) {
         toast.error("Échec de la mise à jour du type de projet");
       }
     } catch (error) {
-      // Detailed error logging
       console.error("[ERROR] Error updating project type:", error);
 
-      // Log specific error details
       if (error.response) {
         console.error("[ERROR] Response data:", error.response.data);
         console.error("[ERROR] Response status:", error.response.status);
@@ -153,9 +143,7 @@ export default function Template({ onValidate }) {
     }
   };
 
-  // Validate form when selectedType changes
   useEffect(() => {
-    // Form is valid if a type is selected
     const isValid = !!selectedType;
     console.log(
       `[DEBUG] Form Validation - Selected Type: ${selectedType}, Is Valid: ${isValid}`

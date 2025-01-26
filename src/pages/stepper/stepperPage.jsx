@@ -26,11 +26,10 @@ const StepperPage = () => {
 
   const handleNext = async () => {
     if (currentStep === 1) {
-      // Save project when moving from first step
       try {
-        const success = await projectRef.current?.saveProject(); // Save the project here
+        const success = await projectRef.current?.saveProject();
         if (!success) {
-          return; // Don't proceed if save failed
+          return;
         }
       } catch (error) {
         console.error("Error saving project:", error);
@@ -47,7 +46,7 @@ const StepperPage = () => {
         return (
           <Project
             ref={projectRef}
-            onValidate={(isValid) => handleValidate(0, isValid)} // Validate the form before moving
+            onValidate={(isValid) => handleValidate(0, isValid)}
           />
         );
       case 2:
