@@ -1,35 +1,48 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Check } from "lucide-react";
 
 const Stepper = ({ steps, currentStep }) => {
-  const [newStep, setNewStep] = useState([]);
-  const stepRef = useRef();
+  // Ensure steps are always strings
+  const sanitizedSteps = useMemo(() => {
+    return steps.map((step) =>
+      typeof step === "string" ? step : step.description || step.toString()
+    );
+  }, [steps]);
 
-  const updateStep = (stepNumber, steps) => {
-    return steps.map((step, index) => ({
-      ...step,
-      completed: index < stepNumber,
-      highlighted: index === stepNumber,
-      selected: index <= stepNumber,
-    }));
-  };
-
-  useEffect(() => {
-    const stepsState = steps.map((step, index) => ({
+  const createStepState = useMemo(() => {
+    return sanitizedSteps.map((step, index) => ({
       description: step,
       completed: false,
       highlighted: index === 0,
       selected: index === 0,
     }));
+  }, [sanitizedSteps]);
 
-    stepRef.current = stepsState;
-    const current = updateStep(currentStep - 1, stepRef.current);
+  const [newStep, setNewStep] = useState(createStepState);
+
+  const updateStep = useMemo(() => {
+    return (stepNumber, stepsArray) => {
+      return stepsArray.map((step, index) => {
+        const description =
+          typeof step === "string" ? step : step.description || step.toString();
+
+        return {
+          description,
+          completed: index < stepNumber,
+          highlighted: index === stepNumber,
+          selected: index <= stepNumber,
+        };
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    const current = updateStep(currentStep - 1, sanitizedSteps);
     setNewStep(current);
-  }, [steps, currentStep]);
+  }, [currentStep, sanitizedSteps, updateStep]);
 
   return (
     <div className="flex max-w justify-center items-center w-full py-12">
-      {/* Stepper Container */}
       <div className="w-full max-w flex justify-between px-12">
         {newStep.map((step, index) => (
           <div
@@ -41,7 +54,6 @@ const Stepper = ({ steps, currentStep }) => {
             }
           >
             <div className="relative flex flex-col items-center text-teal-600">
-              {/* Circle for step */}
               <div
                 className={`rounded-full transition duration-500 ease-in-out
                   border-2 h-12 w-12 flex items-center justify-center
@@ -67,7 +79,6 @@ const Stepper = ({ steps, currentStep }) => {
                 {step.description}
               </div>
             </div>
-            {/* Connector */}
             {index !== newStep.length - 1 && (
               <div
                 className={`flex-auto border-t-2 mx-2 ${
