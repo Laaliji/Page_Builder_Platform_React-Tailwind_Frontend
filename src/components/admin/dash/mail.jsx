@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,31 @@ const InterfaceEmail = ({ data }) => {
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [messageAlert, setMessageAlert] = useState(null);
   const [typeAlert, setTypeAlert] = useState(""); // "success" ou "error"
+  const [responseFromDatabase, setResponseFromDatabase] = useState(""); // Store the response
+
+  // Function to fetch the latest response from the database
+  const fetchResponse = async () => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/contacts/${data.id}`
+      );
+      if (response.ok) {
+        const contactData = await response.json();
+        setResponseFromDatabase(contactData.response || "Aucune réponse");
+      } else {
+        console.error("Erreur lors de la récupération de la réponse.");
+      }
+    } catch (error) {
+      console.error("Erreur de connexion:", error);
+    }
+  };
+
+  // Call fetchResponse when the component is mounted
+  useEffect(() => {
+    if (data.id) {
+      fetchResponse();
+    }
+  }, [data.id]);
 
   const gererEnvoiReponse = async () => {
     if (!reponse.trim()) {
@@ -53,6 +78,7 @@ const InterfaceEmail = ({ data }) => {
       setTypeAlert("success");
       setReponse("");
 
+      // Update response in the database
       await fetch(`http://127.0.0.1:8000/api/contacts/${data.id}/respond`, {
         method: "PUT",
         headers: {
@@ -62,6 +88,9 @@ const InterfaceEmail = ({ data }) => {
           response: reponse,
         }),
       });
+
+      // After sending, fetch the latest response again
+      fetchResponse();
     } catch (erreur) {
       console.error("Erreur:", erreur);
       setMessageAlert(
@@ -120,12 +149,24 @@ const InterfaceEmail = ({ data }) => {
           </div>
         </div>
 
-        <div className="space-y-4 mb-8">
-          <p className="bg-gray-50 p-4 rounded-lg">
-            {data.message || "Aucun message fourni."}
-          </p>
+        <div className="space-y-4">
+          <div className="flex flex-col space-y-4">
+            <div className="self-start bg-gray-200 text-black p-3 rounded-lg max-w-sm">
+              <p>{data.message || "Aucun message fourni."}</p>
+            </div>
+          </div>
         </div>
 
+        <div className="space-y-4">
+          <div className="flex flex-col space-y-4">
+            {responseFromDatabase && (
+              <div className="self-end bg-gray-400 text-white p-3 rounded-lg max-w-sm">
+                <p>{responseFromDatabase}</p>
+              </div>
+            )}
+          </div>
+        </div>
+        <br />
         <div className="space-y-4">
           <div className="relative">
             <Textarea
