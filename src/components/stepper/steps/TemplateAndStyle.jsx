@@ -206,6 +206,33 @@ const TemplateAndStyle = ({ onValidate }) => {
     }
   };
 
+  useEffect(() => {
+    const currentProject = localStorage.getItem("currentProject");
+    if (currentProject) {
+      try {
+        const parsedProject = JSON.parse(currentProject);
+        const projectIdFromStorage = parsedProject.idP;
+
+        console.log(
+          "[DEBUG] Project ID retrieved from localStorage:",
+          projectIdFromStorage
+        );
+
+        if (projectIdFromStorage) {
+          setProjectId(projectIdFromStorage);
+        }
+      } catch (error) {
+        console.error(
+          "[ERROR] Failed to parse currentProject from localStorage:",
+          error
+        );
+        toast.error("Error retrieving project information");
+      }
+    } else {
+      console.log("[DEBUG] No current project found in localStorage");
+    }
+  }, []);
+
   const handleCardClick = async (templateId) => {
     setSelectedTemplate(templateId);
     setShowModal(true);

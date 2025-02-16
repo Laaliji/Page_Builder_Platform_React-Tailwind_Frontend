@@ -96,7 +96,6 @@ const Project = forwardRef(({ onValidate }, ref) => {
       const response = await api.post("/api/projects/create", formDataToSend);
 
       if (response.data.STATE === "OK") {
-        // Save project details to localStorage
         const projectDetails = response.data.data;
         localStorage.setItem(
           "currentProject",
