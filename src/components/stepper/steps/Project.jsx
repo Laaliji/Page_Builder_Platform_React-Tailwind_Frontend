@@ -4,17 +4,16 @@ import { Label } from "../../ui/Label";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
-// Create axios instance with base configuration
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000",
-  withCredentials: true, // Important for CORS with credentials
+  withCredentials: true,
   headers: {
     Accept: "application/json",
-    // Don't set Content-Type here as it will be automatically set with FormData
   },
 });
 
 const Project = forwardRef(({ onValidate }, ref) => {
+  //Manages form data values
   const [formData, setFormData] = useState({
     projectName: "",
     projectDescription: "",
@@ -23,7 +22,9 @@ const Project = forwardRef(({ onValidate }, ref) => {
     image_url: null,
   });
 
+  //Manages validation errors
   const [errors, setErrors] = useState({});
+  //Manages submission loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -32,7 +33,7 @@ const Project = forwardRef(({ onValidate }, ref) => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
+
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -70,7 +71,6 @@ const Project = forwardRef(({ onValidate }, ref) => {
 
     setIsSubmitting(true);
     try {
-      // First, get the CSRF cookie
       await axios.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
 
       const formDataToSend = new FormData();
@@ -112,7 +112,7 @@ const Project = forwardRef(({ onValidate }, ref) => {
         );
 
         toast.success("Project created successfully!");
-        return projectDetails.idP; // Return the project ID
+        return projectDetails.idP;
       } else {
         toast.error(response.data.message || "Failed to create project");
         return false;
