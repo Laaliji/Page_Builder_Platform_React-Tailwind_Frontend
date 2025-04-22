@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { FaGithub } from "react-icons/fa";
-import axios from "axios";
-import Cookies from "js-cookie";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Configure TopBarProgress
 TopBarProgress.config({
@@ -18,27 +17,17 @@ TopBarProgress.config({
   shadowBlur: 5,
 });
 
-// Axios instance with CSRF token
-const csrfToken = Cookies.get("XSRF-TOKEN");
-const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000",
-  withCredentials: true,
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    "XSRF-TOKEN": csrfToken,
-  },
-});
-
 export function SignupPage() {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { githubLogin, register } = useAuth();
   const logo = "/assets/images/logo.png";
 
   useEffect(() => {
@@ -48,16 +37,16 @@ export function SignupPage() {
     const email = urlParams.get("email");
 
     if (token && githubId && email) {
-      localStorage.setItem("auth_token", token);
-      localStorage.setItem("github_id", githubId);
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("githubId", githubId);
       localStorage.setItem("email", email);
-      navigate("/login");
+      navigate("/stepper");
     }
   }, [navigate]);
 
   const handleGitHubLogin = () => {
     setLoading(true);
-    window.location.href = "http://localhost:8000/api/auth/github";
+    githubLogin();
   };
 
   const validateForm = () => {
@@ -67,6 +56,7 @@ export function SignupPage() {
     if (!username) errors.username = "Le nom d'utilisateur est requis.";
     if (!email) errors.email = "L'email est requis.";
     if (!password) errors.password = "Le mot de passe est requis.";
+    if (password !== passwordConfirmation) errors.password_confirmation = "Les mots de passe ne correspondent pas.";
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -77,18 +67,18 @@ export function SignupPage() {
 
     try {
       setLoading(true);
-      await axiosInstance.post("auth/signup", {
+      await register({
         firstname,
         lastname,
         username,
         email,
         password,
-        password_confirmation: password,
+        password_confirmation: passwordConfirmation,
       });
-      navigate("/login");
+      navigate("/stepper");
     } catch (error) {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
+      if (error.errors) {
+        setErrors(error.errors);
       } else {
         alert("Une erreur inattendue s'est produite. Veuillez réessayer.");
       }
@@ -181,6 +171,19 @@ export function SignupPage() {
                 />
                 {errors.password && (
                   <p className="text-red-500 text-xs">{errors.password}</p>
+                )}
+              </div>
+              <div className="mt-4">
+                <Label>Confirmer le mot de passe</Label>
+                <Input
+                  type="password"
+                  value={passwordConfirmation}
+                  onChange={(e) => setPasswordConfirmation(e.target.value)}
+                  className={errors.password_confirmation ? "border-red-500" : ""}
+                  placeholder="Confirmez votre mot de passe"
+                />
+                {errors.password_confirmation && (
+                  <p className="text-red-500 text-xs">{errors.password_confirmation}</p>
                 )}
               </div>
               <div className="mt-6">

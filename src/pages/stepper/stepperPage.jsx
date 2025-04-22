@@ -6,18 +6,19 @@ import Template from "../../components/stepper/steps/Type";
 import Style from "../../components/stepper/steps/Style";
 import Final from "../../components/stepper/steps/Final";
 import TemplateStarter from "../../components/stepper/steps/TemplateStarter";
-import AnimatedModalDemo from "../../components/stepper/steps/AnimatedModalDemo"
-import TemplateAndStyle from "../../components/stepper/steps/TemplateAndStyle"
-
+import AnimatedModalDemo from "../../components/stepper/steps/AnimatedModalDemo";
+import TemplateAndStyle from "../../components/stepper/steps/TemplateAndStyle";
 
 function StepperPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  
   const steps = [
     "Informations du projet",
     "Type du projet",
     "Modèle et Style",
     "Aperçu général et confirmation",
   ];
+  
   const displayStep = (step) => {
     switch (step) {
       case 1:
@@ -32,9 +33,19 @@ function StepperPage() {
         return null;
     }
   };
+  
   const handleNext = () => {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length));
   };
+  
+  // Add this function to handle the finish action
+  const handleFinish = () => {
+    // Add your submission logic here
+    console.log("Form submission completed!");
+    // You might want to redirect the user or show a success message
+    // For example: navigate("/success");
+  };
+  
   return (
     <div className="w-full min-h-screen bg-white flex justify-center items-center ">
       <div className="w-full max-w-7xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -53,10 +64,12 @@ function StepperPage() {
             totalSteps={steps.length}
             onNext={handleNext}
             onPrev={() => setCurrentStep((prev) => Math.max(prev - 1, 1))}
+            onFinish={handleFinish} // Add the onFinish prop here
           />
         </div>
       </div>
     </div>
   );
 }
+
 export default StepperPage;

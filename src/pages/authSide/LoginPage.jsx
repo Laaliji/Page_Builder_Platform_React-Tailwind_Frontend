@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import TopBarProgress from 'react-topbar-progress-indicator';
@@ -7,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { FaGithub } from "react-icons/fa";
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import { useAuth } from "../../contexts/AuthContext";
+import AuthHandler from "../../components/auth/AuthHandler";
 
 TopBarProgress.config({
   barColors: {
@@ -18,21 +17,6 @@ TopBarProgress.config({
   shadowBlur: 5,
 });
 
-const csrfToken = Cookies.get('XSRF-TOKEN');
-const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
-  withCredentials: true,
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'XSRF-TOKEN': csrfToken
-  },
-});
-
-const handleGitHubLogin = () => {
-  window.location.href = 'http://localhost:8000/api/auth/github';
-};
-
 export function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); 
@@ -41,20 +25,7 @@ export function LoginPage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const logo = "/assets/images/logo.png";
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const githubId = urlParams.get('github_id');
-    const email = urlParams.get('email');
-
-    if (token && githubId && email) {
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('githubId', githubId);
-      localStorage.setItem('email', email);
-      navigate('/stepper');
-    }
-  }, [navigate]);
+  const { login, githubLogin } = useAuth();
 
   const validateForm = () => {
     let isValid = true;
@@ -85,34 +56,30 @@ export function LoginPage() {
 
     try {
       setLoading(true);
-      const response = await axiosInstance.post("auth/login", {
-        email,
-        password,
-      });
-
-      localStorage.setItem("authToken", response.data.token);
+      await login(email, password);
       navigate('/stepper');
     } catch (error) {
-      if (error.response) {
-        const errors = error.response.data.errors;
-        if (errors) {
-          if (errors.email) setEmailError(errors.email[0]);
-          if (errors.password) setPasswordError(errors.password[0]);
-        } else {
-          alert(error.response.data.message || "Login a échoué");
-        }
-      } else if (error.request) {
-        alert("Erreur réseau. Veuillez vérifier votre connexion.");
+      if (error.errors) {
+        if (error.errors.email) setEmailError(error.errors.email[0]);
+        if (error.errors.password) setPasswordError(error.errors.password[0]);
       } else {
-        alert("Une erreur inattendue s'est produite.");
+        alert(error.message || "Login a échoué");
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGitHubLogin = () => {
+    setLoading(true);
+    githubLogin();
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      {/* AuthHandler component to process GitHub auth from URL parameters */}
+      <AuthHandler />
+      
       {loading && <TopBarProgress />}
       <div className="flex flex-col items-center justify-center w-full">
         {/* Logo */}
@@ -129,10 +96,7 @@ export function LoginPage() {
             <div className="mt-4 flex justify-center">
               <Button
                 className="w-full text-white bg-gray-800 flex items-center justify-center gap-2"
-                onClick={() => {
-                  setLoading(true);
-                  handleGitHubLogin();
-                }}
+                onClick={handleGitHubLogin}
               >
                 <FaGithub color="white" /> Se connecter avec Github
               </Button>

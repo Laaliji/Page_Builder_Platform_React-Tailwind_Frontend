@@ -14,8 +14,10 @@ import StepperPage from "./pages/stepper/stepperPage.jsx";
 import Layout from "./pages/vistorSide/layoute.jsx";
 import { LoginPage } from "./pages/authSide/LoginPage.jsx";
 import { SignupPage } from "./pages/authSide/SignupPage.jsx";
+import { GitHubCallbackPage } from "./pages/authSide/GitHubCallbackPage.jsx";
 import { Toaster } from "@/components/ui/toaster";
 import Share from "./pages/vistorSide/share";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +30,8 @@ const router = createBrowserRouter([
   { path: "stepper", element: <StepperPage /> },
   { path: "login", element: <LoginPage /> },
   { path: "signup", element: <SignupPage /> },
+  // Direct GitHub callback handler
+  { path: "auth/github/callback", element: <GitHubCallbackPage /> },
 
   {
     path: "/dash/user",
@@ -43,8 +47,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
-      <Toaster />
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </AuthProvider>
     </Provider>
   </StrictMode>
 );
