@@ -16,6 +16,7 @@ import { LoginPage } from "./pages/authSide/LoginPage.jsx";
 import { SignupPage } from "./pages/authSide/SignupPage.jsx";
 import { Toaster } from "@/components/ui/toaster";
 import Share from "./pages/vistorSide/share";
+import { ToastProvider } from "@/hooks/use-toast.jsx";
 
 const router = createBrowserRouter([
   {
@@ -43,8 +44,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
-      <Toaster />
+      <ToastProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </ToastProvider>
     </Provider>
   </StrictMode>
 );

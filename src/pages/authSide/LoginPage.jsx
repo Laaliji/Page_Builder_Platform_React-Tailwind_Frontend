@@ -6,9 +6,11 @@ import TopBarProgress from 'react-topbar-progress-indicator';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { FaGithub } from "react-icons/fa";
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { redirectToGitHub, handleGitHubCallback } from "@/functions/users/githubAuth";
+import { useToast } from "@/hooks/use-toast.jsx";
+import { GitHubButton } from "@/components/ui/github-button";
 
 TopBarProgress.config({
   barColors: {
@@ -29,32 +31,49 @@ const axiosInstance = axios.create({
   },
 });
 
-const handleGitHubLogin = () => {
-  window.location.href = 'http://localhost:8000/api/auth/github';
-};
-
 export function LoginPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false); 
+  const [githubLoading, setGithubLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const logo = "/assets/images/logo.png";
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const githubId = urlParams.get('github_id');
-    const email = urlParams.get('email');
+  // Handle GitHub login
+  const handleGitHubLogin = () => {
+    setGithubLoading(true);
+    redirectToGitHub(false); // false because we're authenticating, not linking
+  };
 
-    if (token && githubId && email) {
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('githubId', githubId);
-      localStorage.setItem('email', email);
+  useEffect(() => {
+    const githubData = handleGitHubCallback();
+    
+    if (githubData) {
+      if (githubData.error) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: githubData.error
+        });
+        setGithubLoading(false);
+        return;
+      }
+      
+      // Store auth data
+      localStorage.setItem('authToken', githubData.token);
+      if (githubData.githubId) localStorage.setItem('githubId', githubData.githubId);
+      if (githubData.email) localStorage.setItem('email', githubData.email);
+      if (githubData.username) localStorage.setItem('username', githubData.username);
+      if (githubData.firstname) localStorage.setItem('firstname', githubData.firstname);
+      if (githubData.lastname) localStorage.setItem('lastname', githubData.lastname);
+      
+      // Redirect to stepper or dashboard
       navigate('/stepper');
     }
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const validateForm = () => {
     let isValid = true;
@@ -99,12 +118,24 @@ export function LoginPage() {
           if (errors.email) setEmailError(errors.email[0]);
           if (errors.password) setPasswordError(errors.password[0]);
         } else {
-          alert(error.response.data.message || "Login a échoué");
+          toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: error.response.data.message || "Login a échoué"
+          });
         }
       } else if (error.request) {
-        alert("Erreur réseau. Veuillez vérifier votre connexion.");
+        toast({
+          variant: "destructive",
+          title: "Network Error",
+          description: "Erreur réseau. Veuillez vérifier votre connexion."
+        });
       } else {
-        alert("Une erreur inattendue s'est produite.");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Une erreur inattendue s'est produite."
+        });
       }
     } finally {
       setLoading(false);
@@ -127,15 +158,14 @@ export function LoginPage() {
           <CardContent>
             {/* GitHub login button */}
             <div className="mt-4 flex justify-center">
-              <Button
-                className="w-full text-white bg-gray-800 flex items-center justify-center gap-2"
-                onClick={() => {
-                  setLoading(true);
-                  handleGitHubLogin();
-                }}
+              <GitHubButton
+                onClick={handleGitHubLogin}
+                loading={githubLoading}
+                disabled={loading}
+                variant="auth"
               >
-                <FaGithub color="white" /> Se connecter avec Github
-              </Button>
+                Se connecter avec Github
+              </GitHubButton>
             </div>
 
             {/* OR text */}

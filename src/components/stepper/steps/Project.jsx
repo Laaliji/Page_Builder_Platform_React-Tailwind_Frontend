@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card,CardContent } from '../../ui/Card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '../../ui/Card';
 import { Label } from '../../ui/Label';
 
 const Project = () => {
@@ -8,6 +8,21 @@ const Project = () => {
     websiteTitle: '',
     repoUrl: ''
   });
+
+  // Initialize with GitHub data if available
+  useEffect(() => {
+    const username = localStorage.getItem('username');
+    const githubId = localStorage.getItem('githubId');
+    
+    // If we have GitHub data, pre-populate the form
+    if (username || githubId) {
+      setFormData(prev => ({
+        ...prev,
+        projectName: prev.projectName || `${username || 'My'}'s Website`,
+        websiteTitle: prev.websiteTitle || `${username || 'my'}-website.com`
+      }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -67,7 +82,6 @@ const Project = () => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="https://github.com/username/repository"
-                required
               />
             </div>
           </form>

@@ -7,10 +7,10 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 const TemplateAndStyle = () => {
   const templates = [
     {
-      title: "Page Vierge",
+      title: "Landing Page",
       image: "/assets/templates/blank.png",
       description:
-        "Modèle vierge : commencez avec une page blanche pour une personnalisation ultime.",
+        "Modèle de landing page : mise en page prédéfinie pour la visualisation.",
     },
     {
       title: "Tableau de Bord",

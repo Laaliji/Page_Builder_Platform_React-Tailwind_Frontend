@@ -5,9 +5,11 @@ import TopBarProgress from "react-topbar-progress-indicator";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { FaGithub } from "react-icons/fa";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { redirectToGitHub, handleGitHubCallback } from "@/functions/users/githubAuth";
+import { useToast } from "@/hooks/use-toast.jsx";
+import { GitHubButton } from "@/components/ui/github-button";
 
 // Configure TopBarProgress
 TopBarProgress.config({
@@ -38,27 +40,43 @@ export function SignupPage() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [githubLoading, setGithubLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
   const logo = "/assets/images/logo.png";
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    const githubId = urlParams.get("github_id");
-    const email = urlParams.get("email");
-
-    if (token && githubId && email) {
-      localStorage.setItem("auth_token", token);
-      localStorage.setItem("github_id", githubId);
-      localStorage.setItem("email", email);
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  const handleGitHubLogin = () => {
-    setLoading(true);
-    window.location.href = "http://localhost:8000/api/auth/github";
+  // Handle GitHub signup
+  const handleGitHubSignup = () => {
+    setGithubLoading(true);
+    redirectToGitHub(false); // false because we're authenticating, not linking
   };
+
+  useEffect(() => {
+    const githubData = handleGitHubCallback();
+    
+    if (githubData) {
+      if (githubData.error) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: githubData.error
+        });
+        setGithubLoading(false);
+        return;
+      }
+      
+      // Store auth data
+      localStorage.setItem("authToken", githubData.token);
+      if (githubData.githubId) localStorage.setItem("githubId", githubData.githubId);
+      if (githubData.email) localStorage.setItem("email", githubData.email);
+      if (githubData.username) localStorage.setItem("username", githubData.username);
+      if (githubData.firstname) localStorage.setItem("firstname", githubData.firstname);
+      if (githubData.lastname) localStorage.setItem("lastname", githubData.lastname);
+      
+      // Redirect to stepper or dashboard
+      navigate("/stepper");
+    }
+  }, [navigate, toast]);
 
   const validateForm = () => {
     const errors = {};
@@ -85,12 +103,20 @@ export function SignupPage() {
         password,
         password_confirmation: password,
       });
+      toast({
+        title: "Success",
+        description: "Inscription réussie. Vous pouvez maintenant vous connecter.",
+      });
       navigate("/login");
     } catch (error) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       } else {
-        alert("Une erreur inattendue s'est produite. Veuillez réessayer.");
+        toast({
+          variant: "destructive",
+          title: "Registration Error",
+          description: "Une erreur inattendue s'est produite. Veuillez réessayer."
+        });
       }
     } finally {
       setLoading(false);
@@ -110,13 +136,15 @@ export function SignupPage() {
             <CardTitle>S'inscrire</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button
-              className="w-full bg-gray-800 text-white flex items-center gap-2 mb-4"
-              onClick={handleGitHubLogin}
+            <GitHubButton
+              onClick={handleGitHubSignup}
+              loading={githubLoading}
+              disabled={loading}
+              variant="auth"
+              className="mb-4"
             >
-              <FaGithub size={20} />
               S'inscrire avec Github
-            </Button>
+            </GitHubButton>
             <div className="text-center text-sm text-gray-600 mb-4">ou</div>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">

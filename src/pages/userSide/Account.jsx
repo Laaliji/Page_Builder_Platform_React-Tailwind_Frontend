@@ -18,10 +18,15 @@ import {
 import { useEffect, useRef, useState } from "react";
 import {
   getUserInfo,
-  isUserConnectedWithGitHub,
   updateUserProfile,
   updateUserProfilePassword,
 } from "@/functions/users/CRUD";
+import { 
+  isUserConnectedWithGitHub,
+  redirectToGitHub,
+  unlinkGitHubAccount,
+  getGitHubStatus 
+} from "@/functions/users/githubAuth";
 import AccountLoading from "@/components/userdashboard/AccountLoading";
 import { backend_url } from "@/constant/global";
 import { dataURItoFile } from "@/functions/global";
@@ -29,10 +34,24 @@ import { useErrorToast, useSuccessToast } from "@/components/toast";
 import translations from "@/locale/translations";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedLang } from "@/store/valueSlicer";
+import { FaGithub } from "react-icons/fa";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast.jsx";
+import { GitHubButton } from "@/components/ui/github-button";
 
 export default function Account() {
   const successToast = useSuccessToast();
   const errorToast = useErrorToast();
+  const { toast } = useToast();
 
   const { selectedLang } = useSelector(
     (state) => state.values
@@ -49,14 +68,20 @@ export default function Account() {
   const [password, setPassword] = useState("");
   const [password_confirmation, setPasswordConfirmation] = useState("");
   const [current_password, setCurrentPassword] = useState("");
-  const [lang,setLang] = useState(localStorage.getItem("lang") || "en");
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
   // States Errors
   const [passwordError, setPasswordError] = useState("");
   const [currentPasswordError, setCurrentPasswordError] = useState("");
   const [passwordConfirmationError, setPasswordConfirmationError] =
     useState("");
 
+  // GitHub states
   const [connectedWithGitHub, setConnectedWithGitHub] = useState(false);
+  const [githubUsername, setGithubUsername] = useState("");
+  const [isLoadingGitHub, setIsLoadingGitHub] = useState(false);
+  const [showUnlinkDialog, setShowUnlinkDialog] = useState(false);
+  
+  // Loading states
   const [loading, setLoading] = useState(true);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false);
@@ -79,16 +104,33 @@ export default function Account() {
     }
   };
 
+  // Fetch GitHub connection status and user data
+  const fetchGitHubStatus = async (userId) => {
+    try {
+      // Check if connected with GitHub
+      const connectionStatus = await isUserConnectedWithGitHub({ idUser: userId });
+      setConnectedWithGitHub(connectionStatus.isConnected);
+      
+      // If connected, get GitHub details
+      if (connectionStatus.isConnected) {
+        const githubDetails = await getGitHubStatus(userId);
+        if (githubDetails.username) {
+          setGithubUsername(githubDetails.username);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching GitHub status:", error);
+    }
+  };
+
   useEffect(() => {
-    const IsUserConnectedWithGitHub = async () => {
-      setConnectedWithGitHub(
-        (await isUserConnectedWithGitHub({ idUser: 1 })).isConnected
-      );
-    };
-    IsUserConnectedWithGitHub();
+    const userId = 1; // Replace with actual user ID from auth
+    
+    // Fetch GitHub connection status
+    fetchGitHubStatus(userId);
 
     const GetUserInfo = async () => {
-      const userInfo = (await getUserInfo({ idUser: 1 })).data;
+      const userInfo = (await getUserInfo({ idUser: userId })).data;
       setFirstname(userInfo.user.firstname);
       setLastname(userInfo.user.lastname);
       setEmail(userInfo.user.email);
@@ -97,6 +139,34 @@ export default function Account() {
     };
     GetUserInfo();
   }, []);
+
+  // Handle GitHub account linking
+  const handleLinkGitHub = () => {
+    setIsLoadingGitHub(true);
+    redirectToGitHub(true); // true because we're linking, not authenticating
+  };
+
+  // Handle GitHub account unlinking
+  const handleUnlinkGitHub = async () => {
+    try {
+      setIsLoadingGitHub(true);
+      const response = await unlinkGitHubAccount(1); // Replace with actual user ID
+      
+      if (response.success) {
+        setConnectedWithGitHub(false);
+        setGithubUsername("");
+        successToast("Votre compte GitHub a été dissocié avec succès");
+      } else {
+        errorToast(response.message || "Échec de la dissociation du compte GitHub");
+      }
+    } catch (error) {
+      errorToast("Une erreur s'est produite lors de la dissociation de votre compte GitHub");
+      console.error("Unlink GitHub error:", error);
+    } finally {
+      setIsLoadingGitHub(false);
+      setShowUnlinkDialog(false);
+    }
+  };
 
   const UpdateUserProfilePassword = async () => {
     setLoadingPassword(true);
@@ -154,8 +224,6 @@ export default function Account() {
 
     setLoadingUpdate(false);
 
-    console.log(response);
-
     if (response.STATE == "OK") {
       successToast("les informations de compte modifier avec succès");
     } else {
@@ -186,8 +254,9 @@ export default function Account() {
         </div>
         {loading ? (
           <AccountLoading />
-        ) : connectedWithGitHub ? (
+        ) : (
           <>
+            {/* GitHub Connection Card */}
             <Card className="border border-black/20 shadow-sm">
               <CardHeader>
                 <CardTitle>{translations[lang].github_connection}</CardTitle>
@@ -197,25 +266,53 @@ export default function Account() {
               </CardHeader>
               <CardContent className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-5 w-5"
-                    fill="currentColor"
-                  >
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                  </svg>
-                  <span className="text-sm font-medium">
-                    {translations[lang].connected_with_github}
-                  </span>
+                  <FaGithub size={24} className="text-black/70" />
+                  <div>
+                    {connectedWithGitHub ? (
+                      <div className="flex flex-col">
+                        <span className="font-medium text-green-600">
+                          {translations[lang].connected_with_github}
+                        </span>
+                        {githubUsername && (
+                          <span className="text-sm text-gray-600">
+                            @{githubUsername}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="font-medium text-gray-600">
+                        Non connecté avec GitHub
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <Button variant="outline" size="sm" className="ml-auto">
-                  {translations[lang].disconnect}
-                </Button>
+                <div className="flex-1"></div>
+                {connectedWithGitHub ? (
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => setShowUnlinkDialog(true)}
+                    disabled={isLoadingGitHub}
+                    className="ml-auto"
+                  >
+                    {isLoadingGitHub ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    {translations[lang].disconnect}
+                  </Button>
+                ) : (
+                  <GitHubButton 
+                    onClick={handleLinkGitHub}
+                    loading={isLoadingGitHub}
+                    variant="link"
+                    className="ml-auto"
+                  >
+                    Connecter avec GitHub
+                  </GitHubButton>
+                )}
               </CardContent>
             </Card>
-          </>
-        ) : (
-          <div className="grid gap-6 overflow-y-scroll max-h-screen hiddenScroll">
+
+            {/* Profile Picture Card */}
             <Card className="border border-black/20 shadow-sm">
               <CardHeader>
                 <CardTitle>{translations[lang].profile_picture}</CardTitle>
@@ -223,47 +320,31 @@ export default function Account() {
                   {translations[lang].update_your_profile_picture}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center">
-                      {image_url.length > 0 ? (
-                        <img
-                          src={image_url}
-                          alt="Photo de profil"
-                          className="h-24 w-24 rounded-full object-cover"
-                        />
-                      ) : (
-                        <User className="h-12 w-12 text-muted-foreground" />
-                      )}
-                    </div>
+              <CardContent className="flex items-center gap-8">
+                <div className="w-20 h-20 rounded-full overflow-hidden">
+                  <img src={image_url} className="w-full h-full" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-lg">
+                    {translations[lang].update_your_profile_picture}
+                  </span>
+                  <div className="flex flex-col gap-2">
                     <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleClick()}
-                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
+                      className="bg-black text-white w-fit"
+                      onClick={handleClick}
                     >
-                      <Camera
-                        className="h-4 w-4"
-                        onClick={() => handleClick()}
-                      />
-                      <span className="sr-only">
-                        {translations[lang].upload_a_new_photo}
-                      </span>
-                    </Button>
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-medium">
+                      <Camera className="mr-2 h-4 w-4" />
                       {translations[lang].upload_a_new_photo}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
+                    </Button>
+                    <span className="text-xs text-black/50">
                       {translations[lang].jpg_gif_or_png_max_size_2mb}
-                    </p>
+                    </span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Personal Information Card */}
             <Card className="border border-black/20 shadow-sm">
               <CardHeader>
                 <CardTitle>{translations[lang].personal_information}</CardTitle>
@@ -271,66 +352,52 @@ export default function Account() {
                   {translations[lang].update_your_personal_information}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-base font-medium">
                       {translations[lang].first_name}
-                    </label>
+                    </span>
                     <Input
-                      placeholder={translations[lang].first_name}
                       value={firstname}
                       onChange={(e) => setFirstname(e.target.value)}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-base font-medium">
                       {translations[lang].last_name}
-                    </label>
+                    </span>
                     <Input
-                      placeholder={translations[lang].last_name}
                       value={lastname}
                       onChange={(e) => setLastname(e.target.value)}
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium">
+                <div className="flex flex-col gap-2">
+                  <span className="text-base font-medium">
                     {translations[lang].email}
-                  </label>
-                  <div className="flex gap-4">
-                    <Input
-                      type="email"
-                      placeholder={translations[lang].email}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <Button type="button" variant="outline">
-                      <Mail className="mr-2 h-4 w-4" />
-                      {translations[lang].verify_email}
-                    </Button>
-                  </div>
+                  </span>
+                  <Input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <Button
-                  onClick={() => UpdateUserProfile()}
-                  type="submit"
-                  className="text-white"
+                  onClick={UpdateUserProfile}
+                  disabled={loadingUpdate}
+                  className="bg-black text-white mt-4"
                 >
                   {loadingUpdate ? (
-                    <>
-                      <Loader2 className="animate-spin" />{" "}
-                      {translations[lang].saving}...
-                    </>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <>
-                      <UserRoundPen className="mr-2 h-4 w-4" />
-                      <span>{translations[lang].update_information}</span>
-                    </>
+                    <UserRoundPen className="mr-2 h-4 w-4" />
                   )}
+                  {translations[lang].update_information}
                 </Button>
               </CardContent>
             </Card>
 
+            {/* Password Card */}
             <Card className="border border-black/20 shadow-sm">
               <CardHeader>
                 <CardTitle>{translations[lang].password}</CardTitle>
@@ -338,70 +405,69 @@ export default function Account() {
                   {translations[lang].change_your_password}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium">
+              <CardContent className="space-y-2">
+                <div className="flex flex-col gap-2">
+                  <span className="text-base font-medium">
                     {translations[lang].current_password}
-                  </label>
+                  </span>
                   <Input
-                    type="password"
                     value={current_password}
                     onChange={(e) => setCurrentPassword(e.target.value)}
+                    className={currentPasswordError && "border-red-500"}
+                    type="password"
                   />
                   {currentPasswordError && (
-                    <span className="text-red-500 text-sm -mt-2">
+                    <span className="text-xs text-red-500">
                       {currentPasswordError}
                     </span>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium">
+                <div className="flex flex-col gap-2">
+                  <span className="text-base font-medium">
                     {translations[lang].new_password}
-                  </label>
+                  </span>
                   <Input
-                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className={passwordError && "border-red-500"}
+                    type="password"
                   />
                   {passwordError && (
-                    <span className="text-red-500 text-sm -mt-2">
-                      {passwordError}
-                    </span>
+                    <span className="text-xs text-red-500">{passwordError}</span>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium">
+                <div className="flex flex-col gap-2">
+                  <span className="text-base font-medium">
                     {translations[lang].confirm_new_password}
-                  </label>
+                  </span>
                   <Input
-                    type="password"
                     value={password_confirmation}
                     onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    className={passwordConfirmationError && "border-red-500"}
+                    type="password"
                   />
                   {passwordConfirmationError && (
-                    <span className="text-red-500 text-sm -mt-2">
+                    <span className="text-xs text-red-500">
                       {passwordConfirmationError}
                     </span>
                   )}
                 </div>
                 <Button
-                  onClick={() => UpdateUserProfilePassword()}
-                  className="text-white"
+                  className="bg-black text-white mt-4"
+                  onClick={UpdateUserProfilePassword}
+                  disabled={loadingPassword}
                 >
                   {loadingPassword ? (
-                    <>
-                      <Loader2 className="animate-spin" />{" "}
-                      {translations[lang].saving}...
-                    </>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <>
-                      <KeyRound className="mr-2 h-4 w-4" />
-                      <span>{translations[lang].update_password}</span>
-                    </>
+                    <KeyRound className="mr-2 h-4 w-4" />
                   )}
+                  {translations[lang].update_password}
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Language Card */}
             <Card className="border border-black/20 shadow-sm">
               <CardHeader>
                 <CardTitle>{translations[lang].language}</CardTitle>
@@ -409,34 +475,60 @@ export default function Account() {
                   {translations[lang].choose_the_interface_language}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-2">
+              <CardContent className="space-y-2">
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
                     <Button
-                      variant={lang === "fr" ? "default" : "outline"}
-                      className={`flex-1 ${
-                        lang == "fr" ? "text-white cursor-not-allowed" : ""
+                      className={`bg-blue-900 text-white ${
+                        lang === "fr" && "bg-blue-600"
                       }`}
                       onClick={() => HandleChangeLang("fr")}
                     >
-                      <img src="/fr.png" width={18} />
                       {translations[lang].french}
                     </Button>
                     <Button
-                      variant={lang === "en" ? "default" : "outline"}
-                      className={`flex-1 ${
-                        lang == "en" ? "text-white cursor-not-allowed" : ""
+                      className={`bg-blue-900 text-white ${
+                        lang === "en" && "bg-blue-600"
                       }`}
                       onClick={() => HandleChangeLang("en")}
                     >
-                      <img src="/en.png" width={18} />
                       {translations[lang].english}
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+            
+            {/* Unlink GitHub confirmation dialog */}
+            <AlertDialog open={showUnlinkDialog} onOpenChange={setShowUnlinkDialog}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Dissocier votre compte GitHub?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Êtes-vous sûr de vouloir dissocier votre compte GitHub? 
+                    {!connectedWithGitHub && (
+                      <p className="text-red-500 mt-2">
+                        Attention: Ceci est votre seule méthode de connexion. Si vous la supprimez,
+                        vous devrez définir un mot de passe pour pouvoir vous connecter.
+                      </p>
+                    )}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleUnlinkGitHub}
+                    className="bg-red-500 hover:bg-red-600"
+                  >
+                    {isLoadingGitHub ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    Dissocier
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
         )}
       </div>
     </>
