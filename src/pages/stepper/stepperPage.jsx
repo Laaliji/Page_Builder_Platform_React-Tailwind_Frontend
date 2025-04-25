@@ -1,40 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Stepper from "../../components/stepper/Stepper";
 import StepperControl from "../../components/stepper/StepperControl";
 import Project from "../../components/stepper/steps/Project";
-import Template from "../../components/stepper/steps/Type";
-import Style from "../../components/stepper/steps/Style";
+import Type from "../../components/stepper/steps/Type";
+import TemplateAndStyle from "../../components/stepper/steps/TemplateAndStyle";
 import Final from "../../components/stepper/steps/Final";
-import TemplateStarter from "../../components/stepper/steps/TemplateStarter";
-import AnimatedModalDemo from "../../components/stepper/steps/AnimatedModalDemo"
-import TemplateAndStyle from "../../components/stepper/steps/TemplateAndStyle"
-
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast.jsx";
 
 function StepperPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const steps = [
     "Informations du projet",
     "Type du projet",
     "Modèle et Style",
-    "Aperçu général et confirmation",
+    "Aperçu et confirmation",
   ];
+
+  // Check for user authentication on page load
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please log in to create a project."
+      });
+      navigate('/login');
+    }
+  }, [navigate, toast]);
+  
   const displayStep = (step) => {
     switch (step) {
       case 1:
         return <Project />;
       case 2:
-        return <Template />;
+        return <Type />;
       case 3:
-        return <TemplateAndStyle setCurrentStep={setCurrentStep} currentStep={currentStep} />;
+        return <TemplateAndStyle />;
       case 4:
         return <Final onNavigateToStep={(step) => setCurrentStep(step)} />;
       default:
         return null;
     }
   };
-  const handleNext = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
-  };
+  
   return (
     <div className="w-full min-h-screen bg-white flex justify-center items-center ">
       <div className="w-full max-w-7xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -51,7 +64,7 @@ function StepperPage() {
           <StepperControl
             currentStep={currentStep}
             totalSteps={steps.length}
-            onNext={handleNext}
+            onNext={() => setCurrentStep((prev) => Math.min(prev + 1, steps.length))}
             onPrev={() => setCurrentStep((prev) => Math.max(prev - 1, 1))}
           />
         </div>
@@ -59,4 +72,5 @@ function StepperPage() {
     </div>
   );
 }
+
 export default StepperPage;

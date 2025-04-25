@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BriefcaseBusiness, User, Code } from "lucide-react";
 import { GlareCard } from "../../ui/GlareCard";
 
@@ -11,8 +11,16 @@ const getColorClasses = (type) => {
   return colorMap[type] || "bg-gray-100 text-gray-900";
 };
 
-export default function Template() {
+export default function Type() {
   const [selectedType, setSelectedType] = useState(null);
+  
+  // Load saved type on component mount
+  useEffect(() => {
+    const savedType = localStorage.getItem('projectType');
+    if (savedType) {
+      setSelectedType(savedType);
+    }
+  }, []);
   
   const projectTypes = [
     {
@@ -39,44 +47,54 @@ export default function Template() {
   ];
 
   const handleCardSelect = (type) => {
-    console.log(`Card clicked: ${type}`);
-    setSelectedType(type === selectedType ? null : type);
+    const newSelectedType = type === selectedType ? null : type;
+    setSelectedType(newSelectedType);
+    
+    // Save to localStorage
+    if (newSelectedType) {
+      localStorage.setItem('projectType', newSelectedType);
+    } else {
+      localStorage.removeItem('projectType');
+    }
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-      {projectTypes.map((type) => (
-        <GlareCard
-    key={type.id}
-    isSelected={selectedType === type.id}
-    onClick={() => handleCardSelect(type.id)}
-    className="relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50"
-  >
-          <div className="flex flex-col items-center gap-4">
-            <div className={`p-4 rounded-full ${getColorClasses(type.id)}`}>
-              <type.Icon className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 text-center">
-              {type.title}
-            </h3>
-            <p className="text-sm text-gray-600 text-center">
-              {type.description}
-            </p>
-            <div className="w-full border-t border-gray-200 pt-4 mt-2">
-              <div className="flex flex-wrap justify-center gap-2">
-                {type.examples.map((example, index) => (
-                  <span
-                    key={`${type.id}-${index}`}
-                    className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
-                  >
-                    {example}
-                  </span>
-                ))}
+    <div className="mt-10 mb-16">
+      <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">Choisissez le type de votre projet</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+        {projectTypes.map((type) => (
+          <GlareCard
+            key={type.id}
+            isSelected={selectedType === type.id}
+            onClick={() => handleCardSelect(type.id)}
+            className="relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50"
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className={`p-4 rounded-full ${getColorClasses(type.id)}`}>
+                <type.Icon className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 text-center">
+                {type.title}
+              </h3>
+              <p className="text-sm text-gray-600 text-center">
+                {type.description}
+              </p>
+              <div className="w-full border-t border-gray-200 pt-4 mt-2">
+                <div className="flex flex-wrap justify-center gap-2">
+                  {type.examples.map((example, index) => (
+                    <span
+                      key={`${type.id}-${index}`}
+                      className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200"
+                    >
+                      {example}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </GlareCard>
-      ))}
+          </GlareCard>
+        ))}
+      </div>
     </div>
   );
 }

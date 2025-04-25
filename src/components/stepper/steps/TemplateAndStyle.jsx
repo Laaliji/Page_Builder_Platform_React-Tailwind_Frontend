@@ -1,30 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GlareCard } from "../../ui/GlareCard";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/Dialog";
+import { getTemplates } from "@/functions/projects/CRUD";
+import { useToast } from "@/hooks/use-toast.jsx";
+import { api_url } from "@/constant/global";
 
 const TemplateAndStyle = () => {
-  const templates = [
-    {
-      title: "Landing Page",
-      image: "/assets/templates/blank.png",
-      description:
-        "Modèle de landing page : mise en page prédéfinie pour la visualisation.",
-    },
-    {
-      title: "Tableau de Bord",
-      image: "/assets/templates/dashboard.png",
-      description:
-        "Modèle de tableau de bord : mise en page prédéfinie pour la visualisation.",
-    },
-    {
-      title: "Minimaliste",
-      image: "/assets/templates/minimal.png",
-      description:
-        "Modèle minimaliste : conception élégante et simple pour un look moderne.",
-    },
-  ];
+  const { toast } = useToast();
+  const [templates, setTemplates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const initialColorPalettes = [
     { 
@@ -69,15 +55,87 @@ const TemplateAndStyle = () => {
     }
   ];
 
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  // Fetch templates from the API
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedTemplates = await getTemplates();
+        console.log("Templates fetched from API:", fetchedTemplates);
+        
+        if (fetchedTemplates && fetchedTemplates.length > 0) {
+          setTemplates(fetchedTemplates);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to load templates",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching templates:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load templates",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTemplates();
+  }, [toast]);
+
+  // Load saved selections on mount
+  useEffect(() => {
+    const savedTemplate = localStorage.getItem('selectedTemplateId');
+    const savedPalette = localStorage.getItem('selectedPalette');
+    
+    if (savedTemplate) {
+      setSelectedTemplateId(parseInt(savedTemplate, 10));
+    }
+    
+    if (savedPalette) {
+      try {
+        const palette = JSON.parse(savedPalette);
+        setSelectedPalette(palette.id);
+        
+        // If we have custom colors saved, update them
+        if (palette.id === 'custom' && palette.colors) {
+          setColorPalettes(prevPalettes => {
+            return prevPalettes.map(p => 
+              p.id === 'custom' ? { ...p, colors: palette.colors } : p
+            );
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing saved palette:", e);
+      }
+    }
+  }, []);
+
+  const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedPalette, setSelectedPalette] = useState(null);
   const [colorPalettes, setColorPalettes] = useState(initialColorPalettes);
   const [hoveringColorIndex, setHoveringColorIndex] = useState(null);
   const [colorPickerPosition, setColorPickerPosition] = useState({ x: 0, y: 0 });
 
-  const openColorPicker = (templateIndex) => {
-    setSelectedTemplate(templateIndex);
+  const openColorPicker = (template) => {
+    setSelectedTemplateId(template.id);
+    
+    // Log template details including HTML and CSS
+    console.log("Selected Template ID:", template.id);
+    console.log("Template Title:", template.title);
+    console.log("Template Description:", template.description);
+    console.log("Template HTML Content Preview:", template.html_content?.substring(0, 100) + '...');
+    console.log("Template CSS Content Preview:", template.css_content?.substring(0, 100) + '...');
+    console.log("Template HTML Content Length:", template.html_content?.length || 0);
+    console.log("Template CSS Content Length:", template.css_content?.length || 0);
+    
+    localStorage.setItem('selectedTemplateId', template.id);
+    localStorage.setItem('selectedTemplate', JSON.stringify(template));
     setShowModal(true);
   };
 
@@ -88,6 +146,14 @@ const TemplateAndStyle = () => {
 
   const handlePaletteSelect = (palette) => {
     setSelectedPalette(palette.id);
+    
+    // Save the selected palette in localStorage
+    const selectedPaletteData = {
+      id: palette.id,
+      name: palette.name,
+      colors: palette.colors
+    };
+    localStorage.setItem('selectedPalette', JSON.stringify(selectedPaletteData));
   };
 
   const handleColorChange = (paletteId, colorIndex, newColor) => {
@@ -102,6 +168,12 @@ const TemplateAndStyle = () => {
         : palette
     );
     setColorPalettes(updatedPalettes);
+    
+    // Also update localStorage if the custom palette is modified
+    if (paletteId === 'custom') {
+      const customPalette = updatedPalettes.find(p => p.id === 'custom');
+      localStorage.setItem('selectedPalette', JSON.stringify(customPalette));
+    }
   };
 
   const handleColorHover = (event, index) => {
@@ -124,33 +196,46 @@ const TemplateAndStyle = () => {
 
   return (
     <div className="mt-10 mb-16">
+      <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">
+        Choisissez un modèle pour votre site
+      </h2>
+      
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+        </div>
+      )}
+
       {/* Template Selection */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        {templates.map((template, idx) => (
-          <GlareCard
-            key={`template-${idx}`}
-            onClick={() => openColorPicker(idx)}
-            className={`relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50`}
-            isSelected={selectedTemplate === idx}
-          >
-            <div className="flex flex-col items-center gap-4">
-              <div className="p-4 rounded-lg bg-gray-100">
-                <img
-                  src={template.image}
-                  alt={`Template ${idx + 1}`}
-                  className="rounded-lg w-50 h-32 object-cover"
-                />
+      {!isLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+          {templates.map((template) => (
+            <GlareCard
+              key={`template-${template.id}`}
+              onClick={() => openColorPicker(template)}
+              className={`relative p-6 bg-white cursor-pointer transition-all duration-300 hover:bg-gray-50`}
+              isSelected={selectedTemplateId === template.id}
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-4 rounded-lg bg-gray-100">
+                  <img
+                    src={template.preview_image_url}
+                    alt={template.title}
+                    className="rounded-lg w-50 h-32 object-cover"
+                  />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">
+                  {template.title}
+                </h3>
+                <p className="text-center text-sm text-gray-600">
+                  {template.description}
+                </p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 text-center">
-                {template.title}
-              </h3>
-              <p className="text-center text-sm text-gray-600">
-                {template.description}
-              </p>
-            </div>
-          </GlareCard>
-        ))}
-      </div>
+            </GlareCard>
+          ))}
+        </div>
+      )}
 
       {/* Modal for Color Selection */}
       {showModal && (

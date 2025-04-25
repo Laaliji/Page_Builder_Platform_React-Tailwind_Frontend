@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -39,6 +39,7 @@ const router = createBrowserRouter([
       { path: "account", element: <Account /> },
     ],
   },
+  { path: "/userSide/projects", element: <Navigate to="/dash/user/projects" replace /> },
 ]);
 
 createRoot(document.getElementById("root")).render(

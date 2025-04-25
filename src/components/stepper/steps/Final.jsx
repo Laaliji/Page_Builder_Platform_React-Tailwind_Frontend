@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '../../ui/Card';
-import { Check, Edit2, Palette } from 'lucide-react';
+import { Check, Edit2, Palette, Layout, User, BriefcaseBusiness, Code } from 'lucide-react';
 import { Button } from '../../ui/button';
+import { api_url } from '@/constant/global';
 
-const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }) => {
-  const demoProjectData = {
-    projectName: "My Awesome Project",
-    websiteTitle: "awesome-project.com",
-    repoUrl: "https://github.com/username/awesome-project"
-  };
+const Final = ({ onNavigateToStep }) => {
+  const [projectData, setProjectData] = useState({
+    title: "My Awesome Project",
+    domaineName: "awesome-project.com",
+    repository: "https://github.com/username/awesome-project",
+    description: "An amazing project description."
+  });
   
-  const demoTemplate = "personal";
-  const demoPalette = {
+  // State for template and palette selections
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [colorPalette, setColorPalette] = useState({
     id: "custom",
     name: "Personnalisé",
     colors: [
@@ -20,19 +23,58 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
       { label: "Tertiaire", value: "#E5E7EB" },
       { label: "Quaternaire", value: "#D1D5DB" }
     ]
-  };
-  
-  const data = projectData || demoProjectData;
-  const template = selectedTemplate || demoTemplate;
-  const palette = colorPalette || demoPalette;
+  });
 
-  const getTemplateTitle = (templateId) => {
-    const templates = {
-      personal: "Personal Project",
-      business: "Business Project",
-      freelance: "Freelance Project"
-    };
-    return templates[templateId] || "Not Selected";
+  // Load saved data from localStorage
+  useEffect(() => {
+    try {
+      // Load project data
+      const savedProjectData = localStorage.getItem('projectFormData');
+      if (savedProjectData) {
+        setProjectData(JSON.parse(savedProjectData));
+      }
+
+      // Load template selection
+      const savedTemplate = localStorage.getItem('selectedTemplate');
+      if (savedTemplate) {
+        setSelectedTemplate(JSON.parse(savedTemplate));
+      }
+
+      // Load color palette
+      const savedPalette = localStorage.getItem('selectedPalette');
+      if (savedPalette) {
+        setColorPalette(JSON.parse(savedPalette));
+      }
+      
+      // Load project type
+      const savedType = localStorage.getItem('projectType');
+      if (savedType) {
+        setProjectType(savedType);
+      }
+    } catch (error) {
+      console.error("Error loading saved data:", error);
+    }
+  }, []);
+
+  // Project type state and mapping
+  const [projectType, setProjectType] = useState(null);
+  
+  const projectTypeMap = {
+    personal: {
+      title: "Projet Personnel",
+      Icon: User,
+      description: "Site Web pour votre portfolio personnel, blog ou projet de loisir."
+    },
+    business: {
+      title: "Projet d'entreprise",
+      Icon: BriefcaseBusiness,
+      description: "Site Web professionnel pour votre entreprise ou organisation."
+    },
+    freelance: {
+      title: "Projet de Freelance",
+      Icon: Code,
+      description: "Site Web pour un client ou votre entreprise indépendante."
+    }
   };
 
   const ReviewItem = ({ label, value, children }) => (
@@ -73,39 +115,87 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
             <SectionHeader title="Project Information" stepNumber={1} />
             <ReviewItem
               label="Project Name"
-              value={data.projectName}
+              value={projectData.title}
             />
             <ReviewItem
               label="Website Title/Domain"
-              value={data.websiteTitle}
+              value={projectData.domaineName}
             />
             <ReviewItem
               label="Repository URL"
-              value={data.repoUrl}
+              value={projectData.repository || "Not provided"}
             />
+            {projectData.description && (
+              <ReviewItem
+                label="Description"
+                value={projectData.description}
+              />
+            )}
+
+            {/* Project Type */}
+            {projectType && projectTypeMap[projectType] && (
+              <>
+                <SectionHeader title="Project Type" stepNumber={2} />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`rounded-full p-1 ${
+                    projectType === 'personal' ? 'bg-blue-100 text-blue-900' :
+                    projectType === 'business' ? 'bg-green-100 text-green-900' :
+                    'bg-purple-100 text-purple-900'
+                  }`}>
+                    {projectType === 'personal' ? <User className="h-4 w-4" /> :
+                     projectType === 'business' ? <BriefcaseBusiness className="h-4 w-4" /> :
+                     <Code className="h-4 w-4" />}
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <span className="font-medium text-gray-900">{projectTypeMap[projectType].title}</span>
+                    <span className="text-sm text-gray-500">{projectTypeMap[projectType].description}</span>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
         
         {/* Right Column - Combined Template and Color Card */}
         <Card className="h-full max-h-[500px] overflow-y-auto">
           <CardContent className="p-6">
-            <SectionHeader title="Project Type" stepNumber={2} />
-            <ReviewItem
-              label="Selected Template"
-              value={getTemplateTitle(template)}
-            />
+            <SectionHeader title="Selected Template" stepNumber={3} />
+            {selectedTemplate ? (
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="rounded-full bg-blue-100 text-blue-900 p-1">
+                    <Layout className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <span className="text-lg font-medium text-gray-900">{selectedTemplate.title}</span>
+                    <span className="text-sm text-gray-500">{selectedTemplate.description}</span>
+                  </div>
+                </div>
+                <div className="mt-4 border rounded-lg overflow-hidden">
+                  <img 
+                    src={selectedTemplate.preview_image_url}
+                    alt={selectedTemplate.title}
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-6">
+                No template selected
+              </div>
+            )}
             
             <SectionHeader title="Color Palette" stepNumber={3} />
             <ReviewItem label="Palette Name">
               <div className="flex items-center gap-2">
                 <Palette className="h-5 w-5 text-slate-600" />
-                <span className="text-slate-900">{palette.name}</span>
+                <span className="text-slate-900">{colorPalette.name}</span>
               </div>
             </ReviewItem>
             
             {/* Color Palette Visualization */}
             <div className="flex justify-between items-center mt-4">
-              {palette.colors.map((color, index) => (
+              {colorPalette.colors.map((color, index) => (
                 <div key={index} className="flex flex-col items-center">
                   <div
                     className="w-10 h-10 rounded-full shadow-md"
@@ -115,9 +205,6 @@ const Final = ({ projectData, selectedTemplate, colorPalette, onNavigateToStep }
                 </div>
               ))}
             </div>
-            
-            {/* Maintain consistent card height */}
-            <div className="h-[40px]" />
           </CardContent>
         </Card>
       </div>

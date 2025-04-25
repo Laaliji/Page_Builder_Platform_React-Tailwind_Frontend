@@ -73,6 +73,12 @@ export function SignupPage() {
       if (githubData.firstname) localStorage.setItem("firstname", githubData.firstname);
       if (githubData.lastname) localStorage.setItem("lastname", githubData.lastname);
       
+      // Store and log user ID if available
+      if (githubData.id) {
+        localStorage.setItem('userId', githubData.id);
+        console.log("Successfully registered GitHub user with ID:", githubData.id);
+      }
+      
       // Redirect to stepper or dashboard
       navigate("/stepper");
     }
@@ -95,7 +101,7 @@ export function SignupPage() {
 
     try {
       setLoading(true);
-      await axiosInstance.post("auth/signup", {
+      const response = await axiosInstance.post("auth/signup", {
         firstname,
         lastname,
         username,
@@ -103,6 +109,14 @@ export function SignupPage() {
         password,
         password_confirmation: password,
       });
+      
+      // If response includes user data with ID, store and log it
+      if (response.data.user && response.data.user.id) {
+        const userId = response.data.user.id;
+        localStorage.setItem("userId", userId);
+        console.log("Successfully registered user with ID:", userId);
+      }
+      
       toast({
         title: "Success",
         description: "Inscription réussie. Vous pouvez maintenant vous connecter.",

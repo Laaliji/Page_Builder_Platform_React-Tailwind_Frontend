@@ -23,7 +23,7 @@ export default function Home(){
       const projectd = queryParams.get("projectd");
 
       if (projectd === "true") {
-        successToast(translations[lang].project_deleted_successfully)
+        successToast(translations[selectedLang].project_deleted_successfully)
       }
     }, []);
 
@@ -31,12 +31,21 @@ export default function Home(){
     const [loading,setLoading] = useState(true)
 
     useEffect(()=>{
-
       const GetProjects = async () => {
-        setProjects(await getProjects({idUser:1}))
-        setLoading(false)
-      }; GetProjects()
-
+        // Get the user ID from localStorage
+        const userId = localStorage.getItem('userId') || 1;
+        try {
+          const data = await getProjects({idUser: userId});
+          setProjects(data || []);
+        } catch (error) {
+          console.error("Error loading projects:", error);
+          setProjects([]);
+        } finally {
+          setLoading(false);
+        }
+      }; 
+      
+      GetProjects();
     },[])
 
     return <>
@@ -49,16 +58,20 @@ export default function Home(){
     <div className="grid grid-cols-1 gap-3 mt-2 overflow-y-scroll max-h-screen hiddenScroll lg:grid-cols-2 pt-2">
       {loading ? (
         <HomeLoading />
-      ) : (
+      ) : projets.length > 0 ? (
         projets.map((project, indx) => (
           <ProjectCard
             key={indx}
             id={project.idP}
             title={project.title}
-            image={backend_url + project.image_url}
-            description={project.desctiption.substring(0, 40) + " ..."}
+            image={backend_url + (project.image_url || '')}
+            description={(project.description || '').substring(0, 40) + " ..."}
           />
         ))
+      ) : (
+        <div className="col-span-2 text-center py-8 text-gray-500">
+          {translations[selectedLang]?.no_projects || "No projects found. Create a new project to get started!"}
+        </div>
       )}
     </div>
   </>

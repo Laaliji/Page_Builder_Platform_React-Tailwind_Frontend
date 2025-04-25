@@ -70,6 +70,12 @@ export function LoginPage() {
       if (githubData.firstname) localStorage.setItem('firstname', githubData.firstname);
       if (githubData.lastname) localStorage.setItem('lastname', githubData.lastname);
       
+      // Store and log user ID if available
+      if (githubData.id) {
+        localStorage.setItem('userId', githubData.id);
+        console.log("Successfully authenticated GitHub user with ID:", githubData.id);
+      }
+      
       // Redirect to stepper or dashboard
       navigate('/stepper');
     }
@@ -109,7 +115,21 @@ export function LoginPage() {
         password,
       });
 
+      // Store auth token and user id
       localStorage.setItem("authToken", response.data.token);
+      
+      // Check if user data is available in the response
+      if (response.data.user && response.data.user.id) {
+        const userId = response.data.user.id;
+        localStorage.setItem("userId", userId);
+        console.log("Successfully authenticated user with ID:", userId);
+      } else if (response.data.id) {
+        // Alternative response structure
+        const userId = response.data.id;
+        localStorage.setItem("userId", userId);
+        console.log("Successfully authenticated user with ID:", userId);
+      }
+      
       navigate('/stepper');
     } catch (error) {
       if (error.response) {

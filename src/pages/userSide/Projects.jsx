@@ -18,45 +18,99 @@ import { useSelector } from "react-redux"
 import { SortableRowLading } from "@/components/userdashboard/SortableRowLoading"
 import EditProjectDialoge from "@/components/userdashboard/EditProjectDialoge"
 import ViewProjectDialoge from "@/components/userdashboard/ViewProjectDialoge"
-import { useNavigate , replace } from "react-router-dom"
+import { useNavigate, replace, useLocation } from "react-router-dom"
 import translations from "@/locale/translations"
+import { useToast } from "@/hooks/use-toast.jsx"
 
 export default function Projects() {
-  const { refrecher , selectedLang } = useSelector((state) => state.values);
-  
-  const navigation = useNavigate()
+  const { refrecher, selectedLang } = useSelector((state) => state.values);
+  const location = useLocation();
+  const navigation = useNavigate();
+  const { toast } = useToast();
 
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [filterValue, setFilterValue] = useState("")
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterValue, setFilterValue] = useState("");
 
-  const [isDeleteDialogOpen,setIsDeleteDialogOpen] = useState(false)
-  const [isViewProjectDialogeOpen,setIsViewProjectDialogeOpen] = useState(false)
-  const [isEditProjectDialogeOpen,setIsEditProjectDialogeOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isViewProjectDialogeOpen, setIsViewProjectDialogeOpen] = useState(false);
+  const [isEditProjectDialogeOpen, setIsEditProjectDialogeOpen] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const projectsPerPage = 5
+  const [currentPage, setCurrentPage] = useState(1);
+  const projectsPerPage = 5;
 
   const filteredProjects = projects.filter((project) =>
     project.title.toLowerCase().includes(filterValue.toLowerCase())
-  )
+  );
 
-  const indexOfLastProject = currentPage * projectsPerPage
-  const indexOfFirstProject = indexOfLastProject - projectsPerPage
-  const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject)
-  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage)
+  const indexOfLastProject = currentPage * projectsPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+  const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
+  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+
+  const fetchProjects = async () => {
+    try {
+      // Get the authenticated user ID from localStorage
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        console.error("User ID not found in localStorage");
+        toast({
+          variant: "destructive",
+          title: "Authentication Required",
+          description: "Please log in to view your projects."
+        });
+        navigation("/login");
+        return;
+      }
+      
+      console.log("Fetching projects for user ID:", userId);
+      setLoading(true);
+      const fetchedProjects = await getProjects({idUser: userId});
+      
+      if (fetchedProjects && Array.isArray(fetchedProjects)) {
+        console.log(`Loaded ${fetchedProjects.length} projects`);
+        setProjects(fetchedProjects);
+      } else {
+        console.error("Invalid projects data:", fetchedProjects);
+        setProjects([]);
+      }
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load projects. Please try again."
+      });
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const GetProjects = async () => {
-      setProjects(await getProjects({idUser: 1}))
-      setLoading(false)
+    // Fetch projects when the component mounts or when refrecher changes
+    fetchProjects();
+  }, [refrecher]);
+
+  // Additional effect to catch navigation from project creation
+  useEffect(() => {
+    // Check if we're navigating from the stepper (project creation)
+    const isFromStepper = location.state?.from === 'stepper';
+    
+    if (isFromStepper) {
+      toast({
+        title: "Success",
+        description: "Your project was created successfully."
+      });
+      // Force a refresh of projects
+      fetchProjects();
     }
-    GetProjects()
-  }, [refrecher])
+  }, [location]);
 
   const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   return (
     <>
@@ -101,12 +155,14 @@ export default function Projects() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {!loading ? (
+              {loading ? (
+                <SortableRowLading />
+              ) : currentProjects.length > 0 ? (
                 currentProjects
                   .filter((project) => project.title.includes(filterValue))
                   .map((project) => (
                     <SortableRow
-                      key={project.id}
+                      key={project.idP || project.id}
                       project={project}
                       setIsDeleteDialogOpen={setIsDeleteDialogOpen}
                       setIsEditProjectDialogeOpen={setIsEditProjectDialogeOpen}
@@ -114,37 +170,43 @@ export default function Projects() {
                     />
                   ))
               ) : (
-                <SortableRowLading />
+                <TableRow>
+                  <td colSpan="4" className="py-8 text-center text-gray-500">
+                    {filterValue ? "No projects match your search" : "You don't have any projects yet. Create one!"}
+                  </td>
+                </TableRow>
               )}
             </TableBody>
           </Table>
         </div>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            {[...Array(totalPages)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => handlePageChange(index + 1)}
-                  isActive={currentPage === index + 1}
-                >
-                  {index + 1}
-                </PaginationLink>
+        {!loading && filteredProjects.length > 0 && (
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                />
               </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => handlePageChange(index + 1)}
+                    isActive={currentPage === index + 1}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </>
   );
