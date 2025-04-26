@@ -109,6 +109,7 @@ const translations = {
         "delete_page": "Delete this page",
         "share_content_1":"Share your amazing website with others! Visit our",
         "share_content_2":"and create your own site today.",
+        "tour": "Guided Tour"
     },
 
     fr: {
@@ -167,11 +168,11 @@ const translations = {
         "contact_us": "Contactez-nous",
         "website_generator_2024": "Générateur de Sites Web 2024",
         "create_professional_website": "Créez un site web professionnel sans coder",
-        "template_description": "Notre modèle prêt-à-l’emploi vous permet de lancer rapidement un site web professionnel et sur-mesure. Concentrez-vous sur votre contenu, nous nous occupons de tout le reste - de la conception sans code à l’optimisation mobile, en passant par la personnalisation avancée. Notre interface intuitive vous donne le contrôle total pour refléter parfaitement votre marque, du choix des couleurs aux polices en un temps record. Que vous soyez une startup, un professionnel ou une petite entreprise, notre solution clé en main s’adapte à tous vos besoins web.",
+        "template_description": "Notre modèle prêt-à-l'emploi vous permet de lancer rapidement un site web professionnel et sur-mesure. Concentrez-vous sur votre contenu, nous nous occupons de tout le reste - de la conception sans code à l'optimisation mobile, en passant par la personnalisation avancée. Notre interface intuitive vous donne le contrôle total pour refléter parfaitement votre marque, du choix des couleurs aux polices en un temps record. Que vous soyez une startup, un professionnel ou une petite entreprise, notre solution clé en main s'adapte à tous vos besoins web.",
         "effortless_customization": "Personnalisez sans effort",
-        "customization_description": "Personnalisez chaque détail pour refléter parfaitement votre marque grâce à notre interface intuitive. Modifiez facilement la palette de couleurs pour des tons sobres ou audacieux, adaptez les polices à votre style, et intégrez des images qui capturent l’esprit de votre entreprise. Chaque élément visuel peut être ajusté en quelques clics pour garantir une expérience cohérente et professionnelle. Cette flexibilité vous permet de créer une identité unique qui parle à votre audience, tout en renforçant l’impact de votre message. Avec nos outils simples et efficaces, la personnalisation devient rapide et accessible.",
+        "customization_description": "Personnalisez chaque détail pour refléter parfaitement votre marque grâce à notre interface intuitive. Modifiez facilement la palette de couleurs pour des tons sobres ou audacieux, adaptez les polices à votre style, et intégrez des images qui capturent l'esprit de votre entreprise. Chaque élément visuel peut être ajusté en quelques clics pour garantir une expérience cohérente et professionnelle. Cette flexibilité vous permet de créer une identité unique qui parle à votre audience, tout en renforçant l'impact de votre message. Avec nos outils simples et efficaces, la personnalisation devient rapide et accessible.",
         "innovative_technologies": "TECHNOLOGIES INNOVANTES",
-        "technologies_description": "Découvrez les technologies modernes pour concevoir des sites web en quelques clics grâce au drag & drop. Un contenu bien structuré est essentiel pour attirer l’attention de vos visiteurs et améliorer leur expérience.",
+        "technologies_description": "Découvrez les technologies modernes pour concevoir des sites web en quelques clics grâce au drag & drop. Un contenu bien structuré est essentiel pour attirer l'attention de vos visiteurs et améliorer leur expérience.",
         "html": "HTML",
         "html_description": "Language de balisage pour structurer et présenter le contenu web",
         "html_features": ["Structure semantique", "Accessibilite", "SEO friendly"],
@@ -221,6 +222,7 @@ const translations = {
         "delete_page": "Supprimer cette page",
         "share_content_1":"Partager votre site web avec d'autres ! Visitez notre ",
         "share_content_2":"et créez votre site web professionnel.",
+        "tour": "Visite Guidée"
     }
 }
 

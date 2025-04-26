@@ -69,10 +69,42 @@ export const StorageManager = {
   id: "gjs-",
   type: "local",
   autosave: true,
+  autoload: true,
+  stepsBeforeSave: 1,
   storeComponents: true,
   storeStyles: true,
   storeHtml: true,
   storeCss: true,
+  contentTypeJson: true,
+  // Custom storage implementation to handle multiple pages/templates
+  onStore: (data, editor) => {
+    const storedData = {
+      html: editor.getHtml(),
+      css: editor.getCss(),
+      components: JSON.stringify(editor.getComponents()),
+      styles: JSON.stringify(editor.getStyles())
+    };
+    return storedData;
+  },
+  onLoad: (data, editor) => {
+    // If we have components and styles data, use them
+    if (data.components && data.styles) {
+      try {
+        const components = JSON.parse(data.components || '[]');
+        const styles = JSON.parse(data.styles || '[]');
+        editor.setComponents(components);
+        editor.setStyle(styles);
+        return { components, styles };
+      } catch (e) {
+        console.error('Error parsing stored data:', e);
+      }
+    }
+    
+    // Fallback to html and css if JSON parsing fails
+    editor.setComponents(data.html || '');
+    editor.setStyle(data.css || '');
+    return { html: data.html, css: data.css };
+  }
 };
 
 export const Panels = {

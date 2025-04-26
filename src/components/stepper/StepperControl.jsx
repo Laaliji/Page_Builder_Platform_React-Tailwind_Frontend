@@ -4,6 +4,7 @@ import TopBarProgress from "react-topbar-progress-indicator";
 import { createProject, createPageFromTemplate, extractPageFromTemplate, createBasicPage, createDirectPage } from "@/functions/projects/CRUD";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast.jsx";
+import SuccessAnimation from "./SuccessAnimation";
 
 TopBarProgress.config({
   barColors: {
@@ -15,6 +16,7 @@ TopBarProgress.config({
 
 const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -132,9 +134,9 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
           description: "Project created successfully."
         });
         
-        // Clear form data
-        clearLocalStorage();
-        navigate('/dash/user/projects', { state: { from: 'stepper' } });
+        // Show success animation instead of clearing storage and navigating
+        setLoading(false);
+        setShowSuccess(true);
         return;
       }
 
@@ -198,52 +200,74 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
             if (pageResult.message) {
               console.log("Creation details:", pageResult.message);
             }
+            
+            // Show success message and navigate
             toast({
               title: "Success",
-              description: "Project and page created successfully."
+              description: "Project and page created successfully!",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
             });
+            
+            // Show success animation instead of navigating immediately
+            setLoading(false);
+            setShowSuccess(true);
           } else {
             console.error("❌ All page creation methods failed:", pageResult.error);
-            
-            // Still proceed with project creation
             toast({
-              variant: "warning",
-              title: "Warning",
-              description: "Project created, but failed to create page. You'll need to add a page manually."
+              title: "Project Created",
+              description: "Project created successfully, but we couldn't create a page from the template. You can add pages manually.",
+              status: "warning",
+              duration: 5000,
+              isClosable: true,
             });
+            
+            // Still show success animation
+            setLoading(false);
+            setShowSuccess(true);
           }
-        } catch (pageError) {
-          console.error("Error creating page:", pageError);
+        } catch (error) {
+          console.error("Error creating page:", error);
           toast({
-            variant: "warning",
-            title: "Warning",
-            description: "Project created, but failed to create page: " + pageError.message
+            title: "Project Created",
+            description: "Project created successfully, but an error occurred while creating a page. You can add pages manually.",
+            status: "warning",
+            duration: 5000,
+            isClosable: true,
           });
+          
+          // Still show success animation
+          setLoading(false);
+          setShowSuccess(true);
         }
       } else {
+        // Project created without a template
         toast({
           title: "Success",
-          description: "Project created successfully."
+          description: "Project created successfully!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
         });
+        
+        // Show success animation
+        setLoading(false);
+        setShowSuccess(true);
       }
-      
-      // Clear form data and navigate to the correct projects page
-      clearLocalStorage();
-      navigate('/dash/user/projects', { state: { from: 'stepper' } });
     } catch (error) {
-      console.error("Error creating project:", error);
+      console.error("Error in project creation process:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "An unexpected error occurred. Please try again."
       });
-    } finally {
       setLoading(false);
     }
   };
 
-  // Helper function to clean up localStorage
   const clearLocalStorage = () => {
+    // Clear form data from localStorage
     localStorage.removeItem('projectFormData');
     localStorage.removeItem('selectedTemplate');
     localStorage.removeItem('selectedTemplateId');
@@ -251,38 +275,51 @@ const StepperControl = ({ currentStep, totalSteps, onNext, onPrev }) => {
     localStorage.removeItem('projectType');
   };
 
+  const handleSuccessClose = () => {
+    clearLocalStorage();
+    setShowSuccess(false);
+  };
+
   return (
-    <div className="container flex justify-between items-center mt-4 mb-4 w-full">
+    <>
       {loading && <TopBarProgress />}
-
-      {/* Back Button */}
-      <Button
-        onClick={handlePrev}
-        disabled={currentStep === 1}
-        className={`uppercase font-semibold bg-black text-white ${
-          currentStep === 1 ? "bg-[#1d4ed8] cursor-not-allowed" : ""
-        }`}
-      >
-        Back
-      </Button>
-
-      {/* Conditional Rendering for Finish or Next Button */}
-      {currentStep === totalSteps ? (
-        <Button
-          onClick={handleFinish}
-          className="uppercase font-semibold bg-black text-white"
-        >
-          Finish
-        </Button>
-      ) : (
-        <Button
-          onClick={handleNext}
-          className="uppercase font-semibold bg-black text-white"
-        >
-          Next
-        </Button>
+      
+      {showSuccess && (
+        <SuccessAnimation 
+          onClose={handleSuccessClose} 
+          redirectUrl="/dash/user/projects" 
+        />
       )}
-    </div>
+      
+      <div className="container flex justify-between gap-3 mt-4 mb-8">
+        <Button
+          onClick={handlePrev}
+          className={`px-4 py-2 ${currentStep === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+          disabled={currentStep === 1 || loading}
+          variant="outline"
+        >
+          Prev
+        </Button>
+
+        {currentStep !== totalSteps ? (
+          <Button
+            onClick={handleNext}
+            disabled={loading}
+            className="px-4 py-2 bg-primary hover:bg-secondary text-white"
+          >
+            Next
+          </Button>
+        ) : (
+          <Button
+            onClick={handleFinish}
+            disabled={loading}
+            className="px-4 py-2 bg-primary hover:bg-secondary text-white flex items-center gap-2"
+          >
+            {loading ? "Creating..." : "Finish"}
+          </Button>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -63,6 +63,8 @@ import {
   RightPanelSkeleton,
 } from "@/components/editor/EditorSkeleton";
 import ToolbarLoading from "@/components/userdashboard/ToolBarLoading";
+import { GuidedTourTrigger } from "@/components/editor/GuidedTour";
+
 const blockIcons = {
   section: LayoutGrid,
   text: Type,
@@ -414,17 +416,20 @@ const Editor = () => {
         {isLoading ? (
           <ToolbarLoading />
         ) : (
-          <Toolbar
-            saveCurrentPageContent={saveCurrentPageContent}
-            idProject={projectID}
-            title={title}
-            editor={editorInstance}
-            pages={pages}
-            setPages={setPages}
-            currentPage={currentPage}
-            setCurrentPage={handlePageChange}
-            handleNewPage={handleNewPage}
-          />
+          <>
+            <GuidedTourTrigger />
+            <Toolbar
+              saveCurrentPageContent={saveCurrentPageContent}
+              idProject={projectID}
+              title={title}
+              editor={editorInstance}
+              pages={pages}
+              setPages={setPages}
+              currentPage={currentPage}
+              setCurrentPage={handlePageChange}
+              handleNewPage={handleNewPage}
+            />
+          </>
         )}
 
         <div className="flex-1 flex w-full bg-white">

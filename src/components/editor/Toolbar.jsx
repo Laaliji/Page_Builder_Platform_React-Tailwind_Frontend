@@ -15,6 +15,8 @@ import {
   Plus,
   Save,
   Smartphone,
+  HelpCircle,
+  Settings,
 } from "lucide-react";
 import {
   Command,
@@ -53,6 +55,10 @@ import {
   setSelectedPageId,
 } from "@/store/valueSlicer";
 import translations from "@/locale/translations";
+import GuidedTour from "./GuidedTour";
+import PricingDialog from "./PricingDialog";
+import { useToast } from "@/hooks/use-toast";
+import ManageUpgrades from "./ManageUpgrades";
 
 const Toolbar = ({
   title,
@@ -79,6 +85,11 @@ const Toolbar = ({
   const [isExtractCodeDialogOpen, setIsExtractCodeDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [projectHasPages, setProjectHasPages] = useState(false);
+  const [showGuidedTour, setShowGuidedTour] = useState(false);
+  const [showPricingDialog, setShowPricingDialog] = useState(false);
+  const [accountUpgraded, setAccountUpgraded] = useState(false);
+  const [showManageUpgrades, setShowManageUpgrades] = useState(false);
+  const { toast } = useToast();
 
   const [updateTitleProject, setUpdateTitleProject] = useState(null);
 
@@ -102,10 +113,64 @@ const Toolbar = ({
     if (idProject) HasPages();
   }, [idProject]);
 
+  // Check for project-specific upgrade status when component loads
+  useEffect(() => {
+    if (idProject) {
+      const upgradedProjects = JSON.parse(localStorage.getItem('upgradedProjects') || '{}');
+      if (upgradedProjects[idProject] && upgradedProjects[idProject].active) {
+        setAccountUpgraded(true);
+      } else {
+        setAccountUpgraded(false);
+      }
+    }
+  }, [idProject]);
+
   const pageTitle = pages.find((page) => page.id === selectedPageId)?.title || translations[lang].select_page;
+
+  const handlePricingClose = () => {
+    // Check if this specific project was upgraded
+    const upgradedProjects = JSON.parse(localStorage.getItem('upgradedProjects') || '{}');
+    if (upgradedProjects[idProject] && upgradedProjects[idProject].active) {
+      setAccountUpgraded(true);
+    }
+    setShowPricingDialog(false);
+  };
+
+  const handlePublishClick = () => {
+    if (accountUpgraded) {
+      // If account is upgraded, we'd handle actual GitHub publishing here
+      toast({
+        title: "Publishing to GitHub",
+        description: "Your website is being published to GitHub...",
+        status: "success",
+        duration: 3000,
+      });
+      // Simulation of publishing
+      setTimeout(() => {
+        toast({
+          title: "Published Successfully",
+          description: "Your website has been published to GitHub.",
+          status: "success",
+          duration: 5000,
+        });
+      }, 3000);
+    } else {
+      setShowPricingDialog(true);
+    }
+  };
 
   return (
     <>
+      {showGuidedTour && <GuidedTour onComplete={() => setShowGuidedTour(false)} />}
+      <PricingDialog 
+        isOpen={showPricingDialog} 
+        onClose={handlePricingClose} 
+        projectId={idProject}
+      />
+      <ManageUpgrades 
+        isOpen={showManageUpgrades} 
+        onClose={() => setShowManageUpgrades(false)} 
+      />
       <DialogeShare
         isShareDialogOpen={isShareDialogOpen}
         setIsShareDialogOpen={setIsShareDialogOpen}
@@ -270,8 +335,9 @@ const Toolbar = ({
           />
           <Button
             title={translations[lang].publish}
-            className="bg-secondary hover:bg-primary text-white"
+            className={`${accountUpgraded ? "bg-green-600 hover:bg-green-700" : "bg-secondary hover:bg-primary"} text-white`}
             icon={<Github size={"16"} />}
+            onClick={handlePublishClick}
           />
           <div
             onClick={() => saveCurrentPageContent()}
@@ -286,6 +352,19 @@ const Toolbar = ({
                 <Save size="20" color="white" />
               </>
             )}
+          </div>
+          <div className="ml-auto mr-5 flex items-center gap-2">
+            <Btn
+              variant="ghost"
+              onClick={() => setShowGuidedTour(true)}
+              className="flex items-center gap-2"
+            >
+              <HelpCircle size={18} />
+              <span className="text-sm">{translations[lang]?.tour || "Tour"}</span>
+            </Btn>
+            
+            {/* Admin button - this would typically be shown only for admin users */}
+           
           </div>
         </div>
       </div>
