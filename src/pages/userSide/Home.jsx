@@ -56,7 +56,7 @@ export default function Home(){
             id={project.idP}
             title={project.title}
             image={backend_url + project.image_url}
-            description={project.desctiption.substring(0, 40) + " ..."}
+            description={project.description.substring(0, 40) + " ..."}
           />
         ))
       )}
