@@ -48,6 +48,7 @@ export function LoginPage() {
     redirectToGitHub(false); // false because we're authenticating, not linking
   };
 
+  // In the GitHub login useEffect
   useEffect(() => {
     const githubData = handleGitHubCallback();
     
@@ -76,30 +77,12 @@ export function LoginPage() {
         console.log("Successfully authenticated GitHub user with ID:", githubData.id);
       }
       
-      // Redirect to stepper or dashboard
-      navigate('/stepper');
+      // Redirect to dashboard instead of stepper
+      navigate('/dash/user/home');
     }
   }, [navigate, toast]);
 
-  const validateForm = () => {
-    let isValid = true;
-    if (!email) {
-      setEmailError("Email est requis");
-      isValid = false;
-    } else {
-      setEmailError("");
-    }
-
-    if (!password) {
-      setPasswordError("Mot de passe est requis");
-      isValid = false;
-    } else {
-      setPasswordError("");
-    }
-
-    return isValid;
-  };
-
+  // In the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEmailError("");
@@ -107,14 +90,14 @@ export function LoginPage() {
   
     const isValid = validateForm();
     if (!isValid) return;
-
+  
     try {
       setLoading(true);
       const response = await axiosInstance.post("auth/login", {
         email,
         password,
       });
-
+  
       // Store auth token and user id
       localStorage.setItem("authToken", response.data.token);
       
@@ -130,7 +113,8 @@ export function LoginPage() {
         console.log("Successfully authenticated user with ID:", userId);
       }
       
-      navigate('/stepper');
+      // Redirect to dashboard instead of stepper
+      navigate('/dash/user/home');
     } catch (error) {
       if (error.response) {
         const errors = error.response.data.errors;
@@ -160,6 +144,25 @@ export function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    if (!email) {
+      setEmailError("Email est requis");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("Mot de passe est requis");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    return isValid;
   };
 
   return (

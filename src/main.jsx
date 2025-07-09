@@ -17,6 +17,7 @@ import { SignupPage } from "./pages/authSide/SignupPage.jsx";
 import { Toaster } from "@/components/ui/toaster";
 import Share from "./pages/vistorSide/share";
 import { ToastProvider } from "@/hooks/use-toast.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -25,21 +26,42 @@ const router = createBrowserRouter([
     children: [{ path: "/", element: <Landing /> }],
   },
   { path: "/share/:id", element: <Share /> },
-  { path: "/project/:id", element: <Editor /> },
-  { path: "stepper", element: <StepperPage /> },
+  { 
+    path: "/project/:id", 
+    element: (
+      <ProtectedRoute>
+        <Editor />
+      </ProtectedRoute>
+    ) 
+  },
+  { 
+    path: "stepper", 
+    element: (
+      <ProtectedRoute>
+        <StepperPage />
+      </ProtectedRoute>
+    ) 
+  },
   { path: "login", element: <LoginPage /> },
   { path: "signup", element: <SignupPage /> },
 
   {
     path: "/dash/user",
-    element: <UserDashBoardLayout />,
+    element: (
+      <ProtectedRoute>
+        <UserDashBoardLayout />
+      </ProtectedRoute>
+    ),
     children: [
+      { path: "", element: <Navigate to="home" replace /> }, // Default redirect
       { path: "home", element: <Home /> },
       { path: "projects", element: <Projects /> },
       { path: "account", element: <Account /> },
     ],
   },
   { path: "/userSide/projects", element: <Navigate to="/dash/user/projects" replace /> },
+  // Add a catch-all redirect for authenticated users
+  { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
 createRoot(document.getElementById("root")).render(

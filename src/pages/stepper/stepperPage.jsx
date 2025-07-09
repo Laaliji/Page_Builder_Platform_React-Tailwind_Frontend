@@ -20,18 +20,18 @@ function StepperPage() {
     "Aperçu et confirmation",
   ];
 
-  // Check for user authentication on page load
-  useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      toast({
-        variant: "destructive",
-        title: "Authentication Required",
-        description: "Please log in to create a project."
-      });
-      navigate('/login');
-    }
-  }, [navigate, toast]);
+  // Remove the manual auth check since the route is now protected
+  // useEffect(() => {
+  //   const userId = localStorage.getItem('userId');
+  //   if (!userId) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Authentication Required",
+  //       description: "Please log in to create a project."
+  //     });
+  //     navigate('/login');
+  //   }
+  // }, [navigate, toast]);
   
   const displayStep = (step) => {
     switch (step) {

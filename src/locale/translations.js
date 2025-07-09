@@ -76,7 +76,7 @@ const translations = {
         "discover": "Discover",
         "features": "Features",
         "try_now": "Try Now",
-        "footer_text": "designed by Hamza QUADOUD & HnIoua Abdessamad & Zakariae LAAIJI",
+        "footer_text": "designed by Hamza QUADOUD & HnIoua Abdessamad & Zakariae LAALIJI",
         "simple": "Simple",
         "fast": "Fast",
         "intuitive": "Intuitive",
